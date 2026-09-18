@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { ChoiceGrid, OptionRows, Segmented } from "@/components/ui/Choices";
 import { Field, Input, TextArea } from "@/components/ui/Field";
 import { Alert, LoadingBlock } from "@/components/ui/States";
+import { isSubstantiveProfileText } from "@/lib/diagnosis";
 import { JOURNEY, profileCompleteness } from "@/lib/journey";
 import {
   ONBOARDING_STEPS,
@@ -92,7 +93,11 @@ function profileSignals(p: Profile): Signal[] {
           : `Aid · ${p.aidNeed}`,
     });
   }
-  if (p.activities.trim() || p.researchExperience) {
+  if (
+    p.researchExperience ||
+    isSubstantiveProfileText(p.activities) ||
+    isSubstantiveProfileText(p.achievements)
+  ) {
     out.push({
       id: "act",
       text: p.researchExperience ? "Research experience" : "Activities on file",

@@ -22,6 +22,53 @@ function gpaLine(profile: Profile) {
   return `${profile.gpa} / 4.0`;
 }
 
+function parseFinite(value: string): number | null {
+  const n = Number(String(value).trim());
+  return Number.isFinite(n) ? n : null;
+}
+
+/** GPA only counts when it fits the declared scale — blocks junk like "123123". */
+function validGpa(profile: Profile): number | null {
+  const gpa = parseFinite(profile.gpa);
+  if (gpa === null) return null;
+  if (profile.gpaScale === "4.0") return gpa >= 0 && gpa <= 4.33 ? gpa : null;
+  if (profile.gpaScale === "100") return gpa >= 0 && gpa <= 100 ? gpa : null;
+  if (profile.gpaScale === "ib") return gpa >= 0 && gpa <= 45 ? gpa : null;
+  return null;
+}
+
+/** SAT section scores are 200–800. */
+function validSatSection(value: string): number | null {
+  const n = parseFinite(value);
+  if (n === null) return null;
+  return n >= 200 && n <= 800 ? n : null;
+}
+
+function validEnglishScore(profile: Profile): number | null {
+  const n = parseFinite(profile.englishScore);
+  if (n === null) return null;
+  if (profile.englishExam === "ielts") return n >= 0 && n <= 9 ? n : null;
+  if (profile.englishExam === "toefl") return n >= 0 && n <= 120 ? n : null;
+  if (profile.englishExam === "duolingo") return n >= 10 && n <= 160 ? n : null;
+  return null;
+}
+
+/**
+ * Free-text only becomes a strength when it looks like a real note —
+ * not empty, not digits-only, not a few random characters.
+ */
+export function isSubstantiveProfileText(value: string): boolean {
+  const text = value.trim();
+  if (text.length < 8) return false;
+  if (!/[A-Za-z\u00C0-\u024F]/.test(text)) return false;
+  const letters = text.replace(/[^A-Za-z\u00C0-\u024F]/g, "");
+  if (letters.length < 4) return false;
+  // Reject mostly-numeric noise like "123123 abc"
+  const digits = text.replace(/\D/g, "");
+  if (digits.length >= 6 && digits.length >= letters.length) return false;
+  return true;
+}
+
 export function synthesize(profile: Profile): Diagnosis {
   const field = profile.field ? fieldLabels[profile.field] : "Undeclared field";
   const research = profile.interests.includes("research");
@@ -39,20 +86,27 @@ export function synthesize(profile: Profile): Diagnosis {
             : "Focused undergraduate applicant";
 
   const strengths: Diagnosis["strengths"] = [];
-  const math = Number(profile.satMath);
-  if (profile.satStatus === "done" && Number.isFinite(math) && math >= 740) {
+  const math = validSatSection(profile.satMath);
+  const gpa = validGpa(profile);
+
+  if (profile.satStatus === "done" && math !== null && math >= 740) {
     strengths.push({
       label: "Strong quantitative preparation",
       evidence: satLine(profile),
     });
-  } else if (profile.gpa && Number(profile.gpa) >= 3.7 && profile.gpaScale === "4.0") {
+  } else if (gpa !== null && profile.gpaScale === "4.0" && gpa >= 3.7) {
     strengths.push({
       label: "Consistently high school record",
       evidence: gpaLine(profile),
     });
-  } else if (profile.gpa) {
+  } else if (gpa !== null && profile.gpaScale === "ib" && gpa >= 38) {
     strengths.push({
-      label: "Academic record on file",
+      label: "Consistently high school record",
+      evidence: gpaLine(profile),
+    });
+  } else if (gpa !== null && profile.gpaScale === "100" && gpa >= 90) {
+    strengths.push({
+      label: "Consistently high school record",
       evidence: gpaLine(profile),
     });
   }
@@ -65,21 +119,21 @@ export function synthesize(profile: Profile): Diagnosis {
     });
   }
 
-  if (profile.activities.trim()) {
+  if (isSubstantiveProfileText(profile.activities)) {
     strengths.push({
       label: "Activities on file",
       evidence: profile.activities.trim(),
     });
   }
 
-  if (profile.achievements.trim()) {
+  if (isSubstantiveProfileText(profile.achievements)) {
     strengths.push({
       label: "Achievements on file",
       evidence: profile.achievements.trim(),
     });
   }
 
-  if (profile.englishExam !== "none" && profile.englishScore) {
+  if (profile.englishExam !== "none" && validEnglishScore(profile) !== null) {
     strengths.push({
       label: "English-proficiency exam already complete",
       evidence: englishLine(profile),
@@ -129,7 +183,14 @@ export function synthesize(profile: Profile): Diagnosis {
   }
 
   const gaps: string[] = [];
-  if (!profile.gpa) gaps.push("No GPA yet — academic strength is inferred from tests and curriculum only.");
+  if (!profile.gpa.trim()) {
+    gaps.push("No GPA yet — academic strength is inferred from tests and curriculum only.");
+  } else if (validGpa(profile) === null) {
+    gaps.push("GPA value does not match the selected scale, so it is not counted as an academic strength.");
+  }
+  if (profile.satStatus === "done" && profile.satMath.trim() && validSatSection(profile.satMath) === null) {
+    gaps.push("SAT Math is outside the 200–800 range, so it is not counted as a strength.");
+  }
   if (profile.satStatus === "planned") {
     gaps.push("SAT is planned. U.S. recommendations assume a score will exist by application time.");
   }
@@ -144,8 +205,15 @@ export function synthesize(profile: Profile): Diagnosis {
       "You want research, but have not logged prior research. That is fine — the roadmap will treat it as something to show, not as a fact.",
     );
   }
-  if (!profile.activities.trim() && !profile.achievements.trim()) {
+  const hasActivityText = Boolean(profile.activities.trim() || profile.achievements.trim());
+  const hasSubstantiveActivity =
+    isSubstantiveProfileText(profile.activities) || isSubstantiveProfileText(profile.achievements);
+  if (!hasActivityText) {
     gaps.push("No activities or achievements text yet — matching relies more on academics and interests.");
+  } else if (!hasSubstantiveActivity) {
+    gaps.push(
+      "Activities/achievements need a short real description (roles, projects, awards) — placeholders are not counted as strengths.",
+    );
   }
   if (!profile.firstName) gaps.push("Name is empty. The route still runs; documents will use a placeholder.");
 
