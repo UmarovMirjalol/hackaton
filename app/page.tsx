@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
-import { HowItWorks } from "@/components/landing/HowItWorks";
-import { ProductPreview } from "@/components/landing/ProductPreview";
-import { WhatYouGet } from "@/components/landing/WhatYouGet";
+import { ProductStory } from "@/components/landing/ProductStory";
+import { RouteTheater } from "@/components/landing/RouteTheater";
+import { StageCanvas } from "@/components/landing/StageCanvas";
 import { JOURNEY_STAGES, type StageId } from "@/components/landing/sample";
 import { profileReady } from "@/lib/onboarding";
 import { useRoute } from "@/lib/store";
@@ -28,65 +28,43 @@ export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Gentle hero stage cycle — paused when reduced motion
   useEffect(() => {
-    const reduce =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
     const order = JOURNEY_STAGES.map((s) => s.id);
     const id = window.setInterval(() => {
-      setHeroStage((cur) => {
-        const i = order.indexOf(cur);
-        return order[(i + 1) % order.length]!;
-      });
-    }, 4200);
+      setHeroStage((cur) => order[(order.indexOf(cur) + 1) % order.length]!);
+    }, 4800);
     return () => window.clearInterval(id);
   }, []);
 
   return (
-    <div className="landing min-h-dvh bg-background">
-      <header
-        className={cn(
-          "landing-header sticky top-0 z-40 border-b transition-[background-color,border-color,backdrop-filter] duration-[var(--duration)]",
-          scrolled
-            ? "border-border bg-background/90 backdrop-blur-md"
-            : "border-transparent bg-background/70",
-        )}
-      >
-        <div className="route-frame flex h-14 items-center justify-between gap-4">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-[15px] font-semibold tracking-tight"
-          >
-            Route
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)]" aria-hidden />
+    <div className="landing min-h-dvh">
+      {/* ——— Header ——— */}
+      <header className={cn("locus-header", scrolled && "is-scrolled")}>
+        <div className="route-frame locus-header-inner">
+          <Link href="/" className="locus-brand">
+            LOCUS
+            <span className="locus-brand-dot" aria-hidden />
           </Link>
 
-          <nav className="hidden items-center gap-6 md:flex" aria-label="Landing">
+          <nav className="locus-nav" aria-label="Landing">
             {NAV.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="small text-secondary transition-colors hover:text-primary"
-              >
+              <a key={item.href} href={item.href} className="locus-nav-link">
                 {item.label}
               </a>
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="locus-header-actions">
             {ready ? (
-              <Link
-                href="/results"
-                className="small hidden text-secondary transition-colors hover:text-primary sm:inline"
-              >
+              <Link href="/results" className="locus-nav-link hidden sm:inline">
                 Continue as {profile.firstName}
               </Link>
             ) : null}
@@ -95,70 +73,53 @@ export default function LandingPage() {
             </Button>
             <button
               type="button"
-              className="inline-flex h-9 w-9 items-center justify-center border border-border bg-surface md:hidden rounded-[var(--radius-md)]"
+              className="locus-menu-btn md:hidden"
               aria-expanded={navOpen}
-              aria-controls="landing-mobile-nav"
+              aria-controls="locus-mobile-nav"
               aria-label={navOpen ? "Close menu" : "Open menu"}
               onClick={() => setNavOpen((v) => !v)}
             >
-              <span className="sr-only">Menu</span>
-              <span aria-hidden className="flex flex-col gap-1.5">
-                <span
-                  className={cn(
-                    "block h-px w-4 bg-primary transition-transform",
-                    navOpen && "translate-y-[3.5px] rotate-45",
-                  )}
-                />
-                <span
-                  className={cn(
-                    "block h-px w-4 bg-primary transition-transform",
-                    navOpen && "-translate-y-[3.5px] -rotate-45",
-                  )}
-                />
-              </span>
+              <span aria-hidden className={cn("locus-menu-icon", navOpen && "is-open")} />
             </button>
           </div>
         </div>
 
         {navOpen ? (
-          <div
-            id="landing-mobile-nav"
-            className="border-t border-border bg-surface px-[var(--space-page)] py-3 md:hidden"
-          >
-            <div className="mx-auto flex max-w-[var(--content)] flex-col gap-1">
-              {NAV.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className="py-2.5 text-[14px] font-medium"
-                  onClick={() => setNavOpen(false)}
-                >
-                  {item.label}
-                </a>
-              ))}
-              <Button href="/onboarding" variant="signal" className="mt-2 w-full">
-                Build my route
-              </Button>
-            </div>
+          <div id="locus-mobile-nav" className="locus-mobile-nav md:hidden">
+            {NAV.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="locus-mobile-link"
+                onClick={() => setNavOpen(false)}
+              >
+                {item.label}
+              </a>
+            ))}
+            <Button href="/onboarding" variant="signal" className="mt-3 w-full">
+              Build my route
+            </Button>
           </div>
         ) : null}
       </header>
 
       <main>
-        {/* ——— Hero ——— */}
-        <section className="landing-hero route-frame pb-16 pt-10 sm:pt-14 lg:pb-24 lg:pt-16">
-          <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-10">
-            <div className="landing-reveal lg:col-span-5">
-              <p className="label">Admissions route</p>
-              <h1 className="text-display mt-4 max-w-lg">
-                Your profile becomes a route.
+        {/* ——— Hero: typography + route band + large canvas ——— */}
+        <section className="locus-hero">
+          <div className="route-frame">
+            <div className="locus-hero-top">
+              <p className="label">Admissions navigation</p>
+              <h1 className="locus-display locus-hero-title">
+                Your profile
+                <br />
+                becomes a route.
               </h1>
-              <p className="body mt-5 max-w-md text-secondary">
-                Route turns a student’s profile, goals, academic context, budget, countries, and
+              <p className="locus-hero-lede">
+                LOCUS turns a student’s profile, goals, academic context, budget, countries, and
                 exams into a personalized admissions path — with reasons you can verify, not a
-                search list to scroll forever.
+                search page to scroll forever.
               </p>
-              <div className="mt-8 flex flex-col gap-2 sm:flex-row sm:items-center">
+              <div className="locus-hero-cta">
                 <Button href="/onboarding" size="lg" variant="signal">
                   Build my route
                 </Button>
@@ -166,92 +127,81 @@ export default function LandingPage() {
                   See how it works
                 </Button>
               </div>
-              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+              <div className="locus-hero-aside">
                 <button
                   type="button"
                   disabled={!hydrated}
+                  className="locus-text-link"
                   onClick={() => {
                     loadDemo();
                     router.push("/analyze");
                   }}
-                  className="small text-secondary underline decoration-border underline-offset-4 transition-colors hover:text-primary disabled:opacity-40"
                 >
                   Try demo profile
                 </button>
-                <span className="caption hidden sm:inline">Saved locally · no account</span>
+                <span className="caption">Saved locally · no account</span>
               </div>
-
-              <ul className="mt-10 flex flex-wrap gap-2" aria-label="Journey stages">
-                {JOURNEY_STAGES.map((s) => (
-                  <li key={s.id}>
-                    <button
-                      type="button"
-                      onClick={() => setHeroStage(s.id)}
-                      className={cn(
-                        "border px-2.5 py-1 text-[11px] font-medium rounded-[var(--radius-sm)] transition-colors duration-[var(--duration)]",
-                        heroStage === s.id
-                          ? "border-[var(--signal)] bg-[var(--signal-subtle)] text-[var(--signal)]"
-                          : "border-border text-tertiary hover:border-border-strong hover:text-primary",
-                      )}
-                      aria-pressed={heroStage === s.id}
-                    >
-                      {s.n} {s.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
             </div>
 
-            <div className="landing-reveal landing-reveal-delay lg:col-span-7">
-              <ProductPreview stage={heroStage} />
+            {/* Horizontal route as visual centerpiece */}
+            <div className="locus-hero-route" role="tablist" aria-label="Sample route stages">
+              {JOURNEY_STAGES.map((step, i) => (
+                <button
+                  key={step.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={heroStage === step.id}
+                  className={cn("locus-hero-node", heroStage === step.id && "is-active")}
+                  onClick={() => setHeroStage(step.id)}
+                >
+                  <span className="locus-hero-node-dot" aria-hidden />
+                  <span className="meta">{step.n}</span>
+                  <span className="locus-hero-node-label">{step.label}</span>
+                  {i < JOURNEY_STAGES.length - 1 ? (
+                    <span className="locus-hero-node-join" aria-hidden />
+                  ) : null}
+                </button>
+              ))}
             </div>
+
+            <StageCanvas stage={heroStage} className="locus-hero-canvas" />
           </div>
         </section>
 
-        <HowItWorks />
+        <RouteTheater />
 
-        <WhatYouGet />
+        <ProductStory />
 
-        {/* ——— Your route ——— */}
-        <section id="your-route" className="landing-section scroll-mt-20" aria-labelledby="route-heading">
+        {/* ——— Final CTA ——— */}
+        <section id="your-route" className="locus-finale scroll-mt-20" aria-labelledby="finale-heading">
           <div className="route-frame">
-            <div className="landing-cta panel relative overflow-hidden px-6 py-12 sm:px-10 sm:py-16">
-              <div
-                className="pointer-events-none absolute inset-0 opacity-[0.55]"
-                aria-hidden
-                style={{
-                  background:
-                    "radial-gradient(ellipse 70% 80% at 100% 0%, var(--signal-subtle), transparent 55%)",
-                }}
-              />
-              <div className="relative max-w-xl">
-                <p className="label">Your route</p>
-                <h2 id="route-heading" className="text-h1 mt-3 tracking-tight">
-                  Your route starts with your profile.
-                </h2>
-                <p className="body mt-3 text-secondary">
-                  Answer what Route needs to know — then move from diagnosis to campuses to the next
-                  action on your timeline.
-                </p>
-                <div className="mt-8 flex flex-col gap-2 sm:flex-row">
-                  <Button href="/onboarding" size="lg" variant="signal">
-                    Build my route
-                  </Button>
-                  <Button href="#how-it-works" size="lg" variant="secondary">
-                    Review the journey
-                  </Button>
-                </div>
+            <div className="locus-finale-inner">
+              <p className="label">Your route</p>
+              <h2 id="finale-heading" className="locus-display-sm mt-4 max-w-2xl">
+                Your route starts with your profile.
+              </h2>
+              <p className="body mt-4 max-w-lg text-secondary">
+                Answer what LOCUS needs to know — then move from diagnosis to campuses to the next
+                action on your timeline.
+              </p>
+              <div className="mt-8 flex flex-col gap-2 sm:flex-row">
+                <Button href="/onboarding" size="lg" variant="signal">
+                  Build my route
+                </Button>
+                <Button href="#how-it-works" size="lg" variant="secondary">
+                  Review the journey
+                </Button>
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="route-frame border-t border-border py-8">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="inline-flex items-center gap-2 text-[13px] font-medium">
-            Route
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)]" aria-hidden />
+      <footer className="locus-footer">
+        <div className="route-frame locus-footer-inner">
+          <p className="locus-brand">
+            LOCUS
+            <span className="locus-brand-dot" aria-hidden />
           </p>
           <p className="caption max-w-md sm:text-right">
             Demo catalog for LOCUS Hackathon 2026. Deadlines and aid rules must be verified on each
