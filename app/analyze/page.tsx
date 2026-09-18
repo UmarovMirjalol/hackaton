@@ -109,7 +109,6 @@ export default function AnalyzePage() {
   const [explanation, setExplanation] = useState<DiagnosisExplanation | null>(null);
   const timersRef = useRef<number[]>([]);
   const cancelledRef = useRef(false);
-  const explanationKeyRef = useRef<string>("");
 
   const diagnosis = useMemo(() => synthesize(profile), [profile]);
   const recs = useMemo(() => recommended(profile, 6), [profile]);
@@ -183,15 +182,11 @@ export default function AnalyzePage() {
 
   // Fetch personalized explanation in parallel with the loading stages.
   // Deterministic diagnosis stays visible even if this fails or is slow.
+  // Server caches by context key — avoid client early-return races with Strict Mode.
   useEffect(() => {
     if (!hydrated || !ready) return;
 
-    const key = diagnosisExplanationCacheKey(explanationContext);
-    if (explanationKeyRef.current === key && explanation) return;
-
-    explanationKeyRef.current = key;
-    const fallback = fallbackDiagnosisExplanation(explanationContext);
-    setExplanation(fallback);
+    setExplanation(fallbackDiagnosisExplanation(explanationContext));
 
     const ac = new AbortController();
     fetch("/api/ai/diagnosis-explanation", {
