@@ -137,12 +137,12 @@ export function fallbackDiagnosisExplanation(
 
   const strengthClause =
     strengths.length > 0
-      ? `The diagnosis highlights ${joinList(strengths.slice(0, 3)).toLowerCase()} as signals already on file`
+      ? `The diagnosis highlights ${joinList(strengths.slice(0, 3))} as signals already on file`
       : "Academic signals are still thin, so the search leans more on your stated preferences";
 
   const constraintClause =
     constraints.length > 0
-      ? `while ${joinList(constraints.slice(0, 2)).toLowerCase()} shape what Route will filter for`
+      ? `while ${joinList(constraints.slice(0, 2))} shape what Route will filter for`
       : "without hard constraints forcing an unusually narrow filter yet";
 
   const priorityClause =
