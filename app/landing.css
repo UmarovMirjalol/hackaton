@@ -2,6 +2,7 @@
 
 .landing {
   --landing-ease: var(--ease);
+  overflow-x: clip;
 }
 
 html {
@@ -25,7 +26,7 @@ html {
 .landing-hero::before {
   content: "";
   position: absolute;
-  inset: 0 -5vw auto;
+  inset: 0 0 auto;
   height: min(52vh, 28rem);
   pointer-events: none;
   background:

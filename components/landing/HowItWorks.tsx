@@ -64,7 +64,7 @@ export function HowItWorks() {
         </div>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-12 lg:gap-10 lg:items-start">
-          <ol className="space-y-2 lg:col-span-5">
+          <ol className="min-w-0 space-y-2 lg:col-span-5">
             {JOURNEY_STAGES.map((step) => {
               const isActive = active === step.id;
               return (
@@ -119,27 +119,32 @@ export function HowItWorks() {
             })}
           </ol>
 
-          <div className="lg:col-span-7 lg:sticky lg:top-24">
+          <div className="min-w-0 lg:col-span-7 lg:sticky lg:top-24">
             <ProductPreview stage={active} />
-            {/* Mobile stage chips when sticky preview is awkward */}
-            <div className="mt-4 flex gap-2 overflow-x-auto pb-1 lg:hidden" role="tablist" aria-label="Journey stages">
-              {JOURNEY_STAGES.map((step) => (
-                <button
-                  key={step.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={active === step.id}
-                  onClick={() => select(step.id, true)}
-                  className={cn(
-                    "shrink-0 border px-3 py-1.5 text-[12px] font-medium rounded-[var(--radius-sm)] transition-colors duration-[var(--duration)]",
-                    active === step.id
-                      ? "border-[var(--signal)] bg-[var(--signal)] text-white"
-                      : "border-border bg-surface text-secondary",
-                  )}
-                >
-                  {step.n} {step.label}
-                </button>
-              ))}
+            <div
+              className="mt-4 -mx-[var(--space-page)] px-[var(--space-page)] lg:hidden"
+              role="tablist"
+              aria-label="Journey stages"
+            >
+              <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {JOURNEY_STAGES.map((step) => (
+                  <button
+                    key={step.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active === step.id}
+                    onClick={() => select(step.id, true)}
+                    className={cn(
+                      "shrink-0 border px-3 py-1.5 text-[12px] font-medium rounded-[var(--radius-sm)] transition-colors duration-[var(--duration)]",
+                      active === step.id
+                        ? "border-[var(--signal)] bg-[var(--signal)] text-white"
+                        : "border-border bg-surface text-secondary",
+                    )}
+                  >
+                    {step.n} {step.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
