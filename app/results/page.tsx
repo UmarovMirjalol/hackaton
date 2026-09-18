@@ -298,10 +298,9 @@ function ResultCard({
   return (
     <article
       className={cn(
-        "result-card group grid gap-5 border-b border-border py-8",
         featured
-          ? "sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:gap-8 sm:py-10"
-          : "sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-8",
+          ? "result-card featured-card group grid gap-5 border-b-0 py-6 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:gap-8 sm:py-7"
+          : "result-card group grid gap-5 border-b border-border py-8 sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-8",
       )}
     >
       <button

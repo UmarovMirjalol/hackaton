@@ -16,11 +16,11 @@ Legacy redirects: `/profile` → onboarding, `/diagnosis` & `/universities` → 
 
 ## Visual principles
 
-- Editorial, calm, precise — not generic AI SaaS
-- One accent: **signal teal** (`#0D6E6A`) for progress, primary product CTAs, “why” rails
-- Ink (`#0B0D12`) for strong destructive/neutral primary when needed
-- Hairlines + typography over decorative card grids
-- No purple gradients, glassmorphism, glow borders, fake match %, sparkle chrome
+- Editorial, calm, precise — stone canvas + **signal teal**, not generic AI SaaS
+- Display type: **Instrument Serif** for LOCUS brand + page titles; IBM Plex Sans/Mono for UI
+- Accent: **signal teal** for progress, CTAs, “why” rails — never parchment/cream + terracotta
+- Hairlines, soft panel shadows, and purposeful motion over decorative card grids
+- No purple gradients, glassmorphism chrome, glow borders, or fake match %
 
 ## Tokens (`app/globals.css`)
 

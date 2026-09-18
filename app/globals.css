@@ -7,31 +7,32 @@
 */
 
 :root {
-  /* Surfaces */
-  --background: #f4f5f7;
-  --surface: #ffffff;
-  --surface-muted: #ebeef2;
-  --surface-tint: #f7f9f9;
+  /* Surfaces — cool stone with a quiet teal wash */
+  --background: #eef2f3;
+  --surface: #fbfcfc;
+  --surface-muted: #e4eaed;
+  --surface-tint: #f3f7f7;
 
   /* Ink / text */
-  --ink: #0b0d12;
-  --text-primary: #0b0d12;
-  --text-secondary: #555b68;
-  --text-tertiary: #6e7584;
+  --ink: #0a1214;
+  --text-primary: #0a1214;
+  --text-secondary: #4d5960;
+  --text-tertiary: #6a757c;
 
   /* Borders */
-  --border: #dde1e8;
-  --border-strong: #c3c9d4;
+  --border: #d5e0e4;
+  --border-strong: #b8c4c9;
 
   /* Actions */
-  --accent: #0b0d12;
-  --accent-hover: #2a2f3a;
-  --accent-subtle: #e8eaef;
+  --accent: #0a1214;
+  --accent-hover: #1c2a2e;
+  --accent-subtle: #e6ecee;
 
   /* Brand / progress / “why” rails */
-  --signal: #0d6e6a;
-  --signal-hover: #0a5854;
-  --signal-subtle: #e6f3f2;
+  --signal: #0b6f6a;
+  --signal-hover: #085852;
+  --signal-subtle: #dff2f0;
+  --signal-deep: #064e4a;
 
   /* Semantic */
   --success: #1a6844;
@@ -40,18 +41,19 @@
   --warning-subtle: #f6f0dc;
   --error: #b42318;
   --error-subtle: #f8e9e7;
-  --info: #0d6e6a;
-  --info-subtle: #e6f3f2;
+  --info: #0b6f6a;
+  --info-subtle: #dff2f0;
 
   /* Radius — tight product chrome */
   --radius-sm: 3px;
-  --radius-md: 5px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
 
   /* Elevation — restrained */
-  --shadow-panel: 0 18px 40px -28px rgba(11, 13, 18, 0.32);
-  --shadow-lift: 0 22px 48px -30px rgba(11, 13, 18, 0.38);
+  --shadow-panel: 0 20px 50px -32px rgba(10, 18, 20, 0.38);
+  --shadow-lift: 0 28px 60px -34px rgba(10, 18, 20, 0.42);
+  --shadow-soft: 0 1px 0 rgba(255, 255, 255, 0.65) inset, 0 18px 40px -28px rgba(10, 18, 20, 0.22);
   --shadow-focus: 0 0 0 3px var(--signal-subtle);
 
   /* Motion */
@@ -111,7 +113,11 @@
 
 html,
 body {
-  background: var(--background);
+  background:
+    radial-gradient(1200px 600px at 12% -10%, rgba(11, 111, 106, 0.09), transparent 55%),
+    radial-gradient(900px 500px at 92% 8%, rgba(11, 111, 106, 0.05), transparent 50%),
+    linear-gradient(180deg, #e8eef0 0%, var(--background) 28%, var(--background) 100%);
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: var(--font-sans), system-ui, sans-serif;
   font-size: 15px;
@@ -126,10 +132,16 @@ body {
 
 /* ——— Typography ——— */
 
+.font-display {
+  font-family: var(--font-display), "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
 .label {
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-tertiary);
 }
@@ -142,16 +154,18 @@ body {
 }
 
 .text-display {
-  font-size: clamp(2.125rem, 5vw, 3.25rem);
-  font-weight: 500;
-  letter-spacing: -0.042em;
+  font-family: var(--font-display), "Times New Roman", serif;
+  font-size: clamp(2.35rem, 5.4vw, 3.6rem);
+  font-weight: 400;
+  letter-spacing: -0.035em;
   line-height: 1.02;
 }
 
 .text-h1 {
-  font-size: clamp(1.5rem, 2.8vw, 2rem);
-  font-weight: 500;
-  letter-spacing: -0.032em;
+  font-family: var(--font-display), "Times New Roman", serif;
+  font-size: clamp(1.7rem, 3.2vw, 2.35rem);
+  font-weight: 400;
+  letter-spacing: -0.028em;
   line-height: 1.12;
 }
 
@@ -181,8 +195,9 @@ body {
 }
 
 .page-title {
-  font-weight: 500;
-  letter-spacing: -0.032em;
+  font-family: var(--font-display), "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -0.028em;
 }
 
 /* ——— Layout helpers ——— */
@@ -196,8 +211,9 @@ body {
 
 .panel {
   border: 1px solid var(--border);
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 92%, white);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
 }
 
 .panel-muted {

@@ -151,19 +151,22 @@ export function AppShell({
 
   return (
     <div className={cn("min-h-dvh", footer ? "pb-52 md:pb-28" : "pb-16 md:pb-0")}>
-      <header className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur-md">
-        <div className="route-frame flex items-center justify-between gap-4 py-3">
-          <Link href="/" className="inline-flex items-center gap-2 text-[15px] font-semibold tracking-tight">
-            Route
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)]" aria-hidden />
+      <header className="sticky top-0 z-20 border-b border-border/80 bg-[color-mix(in_srgb,var(--surface)_82%,transparent)] backdrop-blur-md backdrop-saturate-150">
+        <div className="route-frame flex items-center justify-between gap-4 py-3.5">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 font-[family-name:var(--font-display)] text-[17px] italic tracking-[0.06em]"
+          >
+            LOCUS
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)] shadow-[0_0_0_3px_var(--signal-subtle)]" aria-hidden />
           </Link>
-          <nav className="hidden items-center gap-5 md:flex" aria-label="Product">
+          <nav className="hidden items-center gap-6 md:flex" aria-label="Product">
             {NAV.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "text-[13px] font-medium transition-colors",
+                  "link-flow text-[13px] font-medium",
                   pathname.startsWith(item.href) ? "text-primary" : "text-secondary hover:text-primary",
                 )}
               >
@@ -174,7 +177,7 @@ export function AppShell({
           <Link
             href="/onboarding"
             className={cn(
-              "text-[13px] font-medium transition-colors",
+              "text-[13px] font-medium transition-colors duration-[var(--duration)]",
               pathname.startsWith("/onboarding") || pathname.startsWith("/profile")
                 ? "text-[var(--signal)]"
                 : "text-secondary hover:text-primary",

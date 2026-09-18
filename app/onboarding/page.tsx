@@ -158,10 +158,10 @@ export default function OnboardingPage() {
           <div className="flex min-w-0 items-center gap-3 sm:gap-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-[15px] font-semibold tracking-tight text-primary"
+              className="inline-flex items-center gap-2 font-[family-name:var(--font-display)] text-[16px] italic tracking-[0.06em] text-primary"
             >
-              Route
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)]" aria-hidden />
+              LOCUS
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)] shadow-[0_0_0_3px_var(--signal-subtle)]" aria-hidden />
             </Link>
             <span className="hidden text-[13px] text-secondary sm:inline">
               Building your admissions profile

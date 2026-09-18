@@ -2,7 +2,7 @@
 
 .az-shell {
   min-height: 100dvh;
-  background: var(--background);
+  background: transparent;
   color: var(--text-primary);
 }
 
@@ -10,9 +10,8 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  /* JourneyRail supplies the bottom hairline so chrome matches AppShell. */
-  background: color-mix(in srgb, var(--background) 90%, transparent);
-  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(1.15);
 }
 
 .az-main {
@@ -160,9 +159,10 @@
 }
 
 .az-signal-title {
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: -0.015em;
+  font-family: var(--font-display), "Times New Roman", serif;
+  font-size: 1.05rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
 }
 
 .az-signal-evidence {

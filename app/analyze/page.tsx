@@ -304,10 +304,10 @@ export default function AnalyzePage() {
         <div className="route-frame flex items-center justify-between gap-3 py-3">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-[15px] font-semibold tracking-tight"
+            className="inline-flex items-center gap-2 font-[family-name:var(--font-display)] text-[16px] italic tracking-[0.06em]"
           >
-            Route
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)]" aria-hidden />
+            LOCUS
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)] shadow-[0_0_0_3px_var(--signal-subtle)]" aria-hidden />
           </Link>
           <p className="meta tabular-nums">{pct}% profile · saved locally</p>
         </div>

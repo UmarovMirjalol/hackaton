@@ -108,16 +108,15 @@ export default function LandingPage() {
         <section className="locus-hero">
           <div className="route-frame">
             <div className="locus-hero-top">
-              <p className="label">Admissions navigation</p>
+              <p className="locus-brand-mark">LOCUS</p>
               <h1 className="locus-display locus-hero-title">
                 Your profile
                 <br />
-                becomes a route.
+                <em>becomes a route.</em>
               </h1>
               <p className="locus-hero-lede">
-                LOCUS turns a student’s profile, goals, academic context, budget, countries, and
-                exams into a personalized admissions path — with reasons you can verify, not a
-                search page to scroll forever.
+                Turn academics, budget, countries, and goals into a personalized admissions path —
+                with reasons you can verify, not a match percentage to chase.
               </p>
               <div className="locus-hero-cta">
                 <Button href="/onboarding" size="lg" variant="signal">
