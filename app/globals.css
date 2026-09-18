@@ -237,6 +237,28 @@ body {
   animation: bar 420ms var(--ease) both;
 }
 
+/* Campus media — shared hover / grain */
+.campus-media {
+  isolation: isolate;
+}
+
+.campus-media-img {
+  transform: scale(1.001);
+  transition: transform 700ms var(--ease), filter 700ms var(--ease);
+}
+
+.group:hover .campus-media-img,
+.group:focus-within .campus-media-img {
+  transform: scale(1.05);
+  filter: saturate(1.06) contrast(1.03);
+}
+
+.campus-media-grain {
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18), transparent 42%),
+    radial-gradient(circle at 80% 70%, rgba(0, 0, 0, 0.25), transparent 50%);
+}
+
 .skeleton {
   background: var(--surface-muted);
   border-radius: var(--radius-sm);
@@ -254,6 +276,14 @@ body {
   .progress-bar,
   .skeleton {
     animation: none;
+  }
+
+  .campus-media-img,
+  .group:hover .campus-media-img,
+  .group:focus-within .campus-media-img {
+    transform: none;
+    filter: none;
+    transition: none;
   }
 }
 

@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
+import { CampusMedia } from "@/components/CampusMedia";
 import { MatchDetail } from "@/components/MatchDetail";
 import { NextUp } from "@/components/NextUp";
 import { StatusBadge } from "@/components/ui/Badges";
@@ -12,13 +12,14 @@ import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { useRecommendationExplanations } from "@/lib/ai/use-recommendation-explanations";
 import type { RecommendationExplanation } from "@/lib/ai/recommendation-explanation-shared";
-import { campusImage, IMAGE_DISCLAIMER } from "@/lib/media";
+import { IMAGE_DISCLAIMER } from "@/lib/media";
 import { profileReady } from "@/lib/onboarding";
 import { useDerived, useRoute } from "@/lib/store";
 import type { AidNeed, CountryId, Field, RankedUniversity } from "@/lib/types";
 import { Alert, EmptyState } from "@/components/ui/States";
 import { DEMO_DATA_NOTICE } from "@/lib/journey";
 import { FIT_METHODOLOGY, countryLabels, fieldLabels } from "@/lib/universities";
+import "./results.css";
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -210,7 +211,7 @@ export default function ResultsPage() {
         </label>
       </div>
 
-      <ul className="space-y-0">
+      <ul className="results-list space-y-0">
         {visible.map((row, i) => {
           const context = explanationContexts[i];
           const resolved = context
@@ -220,10 +221,15 @@ export default function ResultsPage() {
                 pending: explanations[row.university.id]?.pending ?? false,
               };
           return (
-            <li key={`${row.university.id}-${row.fitIndex}-${row.why.slice(0, 24)}`}>
+            <li
+              key={`${row.university.id}-${row.fitIndex}-${row.why.slice(0, 24)}`}
+              className="results-item"
+              style={{ animationDelay: `${Math.min(i, 6) * 55}ms` }}
+            >
               <ResultCard
                 row={row}
                 rank={i + 1}
+                featured={i === 0}
                 selected={compareIds.includes(row.university.id)}
                 onToggle={() => toggleCompare(row.university.id)}
                 onOpen={() => setDetail(row)}
@@ -270,6 +276,7 @@ export default function ResultsPage() {
 function ResultCard({
   row,
   rank,
+  featured,
   selected,
   onToggle,
   onOpen,
@@ -278,42 +285,59 @@ function ResultCard({
 }: {
   row: RankedUniversity;
   rank: number;
+  featured?: boolean;
   selected: boolean;
   onToggle: () => void;
   onOpen: () => void;
   explanation: RecommendationExplanation | null;
   explanationPending: boolean;
 }) {
-  const img = campusImage(row.university.id);
   const u = row.university;
   const nextDeadline = u.deadlines[0];
 
   return (
-    <article className="grid gap-5 border-b border-border py-8 sm:grid-cols-[160px_minmax(0,1fr)] sm:gap-8">
+    <article
+      className={cn(
+        "result-card group grid gap-5 border-b border-border py-8",
+        featured
+          ? "sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:gap-8 sm:py-10"
+          : "sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-8",
+      )}
+    >
       <button
         type="button"
         onClick={onOpen}
-        className="relative aspect-[4/5] overflow-hidden bg-surface-muted"
+        className={cn(
+          "relative overflow-hidden text-left outline-none focus-visible:shadow-[var(--shadow-focus)]",
+          featured ? "aspect-[16/11] sm:min-h-[280px] sm:aspect-auto" : "aspect-[4/5]",
+        )}
       >
-        {img ? (
-          <Image
-            src={img.src}
-            alt={img.caption}
-            fill
-            className="object-cover"
-            sizes="160px"
-            priority={rank < 2}
-          />
-        ) : null}
-        <span className="absolute left-2 top-2 font-mono text-[10px] text-white mix-blend-difference">
+        <CampusMedia
+          universityId={u.id}
+          countryId={u.countryId}
+          shortName={u.shortName}
+          alt={`${u.name} campus`}
+          className="absolute inset-0"
+          priority={rank < 2}
+          sizes={featured ? "(max-width: 640px) 100vw, 480px" : "180px"}
+          overlay
+        />
+        <span className="absolute left-2.5 top-2.5 z-[1] font-mono text-[10px] tracking-[0.14em] text-white">
           {String(rank).padStart(2, "0")}
         </span>
+        {featured ? (
+          <span className="absolute bottom-3 left-3 z-[1] text-[11px] font-medium tracking-wide text-white/90">
+            Strongest fit on this route
+          </span>
+        ) : null}
       </button>
 
-      <div>
+      <div className="min-w-0">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="text-h2 tracking-tight">{u.name}</h3>
+            <h3 className="text-h2 tracking-tight transition-colors duration-[var(--duration)] group-hover:text-[var(--signal)]">
+              {u.name}
+            </h3>
             <p className="meta mt-1">
               {u.city} · {u.country} · Fit {row.fitIndex}
             </p>
@@ -328,7 +352,7 @@ function ResultCard({
 
         <div
           className={cn(
-            "mt-4 border-l-2 border-border pl-4",
+            "mt-4 border-l-2 border-border pl-4 transition-opacity duration-[var(--duration)]",
             explanationPending && "opacity-80",
           )}
           aria-busy={explanationPending}
@@ -383,7 +407,7 @@ function ResultCard({
             type="button"
             onClick={onToggle}
             className={cn(
-              "text-[13px] font-medium",
+              "text-[13px] font-medium transition-colors duration-[var(--duration)]",
               selected ? "text-[var(--signal)]" : "text-secondary hover:text-primary",
             )}
           >

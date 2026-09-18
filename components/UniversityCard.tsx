@@ -1,10 +1,9 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import Image from "next/image";
 import { Button } from "@/components/ui/Button";
+import { CampusMedia } from "@/components/CampusMedia";
 import { cn } from "@/lib/cn";
-import { campusImage } from "@/lib/media";
 import type { RankedUniversity } from "@/lib/types";
 
 export function UniversityCard({
@@ -26,59 +25,65 @@ export function UniversityCard({
   style?: CSSProperties;
   featured?: boolean;
 }) {
-  const img = campusImage(row.university.id);
+  const u = row.university;
 
   return (
     <article
       className={cn(
-        "group grid gap-5 border-b border-border pb-7 last:border-0 sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-6",
-        featured && "pt-1",
+        "uni-card group grid gap-5 border-b border-border pb-8 last:border-0",
+        featured
+          ? "sm:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] sm:gap-8 sm:pb-10"
+          : "sm:grid-cols-[168px_minmax(0,1fr)] sm:gap-7",
       )}
       style={style}
     >
       <button
         type="button"
         onClick={onViewMatch}
-        className="relative aspect-[5/4] overflow-hidden bg-surface-muted text-left sm:aspect-[4/5]"
-      >
-        {img ? (
-          <Image
-            src={img.src}
-            alt={img.caption}
-            fill
-            sizes="140px"
-            className="object-cover transition-[transform,filter] duration-500 ease-[var(--ease)] group-hover:scale-[1.04]"
-            priority={rank < 2}
-          />
-        ) : (
-          <div className="flex h-full items-end p-3">
-            <span className="meta">{row.university.shortName}</span>
-          </div>
+        className={cn(
+          "relative overflow-hidden text-left outline-none focus-visible:shadow-[var(--shadow-focus)]",
+          featured ? "aspect-[16/11] sm:aspect-[5/4]" : "aspect-[5/4] sm:aspect-[4/5]",
         )}
-        <span className="absolute left-2 top-2 font-mono text-[10px] text-white mix-blend-difference">
+      >
+        <CampusMedia
+          universityId={u.id}
+          countryId={u.countryId}
+          shortName={u.shortName}
+          alt={`${u.name} campus`}
+          className="absolute inset-0"
+          priority={rank < 2}
+          sizes={featured ? "(max-width: 640px) 100vw, 420px" : "168px"}
+          overlay
+        />
+        <span className="absolute left-2.5 top-2.5 z-[1] font-mono text-[10px] tracking-[0.12em] text-white">
           {String(rank).padStart(2, "0")}
         </span>
+        {featured ? (
+          <span className="absolute bottom-2.5 left-2.5 z-[1] text-[11px] font-medium tracking-wide text-white/90">
+            Top route pick
+          </span>
+        ) : null}
       </button>
 
       <div className="min-w-0 flex flex-col">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-[17px] font-medium tracking-tight transition-colors group-hover:text-accent">
-              {row.university.name}
+            <h2 className="text-[18px] font-medium tracking-tight transition-colors duration-[var(--duration)] group-hover:text-[var(--signal)]">
+              {u.name}
             </h2>
             <p className="meta mt-1">
-              {row.university.city} · {row.university.country}
+              {u.city} · {u.country}
             </p>
           </div>
           <div className="text-right">
             <p className="label">Fit</p>
-            <p className="font-mono text-[18px] font-medium tabular-nums leading-none">
+            <p className="font-mono text-[20px] font-medium tabular-nums leading-none tracking-tight">
               {row.fitIndex}
             </p>
           </div>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-4 border-l-2 border-[var(--signal)] pl-3.5">
           <p className="label">Why this matches you</p>
           <p className="mt-1.5 max-w-xl text-[14px] leading-[1.55] text-secondary">{row.why}</p>
         </div>
@@ -93,7 +98,7 @@ export function UniversityCard({
           ))}
         </ul>
 
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="mt-5 flex flex-wrap items-center gap-3">
           <Button size="sm" variant="secondary" onClick={onViewMatch}>
             Inspect match
           </Button>
@@ -102,14 +107,14 @@ export function UniversityCard({
             onClick={onToggleCompare}
             aria-pressed={selected}
             className={cn(
-              "text-[13px] font-medium transition-colors",
-              selected ? "text-accent" : "text-secondary hover:text-primary",
+              "text-[13px] font-medium transition-colors duration-[var(--duration)]",
+              selected ? "text-[var(--signal)]" : "text-secondary hover:text-primary",
             )}
           >
             {selected ? "Selected for compare" : "Add to compare"}
           </button>
           <span className="meta ml-auto hidden sm:inline">
-            {row.university.application} · {fieldLabel}
+            {u.application} · {fieldLabel}
           </span>
         </div>
       </div>
@@ -121,16 +126,23 @@ export function CampusThumb({
   universityId,
   alt,
   className,
+  countryId,
+  shortName,
 }: {
   universityId: string;
   alt: string;
   className?: string;
+  countryId?: string;
+  shortName?: string;
 }) {
-  const img = campusImage(universityId);
-  if (!img) return <div className={cn("bg-surface-muted", className)} />;
   return (
-    <div className={cn("relative overflow-hidden bg-surface-muted", className)}>
-      <Image src={img.src} alt={alt} fill sizes="120px" className="object-cover" />
-    </div>
+    <CampusMedia
+      universityId={universityId}
+      countryId={countryId}
+      shortName={shortName ?? universityId}
+      alt={alt}
+      className={className}
+      sizes="120px"
+    />
   );
 }

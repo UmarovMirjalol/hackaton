@@ -81,7 +81,9 @@ export default function ComparePage() {
                       <CampusThumb
                         universityId={c.university.id}
                         alt={c.university.shortName}
-                        className="mb-3 h-16 w-full"
+                        shortName={c.university.shortName}
+                        countryId={c.university.countryId}
+                        className="mb-3 h-20 w-full"
                       />
                       <div className="text-[16px] font-medium tracking-tight">
                         {c.university.shortName}
@@ -167,6 +169,8 @@ export default function ComparePage() {
                 <CampusThumb
                   universityId={c.university.id}
                   alt={c.university.name}
+                  shortName={c.university.shortName}
+                  countryId={c.university.countryId}
                   className="aspect-[2/1] w-full"
                 />
                 <h2 className="mt-4 text-h2 tracking-tight">{c.university.name}</h2>

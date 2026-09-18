@@ -1,9 +1,8 @@
 "use client";
 
-import Image from "next/image";
+import { CampusMedia } from "@/components/CampusMedia";
 import { StatusBadge } from "@/components/ui/Badges";
 import { Button } from "@/components/ui/Button";
-import { campusImage } from "@/lib/media";
 import type { Profile, RankedUniversity } from "@/lib/types";
 import { fieldLabels } from "@/lib/universities";
 
@@ -25,32 +24,37 @@ export function MatchDetail({
   onOpenCompare: () => void;
 }) {
   if (!open || !row) return null;
-  const img = campusImage(row.university.id);
   const u = row.university;
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true">
       <button
         type="button"
-        className="absolute inset-0 bg-black/30 transition-opacity"
+        className="absolute inset-0 bg-black/35 backdrop-blur-[2px] transition-opacity"
         aria-label="Close"
         onClick={onClose}
       />
       <div className="relative flex h-full w-full max-w-lg flex-col border-l border-border bg-surface shadow-[var(--shadow-panel)] enter">
-        <div className="relative h-44 shrink-0 bg-surface-muted">
-          {img ? (
-            <Image src={img.src} alt={img.caption} fill className="object-cover" sizes="512px" />
-          ) : null}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/65 to-transparent" />
+        <div className="relative h-56 shrink-0 sm:h-64">
+          <CampusMedia
+            universityId={u.id}
+            countryId={u.countryId}
+            shortName={u.shortName}
+            alt={`${u.name} campus`}
+            className="absolute inset-0"
+            sizes="512px"
+            overlay
+            priority
+          />
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-3 top-3 border border-white/20 bg-black/40 px-2.5 py-1 text-[12px] text-white backdrop-blur-sm transition-colors hover:bg-black/55"
+            className="absolute right-3 top-3 z-[1] border border-white/25 bg-black/40 px-2.5 py-1 text-[12px] text-white backdrop-blur-sm transition-colors hover:bg-black/55"
           >
             Close
           </button>
-          <div className="absolute bottom-4 left-5 right-5 text-white">
-            <p className="font-mono text-[10px] tracking-[0.08em] text-white/70">
+          <div className="absolute bottom-4 left-5 right-5 z-[1] text-white">
+            <p className="font-mono text-[10px] tracking-[0.12em] text-white/75">
               {u.city.toUpperCase()}, {u.country.toUpperCase()}
             </p>
             <h2 className="mt-1 text-[22px] font-medium tracking-tight">{u.name}</h2>

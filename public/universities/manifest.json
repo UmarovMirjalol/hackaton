@@ -82,5 +82,222 @@
     "commonsTitle": "Skyline of Abu Dhabi.jpg",
     "sourceUrl": "https://commons.wikimedia.org/wiki/File:Skyline_of_Abu_Dhabi.jpg",
     "demoNote": "Place context for NYU Abu Dhabi \u2014 not an official campus photograph. Demo imagery."
+  },
+  "princeton": {
+    "src": "/universities/princeton.jpg",
+    "caption": "Nassau Hall, Princeton University",
+    "commonsTitle": "Nassau_Hall,_Princeton_University.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Nassau_Hall%2C_Princeton_University.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "uiuc": {
+    "src": "/universities/uiuc.jpg",
+    "caption": "Altgeld Hall, University of Illinois Urbana-Champaign",
+    "commonsTitle": "Altgeld_Hall.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Altgeld_Hall.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "duke": {
+    "src": "/universities/duke.jpg",
+    "caption": "Duke Chapel, Duke University",
+    "commonsTitle": "Duke_Chapel.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Duke_Chapel.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "imperial": {
+    "src": "/universities/imperial.jpg",
+    "caption": "Queen's Tower, Imperial College London",
+    "commonsTitle": "Queen's_Tower,_Imperial_College_London.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Queen's_Tower%2C_Imperial_College_London.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "mcmaster": {
+    "src": "/universities/mcmaster.jpg",
+    "caption": "University Hall, McMaster University",
+    "commonsTitle": "University_Hall,_McMaster_University.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:University_Hall%2C_McMaster_University.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "heidelberg": {
+    "src": "/universities/heidelberg.jpg",
+    "caption": "University Library, Heidelberg",
+    "commonsTitle": "Universit\u00e4tsbibliothek_Heidelberg.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Universit%C3%A4tsbibliothek_Heidelberg.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "epfl": {
+    "src": "/universities/epfl.jpg",
+    "caption": "Rolex Learning Center, EPFL",
+    "commonsTitle": "Rolex_Learning_Center.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Rolex_Learning_Center.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "jhu": {
+    "src": "/universities/jhu.jpg",
+    "caption": "Gilman Hall, Johns Hopkins University",
+    "commonsTitle": "Gilman_Hall,_Johns_Hopkins_University.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Gilman_Hall%2C_Johns_Hopkins_University.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "stanford": {
+    "src": "/universities/stanford.jpg",
+    "caption": "Hoover Tower, Stanford University",
+    "commonsTitle": "Hoover Tower Stanford January 2013.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AHoover_Tower_Stanford_January_2013.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "caltech": {
+    "src": "/universities/caltech.jpg",
+    "caption": "Millikan Library, Caltech",
+    "commonsTitle": "Millikan Library, Caltech.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AMillikan_Library%2C_Caltech.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "cmu": {
+    "src": "/universities/cmu.jpg",
+    "caption": "Hamerschlag Hall, Carnegie Mellon",
+    "commonsTitle": "Carnegie Mellon Hamerschlag Hall and Scott Hall.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3ACarnegie_Mellon_Hamerschlag_Hall_and_Scott_Hall.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "michigan": {
+    "src": "/universities/michigan.jpg",
+    "caption": "Angell Hall, University of Michigan",
+    "commonsTitle": "Angell Hall, University of Michigan, golden hour.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AAngell_Hall%2C_University_of_Michigan%2C_golden_hour.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "berkeley": {
+    "src": "/universities/berkeley.jpg",
+    "caption": "Sather Gate, UC Berkeley",
+    "commonsTitle": "Sather Gate - University of California, Berkeley - DSC04925.JPG",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3ASather_Gate_-_University_of_California%2C_Berkeley_-_DSC04925.JPG",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "amherst": {
+    "src": "/universities/amherst.jpg",
+    "caption": "Johnson Chapel, Amherst College",
+    "commonsTitle": "Greek Revival - Amherst, MA - Amherst College (Johnson Chapel) (2).jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AGreek_Revival_-_Amherst%2C_MA_-_Amherst_College_%28Johnson_Chapel%29_%282%29.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "rice": {
+    "src": "/universities/rice.jpg",
+    "caption": "Lovett Hall, Rice University",
+    "commonsTitle": "Rice University - Rice statue with Lovett Hall.JPG",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3ARice_University_-_Rice_statue_with_Lovett_Hall.JPG",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "edinburgh": {
+    "src": "/universities/edinburgh.jpg",
+    "caption": "Old College, University of Edinburgh",
+    "commonsTitle": "Old College, Edinburgh University.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AOld_College%2C_Edinburgh_University.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "cambridge": {
+    "src": "/universities/cambridge.jpg",
+    "caption": "King's College Chapel, Cambridge",
+    "commonsTitle": "Kings College Cambridge Chapel from the river.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AKings_College_Cambridge_Chapel_from_the_river.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "oxford": {
+    "src": "/universities/oxford.jpg",
+    "caption": "Radcliffe Camera, University of Oxford",
+    "commonsTitle": "Radcliffe Camera, Oxford - Oct 2006.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3ARadcliffe_Camera%2C_Oxford_-_Oct_2006.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "manchester": {
+    "src": "/universities/manchester.jpg",
+    "caption": "Whitworth Hall, University of Manchester",
+    "commonsTitle": "University of Manchester Whitworth Hall and Whitworth Building - geograph.org.uk - 1963609.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AUniversity_of_Manchester_Whitworth_Hall_and_Whitworth_Building_-_geograph.org.uk_-_1963609.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "mcgill": {
+    "src": "/universities/mcgill.jpg",
+    "caption": "Arts Building, McGill University",
+    "commonsTitle": "Arts Building, McGill University, Montr\u00e9al, Southeast view 20170410 1.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AArts_Building%2C_McGill_University%2C_Montr%C3%A9al%2C_Southeast_view_20170410_1.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "ubc": {
+    "src": "/universities/ubc.jpg",
+    "caption": "Learning Centre and clock tower, UBC",
+    "commonsTitle": "UBC Clock Tower and IKB Learning Centre as seen from Hennings.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AUBC_Clock_Tower_and_IKB_Learning_Centre_as_seen_from_Hennings.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "khalifa": {
+    "src": "/universities/khalifa.jpg",
+    "caption": "Abu Dhabi Corniche (place context for Khalifa University)",
+    "commonsTitle": "Abu Dhabi Corniche.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AAbu_Dhabi_Corniche.jpg",
+    "demoNote": "Place context imagery for recognition in this demo \u2014 not an official campus photograph or partnership."
+  },
+  "aus": {
+    "src": "/universities/aus.jpg",
+    "caption": "American University of Sharjah",
+    "commonsTitle": "American University of Sharjah (29).jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AAmerican_University_of_Sharjah_%2829%29.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "uva": {
+    "src": "/universities/uva.jpg",
+    "caption": "University of Amsterdam",
+    "commonsTitle": "University of Amsterdam 235 2094.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AUniversity_of_Amsterdam_235_2094.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "tue": {
+    "src": "/universities/tue.jpg",
+    "caption": "Atlas building, TU Eindhoven",
+    "commonsTitle": "Gebouw Atlas TU Eindhoven.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AGebouw_Atlas_TU_Eindhoven.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "rwth": {
+    "src": "/universities/rwth.jpg",
+    "caption": "Main building, RWTH Aachen",
+    "commonsTitle": "RWTH Hauptgeb\u00e4ude Seite.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3ARWTH_Hauptgeb%C3%A4ude_Seite.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "williams": {
+    "src": "/universities/williams.jpg",
+    "caption": "Griffin Hall, Williams College",
+    "commonsTitle": "Williams College - Griffin Hall.JPG",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AWilliams_College_-_Griffin_Hall.JPG",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "kcl": {
+    "src": "/universities/kcl.jpg",
+    "caption": "King's Building, King's College London",
+    "commonsTitle": "King's Building and Strand quad.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AKing%27s_Building_and_Strand_quad.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "hku": {
+    "src": "/universities/hku.jpg",
+    "caption": "Main Building, University of Hong Kong",
+    "commonsTitle": "Main Building HKU 20100926 03.JPG",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AMain_Building_HKU_20100926_03.JPG",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "hkust": {
+    "src": "/universities/hkust.jpg",
+    "caption": "Hong Kong University of Science and Technology",
+    "commonsTitle": "Hong Kong University of Science & Technology (2881623727).jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AHong_Kong_University_of_Science_%26_Technology_%282881623727%29.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "cuhk": {
+    "src": "/universities/cuhk.jpg",
+    "caption": "Chinese University of Hong Kong",
+    "commonsTitle": "Chinese University of Hong Kong \u9999\u6e2f\u4e2d\u6587\u5927\u5b78.JPG",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File%3AChinese_University_of_Hong_Kong_%E9%A6%99%E6%B8%AF%E4%B8%AD%E6%96%87%E5%A4%A7%E5%AD%B8.JPG",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
   }
 }

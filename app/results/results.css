@@ -1,0 +1,22 @@
+/* Results — list entrance */
+
+.results-item {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: results-rise 520ms var(--ease) forwards;
+}
+
+@keyframes results-rise {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .results-item {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
