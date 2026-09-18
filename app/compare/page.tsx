@@ -72,8 +72,8 @@ export default function ComparePage() {
                     <th
                       key={c.university.id}
                       className={cn(
-                        "border-b border-border px-4 pb-4 align-bottom transition-colors duration-150",
-                        hoverCol === c.university.id && "bg-accent-subtle/50",
+                        "group border-b border-border px-4 pb-4 align-bottom transition-[background-color,box-shadow] duration-[var(--duration)] ease-[var(--ease-out)]",
+                        hoverCol === c.university.id && "bg-[color-mix(in_srgb,var(--signal-subtle)_55%,transparent)]",
                       )}
                       onMouseEnter={() => setHoverCol(c.university.id)}
                       onMouseLeave={() => setHoverCol(null)}
@@ -83,7 +83,7 @@ export default function ComparePage() {
                         alt={c.university.shortName}
                         shortName={c.university.shortName}
                         countryId={c.university.countryId}
-                        className="mb-3 h-20 w-full"
+                        className="mb-3 h-28 w-full rounded-[var(--radius-md)] transition-transform duration-[var(--duration-slow)] ease-[var(--ease-out)] group-hover:scale-[1.02]"
                       />
                       <div className="text-[16px] font-medium tracking-tight">
                         {c.university.shortName}

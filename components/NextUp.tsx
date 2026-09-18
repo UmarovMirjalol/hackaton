@@ -20,14 +20,16 @@ export function NextUp({
   disabled?: boolean;
 }) {
   return (
-    <div className="sticky bottom-16 z-10 border-t border-border bg-surface/95 backdrop-blur-md transition-[box-shadow,background-color] duration-[var(--duration)] md:bottom-0 hover:shadow-[0_-12px_40px_-28px_rgba(11,13,18,0.28)]">
+    <div className="sticky bottom-16 z-10 border-t border-border/80 bg-[color-mix(in_srgb,var(--surface)_88%,transparent)] backdrop-blur-md backdrop-saturate-150 transition-[box-shadow] duration-[var(--duration)] md:bottom-0 hover:shadow-[0_-16px_48px_-30px_rgba(10,18,20,0.35)]">
       <div
         className="mx-auto flex flex-col gap-3 px-[var(--space-page)] py-3.5 sm:flex-row sm:items-center sm:justify-between"
         style={{ maxWidth: "var(--content)" }}
       >
-        <div className="min-w-0">
+        <div className="min-w-0 border-l-2 border-[var(--signal)] pl-3">
           <p className="label">{label ?? "Next"}</p>
-          <p className="truncate text-[14px] font-medium">{title}</p>
+          <p className="truncate font-[family-name:var(--font-display)] text-[1.05rem] tracking-tight">
+            {title}
+          </p>
           {detail ? <p className="caption mt-0.5">{detail}</p> : null}
         </div>
         {onClick ? (

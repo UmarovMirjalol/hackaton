@@ -23,14 +23,17 @@
 
 .rm-progress {
   margin-top: var(--space-4);
-  height: 2px;
+  height: 3px;
   background: var(--surface-muted);
+  border-radius: 999px;
+  overflow: hidden;
 }
 
 .rm-progress-fill {
   height: 100%;
-  background: var(--signal);
-  transition: width var(--duration-slow) var(--ease);
+  background: linear-gradient(90deg, var(--signal) 0%, var(--signal-deep) 100%);
+  border-radius: 999px;
+  transition: width var(--duration-slow) var(--ease-out);
 }
 
 .rm-shortlist {
@@ -80,9 +83,10 @@
 
 .rm-next-title {
   margin-top: var(--space-2);
-  font-size: clamp(1.5rem, 2.8vw, 2rem);
-  font-weight: 500;
-  letter-spacing: -0.032em;
+  font-family: var(--font-display), "Times New Roman", serif;
+  font-size: clamp(1.65rem, 3vw, 2.25rem);
+  font-weight: 400;
+  letter-spacing: -0.028em;
   line-height: 1.12;
   max-width: 36rem;
 }
@@ -134,8 +138,17 @@
 .rm-task {
   display: grid;
   gap: var(--space-3);
-  padding: var(--space-5) 0;
+  padding: var(--space-5) 0.65rem;
+  margin-inline: -0.65rem;
   border-bottom: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition:
+    background-color var(--duration) var(--ease-out),
+    transform var(--duration) var(--ease-out);
+}
+
+.rm-task:hover {
+  background: color-mix(in srgb, var(--signal-subtle) 35%, transparent);
 }
 
 @media (min-width: 720px) {

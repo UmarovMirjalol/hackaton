@@ -26,7 +26,7 @@ export function ProductStory() {
           <h2 id="story-heading" className="locus-display mt-4 max-w-3xl">
             Not a list of universities.
             <br />
-            <span className="text-secondary">A route.</span>
+            <em className="text-[color:var(--signal-deep)]">A route.</em>
           </h2>
           <p className="body mt-5 max-w-xl text-secondary">
             LOCUS turns your facts into diagnosis, ranked campuses with reasons, a side-by-side
@@ -82,7 +82,7 @@ export function ProductStory() {
                     <p className="font-mono text-[10px] tracking-[0.12em] text-white/70">
                       01 · {top.university.city.toUpperCase()}
                     </p>
-                    <p className="mt-1 text-[1.35rem] font-medium tracking-tight text-white sm:text-[1.6rem]">
+                    <p className="mt-1 font-[family-name:var(--font-display)] text-[1.45rem] tracking-tight text-white sm:text-[1.75rem]">
                       {top.university.name}
                     </p>
                   </div>

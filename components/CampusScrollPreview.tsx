@@ -47,54 +47,78 @@ export function CampusScrollPreview({
   const rank = Math.max(1, rows.findIndex((r) => r.university.id === active.university.id) + 1);
 
   return (
-    <aside className="campus-scroll-preview" aria-hidden={false}>
-      <div className="campus-scroll-stage">
-        {rows.map((row) => {
-          const id = row.university.id;
-          const isCurrent = id === displayId;
-          const isLeaving = id === leavingId;
-          if (!isCurrent && !isLeaving) return null;
-          return (
-            <div
-              key={id}
-              className={cn(
-                "campus-scroll-layer",
-                isCurrent && "is-current",
-                isLeaving && "is-leaving",
-              )}
-            >
-              <CampusMedia
-                universityId={id}
-                countryId={row.university.countryId}
-                shortName={row.university.shortName}
-                alt={`${row.university.name} campus`}
-                className="absolute inset-0"
-                sizes="(max-width: 1100px) 0px, 42vw"
-                priority={isCurrent}
-                overlay
-              />
-            </div>
-          );
-        })}
-
-        <div key={displayId ?? "empty"} className="campus-scroll-meta">
-          <p className="campus-scroll-rank font-mono">
-            {String(rank).padStart(2, "0")} / {String(rows.length).padStart(2, "0")}
-          </p>
-          <h2 className="campus-scroll-name">{active.university.name}</h2>
-          <p className="campus-scroll-place">
-            {active.university.city} · {active.university.country}
-          </p>
-          <p className="campus-scroll-fit">Fit {active.fitIndex}</p>
-          {onSelect ? (
-            <button type="button" className="campus-scroll-open" onClick={() => onSelect(active)}>
-              Open details
-            </button>
-          ) : null}
+    <>
+      {/* Mobile / tablet strip */}
+      <div className="campus-scroll-strip" aria-hidden={false}>
+        <div key={active.university.id} className="campus-scroll-strip-media">
+          <CampusMedia
+            universityId={active.university.id}
+            countryId={active.university.countryId}
+            shortName={active.university.shortName}
+            alt={`${active.university.name} campus`}
+            className="absolute inset-0"
+            sizes="100vw"
+            overlay
+            priority
+          />
+          <div className="campus-scroll-strip-copy">
+            <p className="font-mono text-[10px] tracking-[0.14em] text-white/75">
+              {String(rank).padStart(2, "0")} · {active.university.city}
+            </p>
+            <p className="campus-scroll-strip-name">{active.university.shortName}</p>
+          </div>
         </div>
       </div>
-      <p className="campus-scroll-hint caption">Scroll the list — campus preview follows</p>
-    </aside>
+
+      <aside className="campus-scroll-preview" aria-hidden={false}>
+        <div className="campus-scroll-stage">
+          {rows.map((row) => {
+            const id = row.university.id;
+            const isCurrent = id === displayId;
+            const isLeaving = id === leavingId;
+            if (!isCurrent && !isLeaving) return null;
+            return (
+              <div
+                key={id}
+                className={cn(
+                  "campus-scroll-layer",
+                  isCurrent && "is-current",
+                  isLeaving && "is-leaving",
+                )}
+              >
+                <CampusMedia
+                  universityId={id}
+                  countryId={row.university.countryId}
+                  shortName={row.university.shortName}
+                  alt={`${row.university.name} campus`}
+                  className="absolute inset-0"
+                  sizes="(max-width: 1100px) 0px, 42vw"
+                  priority={isCurrent}
+                  overlay
+                />
+              </div>
+            );
+          })}
+
+          <div key={displayId ?? "empty"} className="campus-scroll-meta">
+            <p className="campus-scroll-rank font-mono">
+              {String(rank).padStart(2, "0")} / {String(rows.length).padStart(2, "0")}
+            </p>
+            <h2 className="campus-scroll-name">{active.university.name}</h2>
+            <p className="campus-scroll-place">
+              {active.university.city} · {active.university.country}
+            </p>
+            <p className="campus-scroll-fit">Fit {active.fitIndex}</p>
+            {onSelect ? (
+              <button type="button" className="campus-scroll-open" onClick={() => onSelect(active)}>
+                Open details
+              </button>
+            ) : null}
+          </div>
+        </div>
+        <p className="campus-scroll-hint caption">Scroll the list — campus preview follows</p>
+      </aside>
+    </>
   );
 }
 

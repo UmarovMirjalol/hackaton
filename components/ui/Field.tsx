@@ -9,7 +9,7 @@ import type {
 } from "react";
 
 const field =
-  "w-full rounded-[var(--radius-md)] border border-border bg-surface px-3 text-[13.5px] text-primary outline-none transition-[border-color,box-shadow] duration-[var(--duration)] placeholder:text-tertiary hover:border-border-strong focus:border-[var(--signal)] focus:shadow-[var(--shadow-focus)]";
+  "w-full rounded-[var(--radius-md)] border border-border bg-[color-mix(in_srgb,var(--surface)_94%,white)] px-3 text-[13.5px] text-primary outline-none transition-[border-color,box-shadow,background-color,transform] duration-[var(--duration)] ease-[var(--ease-out)] placeholder:text-tertiary hover:border-border-strong focus:border-[var(--signal)] focus:bg-surface focus:shadow-[var(--shadow-focus)]";
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={cn(field, "h-10", props.className)} />;
