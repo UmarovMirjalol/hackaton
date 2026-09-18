@@ -174,6 +174,7 @@ export default function OnboardingPage() {
           <div className="flex min-w-0 items-baseline gap-4">
             <Link href="/" className="ob-brand">
               <span className="ob-brand-mark">Route</span>
+              <span className="ob-brand-dot" aria-hidden />
             </Link>
             <p className="hidden truncate text-[13px] text-[var(--text-secondary)] sm:block">
               Build your admissions profile
@@ -224,7 +225,7 @@ export default function OnboardingPage() {
             })}
           </div>
           <p className="ob-journey-foot">
-            Each answer strengthens the profile Route will map into universities.
+            Answers feed a live profile — then a mapped university route.
           </p>
         </nav>
 
@@ -288,7 +289,7 @@ export default function OnboardingPage() {
 
           <dl className="ob-dossier-facts">
             {dossierFacts.map((f) => (
-              <div key={f.label} className="ob-fact">
+              <div key={f.label} className="ob-fact" data-filled={Boolean(f.value)}>
                 <dt>{f.label}</dt>
                 <dd data-empty={!f.value}>{f.value ?? "Not set yet"}</dd>
               </div>

@@ -1,12 +1,14 @@
-/* Route onboarding — scoped product workspace */
+/* Route onboarding — profile-building workspace (composition v2) */
 
 .ob-shell {
-  --ob-journey: 13.5rem;
-  --ob-dossier: 19rem;
-  --ob-frame: 88rem;
-  --ob-stage-bg: #eef1f4;
+  --ob-journey: 12.75rem;
+  --ob-dossier: 20.5rem;
+  --ob-frame: 92rem;
+  --ob-canvas: #e8ecf0;
+  --ob-ink-soft: #1a2330;
   min-height: 100dvh;
-  background: var(--ob-stage-bg);
+  background:
+    linear-gradient(180deg, #e4e9ee 0%, var(--ob-canvas) 40%, #eef1f4 100%);
   color: var(--text-primary);
 }
 
@@ -14,55 +16,55 @@
   width: 100%;
   max-width: var(--ob-frame);
   margin-inline: auto;
-  padding-inline: clamp(1rem, 2.4vw, 2rem);
+  padding-inline: clamp(0.85rem, 1.8vw, 1.75rem);
 }
 
 .ob-top {
   position: sticky;
   top: 0;
   z-index: 20;
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
-  background: color-mix(in srgb, var(--ob-stage-bg) 92%, white);
-  backdrop-filter: blur(10px);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--ob-canvas) 88%, white);
+  backdrop-filter: blur(12px);
 }
 
 .ob-brand {
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.55rem;
+  align-items: center;
+  gap: 0.5rem;
   text-decoration: none;
   color: var(--text-primary);
 }
 
 .ob-brand-mark {
-  font-size: 1.05rem;
+  font-size: 1.125rem;
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
 }
 
-.ob-brand-mark::after {
-  content: "";
-  display: inline-block;
-  width: 0.38rem;
-  height: 0.38rem;
-  margin-left: 0.28rem;
+.ob-brand-dot {
+  width: 0.4rem;
+  height: 0.4rem;
   border-radius: 999px;
   background: var(--signal);
-  vertical-align: 0.12em;
 }
 
 .ob-complete {
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.7rem;
+  padding: 0.35rem 0.65rem 0.35rem 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  border: 1px solid var(--border);
 }
 
 .ob-complete-meter {
-  width: 4.5rem;
-  height: 3px;
+  width: 3.75rem;
+  height: 4px;
   overflow: hidden;
   border-radius: 999px;
-  background: var(--border);
+  background: var(--surface-muted);
 }
 
 .ob-complete-meter > span {
@@ -76,70 +78,68 @@
 .ob-complete-label {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 11px;
-  letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
 }
 
 .ob-workspace {
   display: grid;
-  gap: 1.25rem;
-  padding-block: 1.25rem 1.75rem;
+  gap: 0;
+  padding-block: 1.15rem 1.5rem;
+  min-height: calc(100dvh - 3.75rem);
 }
 
 @media (min-width: 1100px) {
   .ob-workspace {
     grid-template-columns: var(--ob-journey) minmax(0, 1fr) var(--ob-dossier);
-    gap: 1.5rem;
-    padding-block: 1.5rem 2rem;
-    align-items: start;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: 0 18px 40px -28px rgba(11, 13, 18, 0.35);
+    min-height: calc(100dvh - 5.5rem);
   }
 }
 
 @media (min-width: 1440px) {
   .ob-shell {
-    --ob-journey: 14.5rem;
-    --ob-dossier: 21rem;
-    --ob-frame: 94rem;
-  }
-
-  .ob-workspace {
-    gap: 1.75rem;
+    --ob-journey: 13.5rem;
+    --ob-dossier: 22rem;
+    --ob-frame: 96rem;
   }
 }
 
-/* Journey rail */
+/* Journey — integrated left spine, not a floating doc card */
 .ob-journey {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: 1rem 0.85rem 1.1rem;
+  background: #f7f8fa;
+  padding: 1.15rem 0.75rem 1.15rem;
+  border-right: 1px solid var(--border);
 }
 
 .ob-journey-kicker {
-  padding-inline: 0.55rem;
-  margin-bottom: 0.85rem;
+  padding-inline: 0.65rem;
+  margin-bottom: 0.75rem;
   font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-tertiary);
+  color: var(--signal);
 }
 
 .ob-journey-list {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.1rem;
 }
 
 .ob-journey-item {
   display: grid;
-  grid-template-columns: 1.4rem 1fr;
-  gap: 0.55rem;
+  grid-template-columns: 1.15rem 1fr;
+  gap: 0.5rem;
   align-items: center;
   width: 100%;
-  padding: 0.55rem 0.55rem;
-  border-radius: var(--radius-md);
+  padding: 0.58rem 0.65rem;
+  border-radius: 6px;
   text-align: left;
   color: var(--text-tertiary);
   transition: background-color 140ms ease, color 140ms ease;
@@ -147,12 +147,13 @@
 
 .ob-journey-item:hover {
   color: var(--text-primary);
-  background: var(--surface-muted);
+  background: color-mix(in srgb, white 70%, transparent);
 }
 
 .ob-journey-item[data-state="current"] {
   color: var(--text-primary);
-  background: var(--signal-subtle);
+  background: white;
+  box-shadow: inset 3px 0 0 var(--signal);
 }
 
 .ob-journey-item[data-state="done"] {
@@ -160,8 +161,8 @@
 }
 
 .ob-journey-dot {
-  width: 0.55rem;
-  height: 0.55rem;
+  width: 0.5rem;
+  height: 0.5rem;
   margin-inline: auto;
   border-radius: 999px;
   border: 1.5px solid var(--border-strong);
@@ -172,7 +173,7 @@
 .ob-journey-item[data-state="current"] .ob-journey-dot {
   border-color: var(--signal);
   background: var(--signal);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 18%, transparent);
+  transform: scale(1.15);
 }
 
 .ob-journey-item[data-state="done"] .ob-journey-dot {
@@ -183,7 +184,7 @@
 .ob-journey-name {
   font-size: 13px;
   font-weight: 500;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 .ob-journey-item[data-state="current"] .ob-journey-name {
@@ -191,36 +192,33 @@
 }
 
 .ob-journey-foot {
-  margin-top: 1rem;
-  padding: 0.85rem 0.55rem 0.15rem;
+  margin-top: 1.1rem;
+  padding: 0.85rem 0.65rem 0.1rem;
   border-top: 1px solid var(--border);
-  font-size: 12px;
+  font-size: 11.5px;
   line-height: 1.45;
   color: var(--text-tertiary);
 }
 
-/* Focal stage */
+/* Focal stage — owns the workspace */
 .ob-stage {
-  border: 1px solid var(--border);
   background: var(--surface);
-  border-radius: var(--radius-lg);
-  min-height: 36rem;
   display: flex;
   flex-direction: column;
-  padding: 1.5rem 1.35rem 1.25rem;
+  padding: 1.35rem 1.25rem 1.15rem;
+  min-height: 34rem;
 }
 
 @media (min-width: 1100px) {
   .ob-stage {
-    padding: 1.75rem 1.85rem 1.35rem;
-    min-height: 38rem;
+    padding: 1.65rem 2rem 1.35rem;
+    min-height: 0;
   }
 }
 
 @media (min-width: 1440px) {
   .ob-stage {
-    padding: 2rem 2.15rem 1.5rem;
-    min-height: 40rem;
+    padding: 1.85rem 2.4rem 1.5rem;
   }
 }
 
@@ -230,49 +228,51 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem 1rem;
-  margin-bottom: 1.1rem;
+  margin-bottom: 0.85rem;
 }
 
 .ob-stage-step {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 11px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--signal);
 }
 
 .ob-stage-next {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--text-tertiary);
 }
 
 .ob-question {
-  font-size: clamp(1.55rem, 2.1vw, 1.95rem);
+  font-size: clamp(1.65rem, 2.3vw, 2.05rem);
   font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
-  max-width: 22ch;
+  letter-spacing: -0.038em;
+  line-height: 1.12;
+  max-width: 18ch;
+  color: var(--ob-ink-soft);
 }
 
 .ob-purpose {
-  margin-top: 0.55rem;
-  max-width: 40rem;
-  font-size: 0.9375rem;
+  margin-top: 0.5rem;
+  max-width: 36rem;
+  font-size: 0.95rem;
   line-height: 1.5;
   color: var(--text-secondary);
 }
 
 .ob-body {
-  margin-top: 1.6rem;
+  margin-top: 1.5rem;
   flex: 1;
-  max-width: 42rem;
-  animation: ob-enter 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  width: 100%;
+  max-width: 48rem;
+  animation: ob-enter 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes ob-enter {
   from {
     opacity: 0;
-    transform: translateY(5px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -281,9 +281,9 @@
 }
 
 .ob-section-label {
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.65rem;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-tertiary);
@@ -291,18 +291,19 @@
 
 .ob-divider {
   height: 1px;
-  margin-block: 0.25rem;
+  margin-block: 0.15rem;
   background: var(--border);
 }
 
 .ob-error {
   margin-top: 1rem;
-  border-left: 2px solid var(--error);
-  padding: 0.55rem 0 0.55rem 0.75rem;
+  border-left: 3px solid var(--error);
+  padding: 0.55rem 0 0.55rem 0.8rem;
+  background: var(--error-subtle);
   color: var(--error);
   font-size: 0.8125rem;
   font-weight: 500;
-  animation: ob-enter 180ms ease both;
+  animation: ob-enter 160ms ease both;
 }
 
 .ob-actions {
@@ -310,32 +311,31 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-top: 1.75rem;
-  padding-top: 1.15rem;
+  margin-top: auto;
+  padding-top: 1.25rem;
   border-top: 1px solid var(--border);
 }
 
-/* Live profile dossier */
+/* Live dossier — companion, not equal card */
 .ob-dossier {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: 1.1rem 1rem 1.2rem;
-  position: sticky;
-  top: 4.5rem;
+  background: #f4f7f7;
+  border-left: 1px solid var(--border);
+  padding: 1.25rem 1.15rem 1.35rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .ob-dossier-kicker {
   font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-tertiary);
+  color: var(--signal);
 }
 
 .ob-dossier-name {
-  margin-top: 0.55rem;
-  font-size: 1.2rem;
+  margin-top: 0.45rem;
+  font-size: 1.25rem;
   font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1.2;
@@ -347,15 +347,17 @@
 }
 
 .ob-dossier-sub {
-  margin-top: 0.25rem;
+  margin-top: 0.2rem;
   font-size: 12.5px;
   color: var(--text-secondary);
 }
 
 .ob-dossier-progress {
   margin-top: 1rem;
-  padding-top: 0.9rem;
-  border-top: 1px solid var(--border);
+  padding: 0.75rem 0.8rem;
+  border-radius: 8px;
+  background: white;
+  border: 1px solid var(--border);
 }
 
 .ob-dossier-progress-row {
@@ -363,7 +365,7 @@
   justify-content: space-between;
   align-items: baseline;
   gap: 0.5rem;
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.4rem;
 }
 
 .ob-dossier-progress-row span:first-child {
@@ -374,11 +376,12 @@
 .ob-dossier-progress-row span:last-child {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 12px;
+  font-weight: 500;
   color: var(--signal);
 }
 
 .ob-dossier-bar {
-  height: 4px;
+  height: 5px;
   overflow: hidden;
   border-radius: 999px;
   background: var(--surface-muted);
@@ -387,26 +390,31 @@
 .ob-dossier-bar > span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--signal), color-mix(in srgb, var(--signal) 70%, #1a8f88));
+  background: var(--signal);
   transition: width 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .ob-dossier-facts {
-  margin-top: 1rem;
+  margin-top: 0.85rem;
   display: grid;
-  gap: 0.7rem;
+  gap: 0;
+  flex: 1;
 }
 
 .ob-fact {
   display: grid;
-  gap: 0.15rem;
-  padding-bottom: 0.65rem;
-  border-bottom: 1px solid var(--border);
+  gap: 0.12rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+  transition: background-color 200ms ease;
 }
 
 .ob-fact:last-child {
   border-bottom: 0;
-  padding-bottom: 0;
+}
+
+.ob-fact[data-filled="true"] dd {
+  color: var(--text-primary);
 }
 
 .ob-fact dt {
@@ -421,20 +429,22 @@
   font-weight: 500;
   letter-spacing: -0.01em;
   color: var(--text-primary);
-  min-height: 1.25rem;
+  min-height: 1.2rem;
 }
 
 .ob-fact dd[data-empty="true"] {
   color: var(--text-tertiary);
   font-weight: 400;
+  font-size: 12.5px;
 }
 
 .ob-dossier-hint {
-  margin-top: 1rem;
-  padding: 0.7rem 0.75rem;
-  border-radius: var(--radius-md);
+  margin-top: 0.85rem;
+  padding: 0.75rem 0.8rem;
+  border-radius: 8px;
   background: var(--signal-subtle);
-  color: color-mix(in srgb, var(--signal) 75%, var(--ink));
+  border: 1px solid color-mix(in srgb, var(--signal) 18%, transparent);
+  color: color-mix(in srgb, var(--signal) 72%, var(--ink));
   font-size: 12px;
   line-height: 1.45;
 }
@@ -480,15 +490,17 @@
 }
 
 .ob-goals-sheet {
-  margin-top: 0.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
+  margin-top: 0.35rem;
+  padding: 1rem 1rem 0.85rem;
+  border-radius: 8px;
+  background: #f7faf9;
+  border: 1px solid color-mix(in srgb, var(--signal) 14%, var(--border));
 }
 
 .ob-goals-grid {
   display: grid;
-  gap: 0.85rem;
-  margin-top: 0.85rem;
+  gap: 0.15rem 1.25rem;
+  margin-top: 0.65rem;
 }
 
 @media (min-width: 640px) {
@@ -497,17 +509,26 @@
   }
 }
 
-/* Mobile journey as horizontal strip */
+/* Mobile / tablet */
 @media (max-width: 1099px) {
+  .ob-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
   .ob-journey {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    border-right: 1px solid var(--border);
     padding: 0.85rem;
+    background: var(--surface);
   }
 
   .ob-journey-list {
     flex-direction: row;
     overflow-x: auto;
-    gap: 0.35rem;
-    padding-bottom: 0.15rem;
+    gap: 0.3rem;
     scrollbar-width: none;
   }
 
@@ -521,41 +542,44 @@
     padding: 0.45rem 0.7rem;
   }
 
-  .ob-journey-dot {
-    display: none;
+  .ob-journey-item[data-state="current"] {
+    box-shadow: none;
+    background: var(--signal-subtle);
   }
 
-  .ob-journey-item[data-state="current"] {
-    outline: 1px solid color-mix(in srgb, var(--signal) 45%, transparent);
+  .ob-journey-dot {
+    display: none;
   }
 
   .ob-journey-foot {
     display: none;
   }
 
-  .ob-dossier {
-    order: 3;
-    position: static;
-  }
-
   .ob-stage {
-    order: 2;
+    border: 1px solid var(--border);
+    border-radius: 10px;
     min-height: 0;
   }
 
-  .ob-journey {
-    order: 1;
+  .ob-dossier {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    border-left: 1px solid var(--border);
   }
 }
 
 @media (max-width: 480px) {
   .ob-stage {
-    padding: 1.15rem 1rem 1rem;
+    padding: 1.1rem 1rem 1rem;
   }
 
   .ob-question {
     max-width: none;
     font-size: 1.4rem;
+  }
+
+  .ob-body {
+    max-width: none;
   }
 
   .ob-actions {
@@ -564,7 +588,7 @@
     margin-inline: -1rem;
     margin-bottom: -1rem;
     padding: 0.85rem 1rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
-    background: linear-gradient(to top, var(--surface) 75%, transparent);
+    background: linear-gradient(to top, var(--surface) 78%, transparent);
     border-top: 0;
   }
 }
