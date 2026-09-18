@@ -25,10 +25,10 @@ export function Segmented<T extends string>({
             aria-pressed={active}
             onClick={() => onChange(opt.value)}
             className={cn(
-              "min-h-10 flex-1 rounded-[calc(var(--radius-md)-1px)] px-3 text-[13px] font-medium transition-[background-color,color,transform] duration-[var(--duration)] active:scale-[0.99]",
+              "min-h-10 flex-1 rounded-[calc(var(--radius-md)-1px)] px-3 text-[13px] font-medium transition-[background-color,color,transform,box-shadow] duration-[var(--duration)] ease-[var(--ease-out)] active:scale-[0.985]",
               active
                 ? "bg-surface text-primary shadow-[inset_0_0_0_1px_var(--border-strong)]"
-                : "bg-surface-muted/80 text-secondary hover:bg-surface hover:text-primary",
+                : "bg-surface-muted/80 text-secondary hover:-translate-y-px hover:bg-surface hover:text-primary",
             )}
           >
             {opt.label}
@@ -71,10 +71,10 @@ export function ChoiceGrid<T extends string>({
               onChange(next as T[]);
             }}
             className={cn(
-              "flex items-start gap-3 border px-3.5 py-3 text-left transition-[background-color,border-color,transform] duration-[var(--duration)] rounded-[var(--radius-md)] active:scale-[0.995]",
+              "flex items-start gap-3 border px-3.5 py-3 text-left transition-[background-color,border-color,transform,box-shadow] duration-[var(--duration)] ease-[var(--ease-out)] rounded-[var(--radius-md)] active:scale-[0.99]",
               on
-                ? "border-[var(--signal)] bg-[var(--signal-subtle)]"
-                : "border-border bg-surface hover:border-border-strong",
+                ? "border-[var(--signal)] bg-[var(--signal-subtle)] shadow-[var(--shadow-panel)]"
+                : "border-border bg-surface hover:-translate-y-0.5 hover:border-border-strong hover:shadow-[var(--shadow-panel)]",
             )}
           >
             <span
@@ -124,10 +124,10 @@ export function OptionRows<T extends string>({
             aria-checked={on}
             onClick={() => onChange(opt.value)}
             className={cn(
-              "grid w-full grid-cols-[1rem_1fr] gap-3 border px-3.5 py-3.5 text-left transition-[background-color,border-color,transform] duration-[var(--duration)] rounded-[var(--radius-md)] active:scale-[0.995]",
+              "grid w-full grid-cols-[1rem_1fr] gap-3 border px-3.5 py-3.5 text-left transition-[background-color,border-color,transform,box-shadow] duration-[var(--duration)] ease-[var(--ease-out)] rounded-[var(--radius-md)] active:scale-[0.99]",
               on
-                ? "border-[var(--signal)] bg-[var(--signal-subtle)]"
-                : "border-border bg-surface hover:border-border-strong",
+                ? "border-[var(--signal)] bg-[var(--signal-subtle)] shadow-[var(--shadow-panel)]"
+                : "border-border bg-surface hover:-translate-y-0.5 hover:border-border-strong hover:shadow-[var(--shadow-panel)]",
             )}
           >
             <span

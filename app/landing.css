@@ -93,13 +93,31 @@ html {
 }
 
 .locus-nav-link {
+  position: relative;
   font-size: 0.8125rem;
   color: var(--text-secondary);
   transition: color var(--duration) var(--landing-ease);
 }
 
+.locus-nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: var(--signal);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 420ms var(--landing-ease);
+}
+
 .locus-nav-link:hover {
   color: var(--text-primary);
+}
+
+.locus-nav-link:hover::after {
+  transform: scaleX(1);
 }
 
 .locus-header-actions {
@@ -908,11 +926,12 @@ html {
 }
 
 .locus-story-compare-media img {
-  transition: transform 600ms var(--landing-ease);
+  transition: transform 800ms var(--landing-ease), filter 800ms var(--landing-ease);
 }
 
 .locus-story-compare-media:hover img {
-  transform: scale(1.03);
+  transform: scale(1.06);
+  filter: saturate(1.05) contrast(1.02);
 }
 
 /* ——— Finale ——— */

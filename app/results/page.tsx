@@ -139,13 +139,13 @@ export default function ResultsPage() {
       </section>
 
       <section className="mb-8 flex flex-col gap-4 border-b border-border pb-6 lg:flex-row lg:items-end lg:justify-between">
-        <div>
+        <div className="enter">
           <p className="label">Recommendations</p>
           <p className="mt-1 text-[14px] text-secondary">
             Change an input — the list reorders from your profile, not from a static list.
           </p>
         </div>
-        <div className="flex flex-wrap gap-4">
+        <div className="results-filters flex flex-wrap gap-4 enter enter-delay-1">
           <ChipGroup
             label="Field"
             value={profile.field}
@@ -172,7 +172,7 @@ export default function ResultsPage() {
         </div>
       </section>
 
-      <div className="mb-4 flex flex-wrap gap-1.5">
+      <div className="results-chips mb-4 flex flex-wrap gap-1.5 enter enter-delay-2">
         {(Object.keys(countryLabels) as CountryId[]).map((id) => {
           const on = profile.countries.includes(id);
           return (
@@ -345,7 +345,7 @@ function ResultCard({
           <StatusBadge status={row.factors.find((f) => f.key === "aid")?.tone ?? "mixed"} />
         </div>
 
-        <div className="mt-4 border-l-2 border-[var(--signal)] pl-4">
+        <div className="mt-4 border-l-2 border-[var(--signal)] pl-4 signal-rail">
           <p className="label">Match reasons</p>
           <p className="body mt-1.5 text-secondary">{row.why}</p>
         </div>

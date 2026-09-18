@@ -52,17 +52,17 @@ export function JourneyRail({
               aria-current={active ? "step" : undefined}
               title={step.purpose}
               className={cn(
-                "relative flex shrink-0 items-center gap-2 px-3 py-2.5 text-[12.5px] font-medium transition-colors duration-[var(--duration)]",
+                "relative flex shrink-0 items-center gap-2 px-3 py-2.5 text-[12.5px] font-medium transition-[color,transform] duration-[var(--duration)] ease-[var(--ease-out)]",
                 active && "text-primary",
                 done && "text-secondary",
-                !active && !done && "text-tertiary hover:text-primary",
+                !active && !done && "text-tertiary hover:text-primary hover:-translate-y-px",
                 locked && "opacity-55",
               )}
             >
               <span
                 className={cn(
-                  "h-1.5 w-1.5 shrink-0 rounded-full transition-colors",
-                  active && "bg-[var(--signal)] shadow-[0_0_0_3px_var(--signal-subtle)]",
+                  "h-1.5 w-1.5 shrink-0 rounded-full transition-[background-color,box-shadow,transform] duration-[var(--duration-slow)] ease-[var(--ease-out)]",
+                  active && "scale-110 bg-[var(--signal)] shadow-[0_0_0_3px_var(--signal-subtle)]",
                   done && "bg-[var(--signal)]",
                   !active && !done && "border border-border-strong bg-transparent",
                 )}
@@ -71,7 +71,7 @@ export function JourneyRail({
               {step.label}
               {active ? (
                 <span
-                  className="absolute inset-x-3 -bottom-px h-0.5 bg-[var(--signal)]"
+                  className="flow-rail absolute inset-x-3 -bottom-px h-0.5 bg-[var(--signal)]"
                   aria-hidden
                 />
               ) : null}

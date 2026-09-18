@@ -1,9 +1,9 @@
-/* Results — list entrance */
+/* Results — list entrance + filter chip flow */
 
 .results-item {
   opacity: 0;
-  transform: translateY(12px);
-  animation: results-rise 520ms var(--ease) forwards;
+  transform: translateY(16px);
+  animation: results-rise 640ms var(--ease-out) forwards;
 }
 
 @keyframes results-rise {
@@ -13,10 +13,46 @@
   }
 }
 
+.result-card {
+  padding-inline: 0.35rem;
+  margin-inline: -0.35rem;
+  border-radius: var(--radius-lg);
+}
+
+.results-filters button,
+.results-chips button {
+  transition:
+    background-color var(--duration) var(--ease-out),
+    border-color var(--duration) var(--ease-out),
+    color var(--duration) var(--ease-out),
+    transform var(--duration) var(--ease-out),
+    box-shadow var(--duration) var(--ease-out);
+}
+
+.results-filters button:hover,
+.results-chips button:hover {
+  transform: translateY(-1px);
+}
+
+.results-filters button:active,
+.results-chips button:active {
+  transform: translateY(0);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .results-item {
     opacity: 1;
     transform: none;
     animation: none;
+  }
+
+  .results-filters button,
+  .results-chips button {
+    transition: none;
+  }
+
+  .results-filters button:hover,
+  .results-chips button:hover {
+    transform: none;
   }
 }

@@ -83,7 +83,7 @@ export function UniversityCard({
           </div>
         </div>
 
-        <div className="mt-4 border-l-2 border-[var(--signal)] pl-3.5">
+        <div className="mt-4 border-l-2 border-[var(--signal)] pl-3.5 signal-rail">
           <p className="label">Why this matches you</p>
           <p className="mt-1.5 max-w-xl text-[14px] leading-[1.55] text-secondary">{row.why}</p>
         </div>

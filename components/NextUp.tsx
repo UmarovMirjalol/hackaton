@@ -20,7 +20,7 @@ export function NextUp({
   disabled?: boolean;
 }) {
   return (
-    <div className="sticky bottom-16 z-10 border-t border-border bg-surface/95 backdrop-blur-md md:bottom-0">
+    <div className="sticky bottom-16 z-10 border-t border-border bg-surface/95 backdrop-blur-md transition-[box-shadow,background-color] duration-[var(--duration)] md:bottom-0 hover:shadow-[0_-12px_40px_-28px_rgba(11,13,18,0.28)]">
       <div
         className="mx-auto flex flex-col gap-3 px-[var(--space-page)] py-3.5 sm:flex-row sm:items-center sm:justify-between"
         style={{ maxWidth: "var(--content)" }}

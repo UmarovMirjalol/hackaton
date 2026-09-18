@@ -30,11 +30,11 @@ export function MatchDetail({
     <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true">
       <button
         type="button"
-        className="absolute inset-0 bg-black/35 backdrop-blur-[2px] transition-opacity"
+        className="drawer-veil absolute inset-0 bg-black/35 backdrop-blur-[2px]"
         aria-label="Close"
         onClick={onClose}
       />
-      <div className="relative flex h-full w-full max-w-lg flex-col border-l border-border bg-surface shadow-[var(--shadow-panel)] enter">
+      <div className="drawer-panel relative flex h-full w-full max-w-lg flex-col border-l border-border bg-surface shadow-[var(--shadow-panel)]">
         <div className="relative h-56 shrink-0 sm:h-64">
           <CampusMedia
             universityId={u.id}

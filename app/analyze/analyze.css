@@ -36,12 +36,16 @@
   gap: 0.75rem;
   padding: 1rem 0;
   border-bottom: 1px solid var(--border);
-  opacity: 0.35;
-  transition: opacity var(--duration-slow) var(--ease);
+  opacity: 0.28;
+  transform: translateX(-6px);
+  transition:
+    opacity var(--duration-slow) var(--ease-out),
+    transform var(--duration-slow) var(--ease-out);
 }
 
 .az-stage.is-shown {
   opacity: 1;
+  transform: none;
 }
 
 .az-stage-dot {
@@ -51,18 +55,22 @@
   border-radius: 999px;
   border: 1.5px solid var(--border-strong);
   background: transparent;
-  transition: background-color var(--duration) ease, border-color var(--duration) ease,
-    box-shadow var(--duration) ease;
+  transition:
+    background-color var(--duration-slow) var(--ease-out),
+    border-color var(--duration-slow) var(--ease-out),
+    box-shadow var(--duration-slow) var(--ease-out),
+    transform var(--duration-slow) var(--ease-spring);
 }
 
 .az-stage.is-done .az-stage-dot,
 .az-stage.is-active .az-stage-dot {
   border-color: var(--signal);
   background: var(--signal);
+  transform: scale(1.15);
 }
 
 .az-stage.is-active .az-stage-dot {
-  box-shadow: 0 0 0 3px var(--signal-subtle);
+  box-shadow: 0 0 0 4px var(--signal-subtle);
 }
 
 .az-stage-label {
@@ -131,10 +139,24 @@
 .az-signal {
   padding-left: 0.85rem;
   border-left: 2px solid var(--signal);
+  transition:
+    transform var(--duration) var(--ease-out),
+    border-color var(--duration) var(--ease),
+    background-color var(--duration) var(--ease);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.az-signal:hover {
+  transform: translateX(3px);
+  background: color-mix(in srgb, var(--signal-subtle) 55%, transparent);
 }
 
 .az-signal.is-constraint {
   border-left-color: var(--warning);
+}
+
+.az-signal.is-constraint:hover {
+  background: color-mix(in srgb, var(--warning-subtle) 70%, transparent);
 }
 
 .az-signal-title {
@@ -257,5 +279,11 @@
   .az-stage {
     animation: none;
     transition: none;
+    transform: none;
+    opacity: 1;
+  }
+
+  .az-signal:hover {
+    transform: none;
   }
 }

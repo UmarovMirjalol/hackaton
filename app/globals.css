@@ -51,13 +51,17 @@
 
   /* Elevation — restrained */
   --shadow-panel: 0 18px 40px -28px rgba(11, 13, 18, 0.32);
+  --shadow-lift: 0 22px 48px -30px rgba(11, 13, 18, 0.38);
   --shadow-focus: 0 0 0 3px var(--signal-subtle);
 
   /* Motion */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --duration-fast: 120ms;
-  --duration: 180ms;
-  --duration-slow: 280ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+  --duration-fast: 140ms;
+  --duration: 220ms;
+  --duration-slow: 420ms;
+  --duration-crawl: 700ms;
 
   /* Spacing scale */
   --space-1: 0.25rem;
@@ -209,18 +213,39 @@ body {
 /* ——— Motion ——— */
 
 .enter {
-  animation: enter var(--duration-slow) var(--ease) both;
+  animation: enter var(--duration-slow) var(--ease-out) both;
 }
+
+.enter-delay-1 { animation-delay: 60ms; }
+.enter-delay-2 { animation-delay: 120ms; }
+.enter-delay-3 { animation-delay: 180ms; }
+.enter-delay-4 { animation-delay: 240ms; }
 
 @keyframes enter {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
     transform: none;
   }
+}
+
+@keyframes enter-left {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes enter-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes bar {
@@ -232,9 +257,92 @@ body {
   }
 }
 
+@keyframes rail-in {
+  from {
+    transform: scaleX(0);
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes veil-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .progress-bar {
   transform-origin: left;
-  animation: bar 420ms var(--ease) both;
+  animation: bar 520ms var(--ease-out) both;
+}
+
+.flow-rail {
+  transform-origin: left center;
+  animation: rail-in 480ms var(--ease-out) both;
+}
+
+.drawer-panel {
+  animation: drawer-in 420ms var(--ease-out) both;
+}
+
+.drawer-veil {
+  animation: veil-in 280ms var(--ease) both;
+}
+
+/* Interactive lift / press language */
+.lift {
+  transition:
+    transform var(--duration) var(--ease-out),
+    box-shadow var(--duration) var(--ease-out),
+    border-color var(--duration) var(--ease),
+    background-color var(--duration) var(--ease),
+    color var(--duration) var(--ease);
+}
+
+.lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+
+.lift:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.link-flow {
+  position: relative;
+  transition: color var(--duration) var(--ease);
+}
+
+.link-flow::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.link-flow:hover::after,
+.link-flow:focus-visible::after {
+  transform: scaleX(1);
 }
 
 /* Campus media — shared hover / grain */
@@ -242,21 +350,90 @@ body {
   isolation: isolate;
 }
 
+.campus-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 45%,
+    rgba(11, 13, 18, 0.08) 100%
+  );
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease);
+}
+
+.group:hover .campus-media::after,
+.group:focus-within .campus-media::after {
+  opacity: 1;
+}
+
 .campus-media-img {
-  transform: scale(1.001);
-  transition: transform 700ms var(--ease), filter 700ms var(--ease);
+  transform: scale(1.02);
+  transition:
+    transform var(--duration-crawl) var(--ease-out),
+    filter var(--duration-crawl) var(--ease-out);
+  will-change: transform;
 }
 
 .group:hover .campus-media-img,
 .group:focus-within .campus-media-img {
-  transform: scale(1.05);
-  filter: saturate(1.06) contrast(1.03);
+  transform: scale(1.08);
+  filter: saturate(1.08) contrast(1.04) brightness(1.02);
 }
 
 .campus-media-grain {
   background-image:
     radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18), transparent 42%),
     radial-gradient(circle at 80% 70%, rgba(0, 0, 0, 0.25), transparent 50%);
+}
+
+/* Result / uni card flow */
+.result-card,
+.uni-card {
+  position: relative;
+  transition:
+    background-color var(--duration-slow) var(--ease),
+    border-color var(--duration) var(--ease);
+}
+
+.result-card::before,
+.uni-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1.25rem;
+  bottom: 1.25rem;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--signal);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform var(--duration-slow) var(--ease-out);
+  opacity: 0.9;
+}
+
+.result-card:hover::before,
+.uni-card:hover::before,
+.result-card:focus-within::before,
+.uni-card:focus-within::before {
+  transform: scaleY(1);
+}
+
+.result-card:hover,
+.uni-card:hover {
+  background: color-mix(in srgb, var(--surface) 70%, var(--signal-subtle));
+}
+
+.result-card .signal-rail,
+.uni-card .signal-rail {
+  transition: border-color var(--duration) var(--ease), padding-left var(--duration) var(--ease);
+}
+
+.result-card:hover .signal-rail,
+.uni-card:hover .signal-rail {
+  border-color: var(--signal-hover);
 }
 
 .skeleton {
@@ -274,16 +451,31 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .enter,
   .progress-bar,
-  .skeleton {
+  .skeleton,
+  .flow-rail,
+  .drawer-panel,
+  .drawer-veil {
     animation: none;
   }
 
   .campus-media-img,
   .group:hover .campus-media-img,
-  .group:focus-within .campus-media-img {
-    transform: none;
-    filter: none;
-    transition: none;
+  .group:focus-within .campus-media-img,
+  .lift,
+  .lift:hover,
+  .lift:active,
+  .link-flow::after,
+  .result-card::before,
+  .uni-card::before {
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .result-card:hover,
+  .uni-card:hover {
+    background: transparent;
   }
 }
 
