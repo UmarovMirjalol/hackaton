@@ -1,11 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/Button";
-import { ChoiceGrid, Segmented } from "@/components/ui/Choices";
-import { Field, Input, TextArea } from "@/components/ui/Field";
-import { cn } from "@/lib/cn";
+import { useMemo, useState } from "react";
+import {
+  ObButton,
+  ObCountryGrid,
+  ObField,
+  ObInput,
+  ObOptionRows,
+  ObRange,
+  ObSegmented,
+  ObSelectList,
+  ObTextArea,
+} from "@/components/onboarding/Controls";
 import {
   ONBOARDING_STEPS,
   clampOnboardingStep,
@@ -23,7 +31,7 @@ import {
   type Interest,
 } from "@/lib/types";
 import { countryLabels, fieldLabels } from "@/lib/universities";
-import Link from "next/link";
+import "./onboarding.css";
 
 export default function OnboardingPage() {
   const { profile, setProfile, loadDemo, hydrated, onboardingStep, setOnboardingStep } = useRoute();
@@ -64,9 +72,6 @@ export default function OnboardingPage() {
         profile.firstName && `${profile.firstName} ${profile.lastName}`.trim(),
         profile.homeCountry,
         profile.field ? fieldLabels[profile.field] : null,
-        profile.countries.length
-          ? profile.countries.map((c) => countryLabels[c]).join(", ")
-          : null,
       ]
         .filter(Boolean)
         .join(" · "),
@@ -75,50 +80,56 @@ export default function OnboardingPage() {
 
   if (!hydrated) {
     return (
-      <div className="flex min-h-dvh items-center justify-center">
-        <div className="skeleton h-4 w-40" />
+      <div className="ob-shell flex min-h-dvh items-center justify-center">
+        <p className="font-mono text-[12px] tracking-[0.08em] text-[var(--text-tertiary)] uppercase">
+          Loading profile
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-dvh bg-background">
-      <header className="border-b border-border bg-surface/80 backdrop-blur-md">
-        <div
-          className="mx-auto flex items-center justify-between gap-4 px-[var(--space-page)] py-3"
-          style={{ maxWidth: "var(--content)" }}
-        >
-          <Link href="/" className="text-[15px] font-semibold tracking-tight">
-            Route
-          </Link>
-          <p className="meta hidden sm:block">{summary || "Building your profile"}</p>
-          <button
-            type="button"
-            className="text-[12px] font-medium text-secondary underline decoration-border underline-offset-4 hover:text-primary"
-            onClick={() => {
-              loadDemo();
-              router.push("/analyze");
-            }}
-          >
-            Try demo profile
-          </button>
+    <div className="ob-shell">
+      <header className="sticky top-0 z-20 border-b border-[var(--border)] backdrop-blur-md">
+        <div className="ob-frame flex items-center justify-between gap-4 py-3.5">
+          <div className="flex items-baseline gap-3">
+            <Link
+              href="/"
+              className="text-[15px] font-semibold tracking-tight text-[var(--text-primary)] transition-opacity hover:opacity-70"
+            >
+              Route
+            </Link>
+            <span className="hidden text-[12px] text-[var(--text-tertiary)] sm:inline">
+              Admissions profile
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4 sm:gap-6">
+            <p className="font-mono text-[11px] tracking-[0.04em] text-[var(--text-tertiary)] tabular-nums">
+              Step {step.number} of {ONBOARDING_STEPS.length}
+            </p>
+            <ObButton
+              variant="text"
+              onClick={() => {
+                loadDemo();
+                router.push("/analyze");
+              }}
+            >
+              Try demo
+            </ObButton>
+          </div>
         </div>
-        <div className="h-0.5 bg-surface-muted">
-          <div
-            key={step.id}
-            className="progress-bar h-full bg-[var(--signal)]"
-            style={{ width: `${progress}%` }}
-          />
+        <div className="ob-progress" aria-hidden>
+          <span style={{ width: `${progress}%` }} />
         </div>
       </header>
 
-      <main
-        className="mx-auto grid gap-10 px-[var(--space-page)] py-8 lg:grid-cols-12 lg:gap-12 lg:py-12"
-        style={{ maxWidth: "var(--content)" }}
-      >
-        <aside className="hidden lg:col-span-4 lg:block">
-          <p className="label">Build your profile</p>
-          <ol className="mt-6 space-y-0">
+      <div className="ob-frame grid gap-10 py-8 lg:grid-cols-[var(--ob-rail)_minmax(0,1fr)] lg:gap-16 lg:py-12 xl:gap-20">
+        <aside className="ob-rail hidden lg:block">
+          <p className="mb-5 font-mono text-[10px] tracking-[0.12em] text-[var(--text-tertiary)] uppercase">
+            Profile build
+          </p>
+          <ol>
             {ONBOARDING_STEPS.map((s, i) => {
               const done = i < stepIndex;
               const active = i === stepIndex;
@@ -126,24 +137,21 @@ export default function OnboardingPage() {
                 <li key={s.id}>
                   <button
                     type="button"
+                    data-active={active}
+                    data-done={done}
+                    className="ob-step-btn"
                     onClick={() => {
                       setError(null);
                       setStep(i);
                     }}
-                    className={cn(
-                      "flex w-full items-start gap-3 border-l-2 py-2.5 pl-4 text-left transition-colors",
-                      active
-                        ? "border-[var(--signal)] text-primary"
-                        : done
-                          ? "border-border-strong text-secondary"
-                          : "border-transparent text-tertiary hover:text-secondary",
-                    )}
                   >
-                    <span className="meta w-5 shrink-0">{String(s.number).padStart(2, "0")}</span>
+                    <span className="font-mono text-[11px] tabular-nums opacity-70">
+                      {String(s.number).padStart(2, "0")}
+                    </span>
                     <span>
-                      <span className="block text-[13px] font-medium">{s.label}</span>
+                      <span className="block text-[13px] font-medium leading-5">{s.label}</span>
                       {active ? (
-                        <span className="mt-1 block text-[12px] leading-5 text-tertiary">
+                        <span className="mt-1 block text-[12px] leading-5 text-[var(--text-tertiary)]">
                           {s.purpose}
                         </span>
                       ) : null}
@@ -153,33 +161,43 @@ export default function OnboardingPage() {
               );
             })}
           </ol>
+          {summary ? (
+            <p className="mt-8 border-t border-[var(--border)] pt-5 text-[12px] leading-5 text-[var(--text-tertiary)]">
+              {summary}
+            </p>
+          ) : null}
         </aside>
 
-        <section className="enter lg:col-span-8">
-          <p className="meta lg:hidden">
-            Step {step.number} of {ONBOARDING_STEPS.length} · {step.label}
+        <section key={step.id} className="ob-main min-w-0">
+          <p className="mb-3 font-mono text-[11px] tracking-[0.08em] text-[var(--text-tertiary)] uppercase lg:hidden">
+            {step.label} · {step.number}/{ONBOARDING_STEPS.length}
           </p>
-          <h1 className="text-h1 mt-2 max-w-xl">{step.title}</h1>
-          <p className="body mt-2 max-w-lg text-secondary">{step.purpose}</p>
 
-          <div className="mt-8 max-w-2xl">{renderStep(step.id, profile, setProfile)}</div>
+          <h1 className="ob-question">{step.title}</h1>
+          <p className="ob-purpose">{step.purpose}</p>
+
+          <div className="ob-body mt-9 max-w-xl xl:max-w-2xl">
+            {renderStep(step.id, profile, setProfile)}
+          </div>
 
           {error ? (
-            <p role="alert" className="mt-5 text-[13px] font-medium text-error">
+            <p role="alert" className="ob-error">
               {error}
             </p>
           ) : null}
 
-          <div className="mt-10 flex items-center justify-between gap-3 border-t border-border pt-5">
-            <Button variant="ghost" onClick={goBack}>
-              {stepIndex === 0 ? "Home" : "Back"}
-            </Button>
-            <Button variant="signal" onClick={goNext}>
-              {stepIndex >= ONBOARDING_STEPS.length - 1 ? "Analyze profile" : "Continue"}
-            </Button>
+          <div className="ob-footer">
+            <div className="flex items-center justify-between gap-3">
+              <ObButton variant="ghost" onClick={goBack}>
+                {stepIndex === 0 ? "Home" : "Back"}
+              </ObButton>
+              <ObButton variant="primary" onClick={goNext}>
+                {stepIndex >= ONBOARDING_STEPS.length - 1 ? "Analyze profile" : "Continue"}
+              </ObButton>
+            </div>
           </div>
         </section>
-      </main>
+      </div>
     </div>
   );
 }
@@ -192,30 +210,32 @@ function renderStep(
   switch (id) {
     case "academic":
       return (
-        <div className="space-y-6">
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="First name">
-              <Input
+        <div className="space-y-8">
+          <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+            <ObField label="First name">
+              <ObInput
                 autoFocus
                 value={profile.firstName}
                 onChange={(e) => setProfile({ firstName: e.target.value })}
+                placeholder="Amira"
               />
-            </Field>
-            <Field label="Last name">
-              <Input
+            </ObField>
+            <ObField label="Last name">
+              <ObInput
                 value={profile.lastName}
                 onChange={(e) => setProfile({ lastName: e.target.value })}
+                placeholder="Hassan"
               />
-            </Field>
-            <Field label="Home country">
-              <Input
+            </ObField>
+            <ObField label="Home country">
+              <ObInput
                 value={profile.homeCountry}
                 onChange={(e) => setProfile({ homeCountry: e.target.value })}
                 placeholder="Kenya"
               />
-            </Field>
-            <Field label="Graduation year">
-              <Segmented<`${GradYear}`>
+            </ObField>
+            <ObField label="Graduation year">
+              <ObSegmented<`${GradYear}`>
                 value={`${profile.gradYear}`}
                 onChange={(v) => setProfile({ gradYear: Number(v) as GradYear })}
                 options={[
@@ -224,10 +244,13 @@ function renderStep(
                   { value: "2028", label: "2028" },
                 ]}
               />
-            </Field>
+            </ObField>
           </div>
-          <Field label="Curriculum">
-            <Segmented<Curriculum>
+
+          <div className="ob-divider" />
+
+          <ObField label="Curriculum">
+            <ObSegmented<Curriculum>
               value={profile.curriculum}
               onChange={(v) => setProfile({ curriculum: v })}
               options={[
@@ -237,20 +260,22 @@ function renderStep(
                 { value: "national", label: "National" },
               ]}
             />
-          </Field>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field
+          </ObField>
+
+          <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+            <ObField
               label={profile.gpaScale === "ib" ? "IB points" : "GPA"}
               hint="Optional if you do not have a number yet."
             >
-              <Input
+              <ObInput
                 inputMode="decimal"
                 value={profile.gpa}
                 onChange={(e) => setProfile({ gpa: e.target.value })}
+                placeholder={profile.gpaScale === "ib" ? "38" : "3.8"}
               />
-            </Field>
-            <Field label="Scale">
-              <Segmented
+            </ObField>
+            <ObField label="Scale">
+              <ObSegmented
                 value={profile.gpaScale}
                 onChange={(v) => setProfile({ gpaScale: v })}
                 options={[
@@ -259,42 +284,51 @@ function renderStep(
                   { value: "ib", label: "IB 45" },
                 ]}
               />
-            </Field>
+            </ObField>
           </div>
         </div>
       );
+
     case "testing":
       return (
-        <div className="space-y-6">
-          <Field label="SAT status">
-            <Segmented
+        <div className="space-y-9">
+          <div>
+            <p className="ob-section-label">SAT</p>
+            <ObOptionRows
               value={profile.satStatus}
               onChange={(v) => setProfile({ satStatus: v })}
               options={[
-                { value: "done", label: "Score in hand" },
-                { value: "planned", label: "Planning to sit" },
-                { value: "skip", label: "Not using SAT" },
+                { value: "done", label: "Score in hand", hint: "We’ll use Math and ERW in the match." },
+                { value: "planned", label: "Planning to sit", hint: "Becomes a dated task on your roadmap." },
+                { value: "skip", label: "Not using SAT", hint: "Test-optional and non-SAT paths stay open." },
               ]}
             />
-          </Field>
-          {profile.satStatus === "done" ? (
-            <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="SAT Math">
-                <Input
-                  value={profile.satMath}
-                  onChange={(e) => setProfile({ satMath: e.target.value })}
-                />
-              </Field>
-              <Field label="SAT ERW">
-                <Input
-                  value={profile.satEbrw}
-                  onChange={(e) => setProfile({ satEbrw: e.target.value })}
-                />
-              </Field>
-            </div>
-          ) : null}
-          <Field label="English-proficiency exam">
-            <Segmented<EnglishExam>
+            {profile.satStatus === "done" ? (
+              <div className="mt-6 grid gap-6 sm:grid-cols-2">
+                <ObField label="SAT Math">
+                  <ObInput
+                    autoFocus
+                    inputMode="numeric"
+                    value={profile.satMath}
+                    onChange={(e) => setProfile({ satMath: e.target.value })}
+                    placeholder="760"
+                  />
+                </ObField>
+                <ObField label="SAT ERW">
+                  <ObInput
+                    inputMode="numeric"
+                    value={profile.satEbrw}
+                    onChange={(e) => setProfile({ satEbrw: e.target.value })}
+                    placeholder="710"
+                  />
+                </ObField>
+              </div>
+            ) : null}
+          </div>
+
+          <div>
+            <p className="ob-section-label">English proficiency</p>
+            <ObSegmented<EnglishExam>
               value={profile.englishExam}
               onChange={(v) => setProfile({ englishExam: v })}
               options={[
@@ -304,39 +338,51 @@ function renderStep(
                 { value: "duolingo", label: "Duolingo" },
               ]}
             />
-          </Field>
-          {profile.englishExam !== "none" ? (
-            <Field label="Score">
-              <Input
-                value={profile.englishScore}
-                onChange={(e) => setProfile({ englishScore: e.target.value })}
-              />
-            </Field>
-          ) : null}
+            {profile.englishExam !== "none" ? (
+              <div className="mt-6 max-w-xs">
+                <ObField label="Score">
+                  <ObInput
+                    value={profile.englishScore}
+                    onChange={(e) => setProfile({ englishScore: e.target.value })}
+                    placeholder={
+                      profile.englishExam === "ielts"
+                        ? "7.5"
+                        : profile.englishExam === "toefl"
+                          ? "105"
+                          : "130"
+                    }
+                  />
+                </ObField>
+              </div>
+            ) : null}
+          </div>
         </div>
       );
+
     case "activities":
       return (
-        <div className="space-y-6">
-          <Field
-            label="Activities"
+        <div className="space-y-10">
+          <ObField
+            label="What you spend time on"
             hint="Clubs, projects, work, volunteering — short phrases are enough."
           >
-            <TextArea
+            <ObTextArea
+              autoFocus
               value={profile.activities}
               onChange={(e) => setProfile({ activities: e.target.value })}
               placeholder="Robotics captain · coding club · family business weekends"
             />
-          </Field>
-          <Field label="Achievements" hint="Optional awards, olympiads, publications.">
-            <TextArea
+          </ObField>
+          <ObField label="Achievements" hint="Optional awards, olympiads, publications.">
+            <ObTextArea
               value={profile.achievements}
               onChange={(e) => setProfile({ achievements: e.target.value })}
               placeholder="National olympiad shortlist · research fair winner"
             />
-          </Field>
-          <Field label="Have you done research?">
-            <Segmented
+          </ObField>
+          <div>
+            <p className="ob-section-label">Research experience</p>
+            <ObSegmented
               value={profile.researchExperience ? "yes" : "no"}
               onChange={(v) => setProfile({ researchExperience: v === "yes" })}
               options={[
@@ -344,15 +390,16 @@ function renderStep(
                 { value: "yes", label: "Yes" },
               ]}
             />
-          </Field>
+          </div>
         </div>
       );
+
     case "interests":
       return (
-        <div className="space-y-8">
+        <div className="space-y-10">
           <div>
-            <p className="small mb-3 font-medium text-secondary">Intended field</p>
-            <ChoiceGrid<StudyField>
+            <p className="ob-section-label">Intended field</p>
+            <ObSelectList<StudyField>
               value={profile.field}
               onChange={(v) => setProfile({ field: v as StudyField })}
               options={[
@@ -365,8 +412,8 @@ function renderStep(
             />
           </div>
           <div>
-            <p className="small mb-3 font-medium text-secondary">Campus strengths that matter</p>
-            <ChoiceGrid<Interest>
+            <p className="ob-section-label">Campus strengths that matter</p>
+            <ObSelectList<Interest>
               multiple
               value={profile.interests}
               onChange={(v) => setProfile({ interests: v as Interest[] })}
@@ -381,55 +428,77 @@ function renderStep(
           </div>
         </div>
       );
+
     case "place":
       return (
-        <ChoiceGrid<CountryId>
-          multiple
-          value={profile.countries}
-          onChange={(v) => setProfile({ countries: v as CountryId[] })}
-          options={(Object.keys(countryLabels) as CountryId[]).map((id) => ({
-            value: id,
-            label: countryLabels[id],
-          }))}
-        />
-      );
-    case "aid":
-      return (
-        <div className="space-y-7">
-          <ChoiceGrid<AidNeed>
-            value={profile.aidNeed}
-            onChange={(v) => setProfile({ aidNeed: v as AidNeed })}
-            options={[
-              { value: "full", label: "Full aid required", hint: "Little or no family contribution" },
-              {
-                value: "substantial",
-                label: "Substantial aid",
-                hint: "Some contribution, not full fees",
-              },
-              { value: "some", label: "Some help", hint: "Merit or a partial package would matter" },
-              { value: "none", label: "Can fund without aid", hint: "Still useful to compare net cost" },
-            ]}
+        <div>
+          <p className="ob-section-label">Where you will apply</p>
+          <ObCountryGrid<CountryId>
+            value={profile.countries}
+            onChange={(v) => setProfile({ countries: v })}
+            options={(Object.keys(countryLabels) as CountryId[]).map((cid) => ({
+              value: cid,
+              label: countryLabels[cid],
+            }))}
           />
-          <Field
-            label={`Annual family contribution: $${Number(profile.annualBudget || 0).toLocaleString()}`}
-          >
-            <input
-              type="range"
-              min={0}
-              max={70000}
-              step={1000}
-              value={Number(profile.annualBudget || 0)}
-              onChange={(e) => setProfile({ annualBudget: e.target.value })}
-              className="mt-3 w-full"
-            />
-          </Field>
+          <p className="mt-5 text-[12.5px] leading-5 text-[var(--text-tertiary)]">
+            {profile.countries.length
+              ? `${profile.countries.length} selected — unchecked countries leave the shortlist.`
+              : "Select every region you are willing to apply to."}
+          </p>
         </div>
       );
+
+    case "aid":
+      return (
+        <div className="space-y-10">
+          <div>
+            <p className="ob-section-label">Aid need</p>
+            <ObOptionRows<AidNeed>
+              value={profile.aidNeed}
+              onChange={(v) => setProfile({ aidNeed: v })}
+              options={[
+                {
+                  value: "full",
+                  label: "Full aid required",
+                  hint: "Little or no family contribution",
+                },
+                {
+                  value: "substantial",
+                  label: "Substantial aid",
+                  hint: "Some contribution, not full fees",
+                },
+                {
+                  value: "some",
+                  label: "Some help",
+                  hint: "Merit or a partial package would matter",
+                },
+                {
+                  value: "none",
+                  label: "Can fund without aid",
+                  hint: "Still useful to compare net cost",
+                },
+              ]}
+            />
+          </div>
+          <ObRange
+            label="Annual family contribution"
+            value={Number(profile.annualBudget || 0)}
+            onChange={(n) => setProfile({ annualBudget: String(n) })}
+            min={0}
+            max={70000}
+            step={1000}
+            display={`$${Number(profile.annualBudget || 0).toLocaleString()}`}
+          />
+        </div>
+      );
+
     case "goals":
       return (
-        <div className="space-y-6">
-          <Field label="Recommendation letters">
-            <Segmented
+        <div className="space-y-10">
+          <div>
+            <p className="ob-section-label">Recommendation letters</p>
+            <ObSegmented
               value={profile.recLettersStarted ? "yes" : "no"}
               onChange={(v) => setProfile({ recLettersStarted: v === "yes" })}
               options={[
@@ -437,32 +506,41 @@ function renderStep(
                 { value: "yes", label: "Already asked" },
               ]}
             />
-          </Field>
-          <div className="border border-border bg-surface p-5">
-            <p className="label">Ready to analyze</p>
-            <p className="mt-2 text-[18px] font-medium tracking-tight">
-              {profile.firstName} {profile.lastName}
+          </div>
+
+          <div className="ob-dossier-wrap">
+            <p className="ob-section-label">Profile ready for analysis</p>
+            <p className="mt-1 text-[22px] font-medium tracking-tight">
+              {profile.firstName || "—"} {profile.lastName}
             </p>
-            <dl className="mt-4 grid gap-3 text-[13px] sm:grid-cols-2">
+            <dl className="ob-dossier mt-6 sm:grid-cols-2">
               <div>
-                <dt className="text-tertiary">Field</dt>
-                <dd className="font-medium">{profile.field ? fieldLabels[profile.field] : "—"}</dd>
+                <dt>Field</dt>
+                <dd>{profile.field ? fieldLabels[profile.field] : "—"}</dd>
               </div>
               <div>
-                <dt className="text-tertiary">Aid</dt>
-                <dd className="font-medium capitalize">{profile.aidNeed || "—"}</dd>
+                <dt>Aid</dt>
+                <dd className="capitalize">{profile.aidNeed || "—"}</dd>
               </div>
               <div>
-                <dt className="text-tertiary">Countries</dt>
-                <dd className="font-medium">
-                  {profile.countries.map((c) => countryLabels[c]).join(", ")}
+                <dt>Countries</dt>
+                <dd>
+                  {profile.countries.length
+                    ? profile.countries.map((c) => countryLabels[c]).join(", ")
+                    : "—"}
                 </dd>
               </div>
               <div>
-                <dt className="text-tertiary">Budget</dt>
-                <dd className="font-medium">
-                  ${Number(profile.annualBudget || 0).toLocaleString()}/yr
-                </dd>
+                <dt>Budget</dt>
+                <dd>${Number(profile.annualBudget || 0).toLocaleString()}/yr</dd>
+              </div>
+              <div>
+                <dt>Home</dt>
+                <dd>{profile.homeCountry || "—"}</dd>
+              </div>
+              <div>
+                <dt>Grad year</dt>
+                <dd>{profile.gradYear}</dd>
               </div>
             </dl>
           </div>
