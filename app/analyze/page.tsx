@@ -255,7 +255,7 @@ export default function AnalyzePage() {
           </Link>
           <p className="meta tabular-nums">{pct}% profile · saved locally</p>
         </div>
-        <JourneyRail alwaysShow />
+        <JourneyRail alwaysShow showStatus={false} />
       </header>
 
       <main className="route-frame az-main">

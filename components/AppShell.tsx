@@ -18,7 +18,14 @@ const NAV = [
   { href: "/roadmap", label: "Act" },
 ] as const;
 
-export function JourneyRail({ alwaysShow = false }: { alwaysShow?: boolean }) {
+export function JourneyRail({
+  alwaysShow = false,
+  /** When false, omit trailing completeness meta (host chrome already shows it). */
+  showStatus = true,
+}: {
+  alwaysShow?: boolean;
+  showStatus?: boolean;
+}) {
   const pathname = usePathname();
   const { profile } = useRoute();
   const ready = profileReady(profile);
@@ -71,13 +78,15 @@ export function JourneyRail({ alwaysShow = false }: { alwaysShow?: boolean }) {
             </Link>
           );
         })}
-        <span className="meta ml-auto hidden items-center gap-2 py-2.5 lg:inline-flex">
-          {!ready ? (
-            <span>Finish profile to unlock route</span>
-          ) : (
-            <span>{pct}% profile · saved locally</span>
-          )}
-        </span>
+        {showStatus ? (
+          <span className="meta ml-auto hidden items-center gap-2 py-2.5 lg:inline-flex">
+            {!ready ? (
+              <span>Finish profile to unlock route</span>
+            ) : (
+              <span>{pct}% profile · saved locally</span>
+            )}
+          </span>
+        ) : null}
       </div>
     </div>
   );
