@@ -136,7 +136,7 @@ export function AppShell({
   const pathname = usePathname();
 
   return (
-    <div className="min-h-dvh pb-16 md:pb-0">
+    <div className={cn("min-h-dvh", footer ? "pb-52 md:pb-28" : "pb-16 md:pb-0")}>
       <header className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur-md">
         <div className="route-frame flex items-center justify-between gap-4 py-3">
           <Link href="/" className="inline-flex items-center gap-2 text-[15px] font-semibold tracking-tight">

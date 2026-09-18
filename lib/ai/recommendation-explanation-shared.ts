@@ -135,37 +135,78 @@ export function parseRecommendationExplanationText(
 
 /**
  * Deterministic narrative when Gemini is unavailable or invalid.
- * Built only from matcher why-text and factor labels already on the card.
+ * Built from match factors — not a verbatim copy of the match-reasons paragraph.
  */
 export function fallbackRecommendationExplanation(
   context: RecommendationExplanationContext,
 ): RecommendationExplanation {
-  const whyItFits = context.match.why.trim();
-  const keyReasons: string[] = [];
+  const uni = context.university.shortName;
+  const field = context.profileSignals.field;
+  const aidNeed = context.profileSignals.aidNeed;
+  const factors = context.match.factors;
 
-  for (const factor of context.match.factors) {
+  const academic = factors.find((f) => f.label === "Academic fit");
+  const research = factors.find((f) => f.label === "Research");
+  const financial = factors.find((f) => f.label === "Financial aid");
+  const location = factors.find((f) => f.label === "Location");
+
+  const clauses: string[] = [];
+  if (academic?.value) {
+    const academicValue = academic.value.replace(/^Offers\s+/i, "offers ").toLowerCase();
+    clauses.push(
+      academic.tone === "good"
+        ? `${academicValue} aligns with your ${field} direction`
+        : `academic overlap is limited (${academic.value.toLowerCase()})`,
+    );
+  }
+  if (financial?.value) {
+    clauses.push(
+      `aid reads as “${financial.value.toLowerCase()}” against your ${aidNeed} priority`,
+    );
+  }
+  if (
+    research?.value &&
+    (context.profileSignals.interests.includes("research") ||
+      context.profileSignals.researchExperience)
+  ) {
+    clauses.push(research.value.toLowerCase());
+  } else if (location?.value) {
+    clauses.push(location.value.toLowerCase());
+  }
+
+  const joined =
+    clauses.length === 0
+      ? "it still passes the filters already applied to your profile"
+      : clauses.length === 1
+        ? clauses[0]
+        : clauses.length === 2
+          ? `${clauses[0]}, and ${clauses[1]}`
+          : `${clauses.slice(0, -1).join(", ")}, and ${clauses[clauses.length - 1]}`;
+
+  const whyItFits = `${uni} stays on this shortlist because ${joined}. This note restates the match factors above — it does not change the ranking.`;
+
+  const keyReasons: string[] = [];
+  for (const factor of factors) {
     if (keyReasons.length >= 3) break;
     if (factor.tone === "watch" && keyReasons.length > 0) continue;
     const line = `${factor.label}: ${factor.value}`;
     if (line.length >= 8) keyReasons.push(line);
   }
-
   if (keyReasons.length < 2) {
-    for (const factor of context.match.factors) {
+    for (const factor of factors) {
       if (keyReasons.length >= 3) break;
       const line = `${factor.label}: ${factor.value}`;
       if (!keyReasons.includes(line) && line.length >= 8) keyReasons.push(line);
     }
   }
-
   if (keyReasons.length < 1) {
-    keyReasons.push(`${context.university.shortName} stays on your list based on the current profile filters.`);
+    keyReasons.push(
+      `${uni} stays on your list based on the current profile filters.`,
+    );
   }
 
   return {
-    whyItFits:
-      whyItFits ||
-      `${context.university.name} remains on the list because it matches the constraints already computed for your profile.`,
+    whyItFits,
     keyReasons: keyReasons.slice(0, 3),
   };
 }

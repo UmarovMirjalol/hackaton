@@ -64,7 +64,7 @@ export default function LandingPage() {
           <ol className="mt-12 space-y-3 border-t border-border pt-6">
             {[
               ["01", "Build profile", "Academics, tests, interests, aid"],
-              ["02", "Analyze", "Deterministic match on your constraints"],
+              ["02", "Understand", "Deterministic diagnosis on your constraints"],
               ["03", "Act", "Compare campuses · follow the roadmap"],
             ].map(([n, t, d]) => (
               <li key={n} className="grid grid-cols-[2rem_1fr] gap-3 text-[13px]">
