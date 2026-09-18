@@ -16,6 +16,7 @@ import {
   writeStore,
 } from "./persist";
 import { buildRoadmap, nextTask } from "./roadmap";
+import { routeInputsChanged } from "./route-fingerprint";
 import { demoProfile, type Profile, type TaskStatus } from "./types";
 
 type Persisted = ReturnType<typeof getPersistedSnapshot>;
@@ -58,7 +59,15 @@ export function RouteProvider({ children }: { children: ReactNode }) {
     () => ({
       setProfile: (patch: Partial<Profile>) => {
         const cur = getPersistedSnapshot();
-        writeStore({ ...cur, profile: { ...cur.profile, ...patch } });
+        const profile = { ...cur.profile, ...patch };
+        const inputsChanged = routeInputsChanged(cur.profile, patch);
+        writeStore({
+          ...cur,
+          profile,
+          // Shortlist + task completion belong to the previous route inputs.
+          // Clear them so compare / roadmap / next-action cannot linger.
+          ...(inputsChanged ? { compareIds: [], taskStatus: {} } : {}),
+        });
       },
       replaceProfile: (profile: Profile) => {
         writeStore({ profile, compareIds: [], taskStatus: {}, onboardingStep: 0 });

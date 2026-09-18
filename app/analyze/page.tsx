@@ -17,6 +17,7 @@ import { JOURNEY, profileCompleteness } from "@/lib/journey";
 import { recommended } from "@/lib/matching";
 import { profileReady } from "@/lib/onboarding";
 import { buildRoadmap } from "@/lib/roadmap";
+import { routeInputFingerprint } from "@/lib/route-fingerprint";
 import { useRoute } from "@/lib/store";
 import type { Profile } from "@/lib/types";
 import { countryLabels, fieldLabels } from "@/lib/universities";
@@ -109,6 +110,8 @@ export default function AnalyzePage() {
   const [explanation, setExplanation] = useState<DiagnosisExplanation | null>(null);
   const timersRef = useRef<number[]>([]);
   const cancelledRef = useRef(false);
+  const explanationGenerationRef = useRef(0);
+  const profileRouteKey = useMemo(() => routeInputFingerprint(profile), [profile]);
 
   const diagnosis = useMemo(() => synthesize(profile), [profile]);
   const recs = useMemo(() => recommended(profile, 6), [profile]);
@@ -169,16 +172,9 @@ export default function AnalyzePage() {
       cancelledRef.current = true;
       clearAll();
     };
+    // Re-stage whenever matching/diagnosis-relevant inputs change (budget, exams, …).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    hydrated,
-    ready,
-    profile.firstName,
-    profile.field,
-    profile.aidNeed,
-    profile.countries.join(","),
-    router,
-  ]);
+  }, [hydrated, ready, profileRouteKey, profile.firstName, router]);
 
   // Fetch personalized explanation in parallel with the loading stages.
   // Deterministic diagnosis stays visible even if this fails or is slow.
@@ -186,6 +182,8 @@ export default function AnalyzePage() {
   useEffect(() => {
     if (!hydrated || !ready) return;
 
+    const generation = ++explanationGenerationRef.current;
+    const expectedKey = diagnosisExplanationCacheKey(explanationContext);
     setExplanation(fallbackDiagnosisExplanation(explanationContext));
 
     const ac = new AbortController();
@@ -200,6 +198,8 @@ export default function AnalyzePage() {
           explanation?: DiagnosisExplanation;
         };
         if (ac.signal.aborted) return;
+        if (explanationGenerationRef.current !== generation) return;
+        if (diagnosisExplanationCacheKey(explanationContext) !== expectedKey) return;
         if (
           data.explanation &&
           typeof data.explanation.summary === "string" &&

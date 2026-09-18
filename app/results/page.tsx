@@ -31,11 +31,8 @@ export default function ResultsPage() {
     [recs, profile.countries],
   );
 
-  const { byUniversityId: explanations } = useRecommendationExplanations(
-    profile,
-    visible,
-    hydrated && profileReady(profile),
-  );
+  const { byUniversityId: explanations, contexts: explanationContexts, getExplanation } =
+    useRecommendationExplanations(profile, visible, hydrated && profileReady(profile));
 
   useEffect(() => {
     if (hydrated && !profileReady(profile)) router.replace("/onboarding");
@@ -214,19 +211,28 @@ export default function ResultsPage() {
       </div>
 
       <ul className="space-y-0">
-        {visible.map((row, i) => (
-          <li key={`${row.university.id}-${row.fitIndex}-${row.why.slice(0, 24)}`}>
-            <ResultCard
-              row={row}
-              rank={i + 1}
-              selected={compareIds.includes(row.university.id)}
-              onToggle={() => toggleCompare(row.university.id)}
-              onOpen={() => setDetail(row)}
-              explanation={explanations[row.university.id]?.explanation ?? null}
-              explanationPending={explanations[row.university.id]?.pending ?? false}
-            />
-          </li>
-        ))}
+        {visible.map((row, i) => {
+          const context = explanationContexts[i];
+          const resolved = context
+            ? getExplanation(row.university.id, context)
+            : {
+                explanation: explanations[row.university.id]?.explanation ?? null,
+                pending: explanations[row.university.id]?.pending ?? false,
+              };
+          return (
+            <li key={`${row.university.id}-${row.fitIndex}-${row.why.slice(0, 24)}`}>
+              <ResultCard
+                row={row}
+                rank={i + 1}
+                selected={compareIds.includes(row.university.id)}
+                onToggle={() => toggleCompare(row.university.id)}
+                onOpen={() => setDetail(row)}
+                explanation={resolved.explanation}
+                explanationPending={resolved.pending}
+              />
+            </li>
+          );
+        })}
       </ul>
 
       {!visible.length ? (
