@@ -30,23 +30,30 @@ export function MatchDetail({
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true">
-      <button type="button" className="absolute inset-0 bg-black/25" aria-label="Close" onClick={onClose} />
-      <div className="relative flex h-full w-full max-w-lg flex-col border-l border-border bg-surface shadow-[-8px_0_32px_-12px_rgba(0,0,0,0.12)] enter">
-        <div className="relative h-40 shrink-0 bg-surface-muted">
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/30 transition-opacity"
+        aria-label="Close"
+        onClick={onClose}
+      />
+      <div className="relative flex h-full w-full max-w-lg flex-col border-l border-border bg-surface shadow-[var(--shadow-panel)] enter">
+        <div className="relative h-44 shrink-0 bg-surface-muted">
           {img ? (
             <Image src={img.src} alt={img.caption} fill className="object-cover" sizes="512px" />
           ) : null}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/65 to-transparent" />
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-3 top-3 rounded-[var(--radius-sm)] bg-black/40 px-2 py-1 text-[12px] text-white"
+            className="absolute right-3 top-3 border border-white/20 bg-black/40 px-2.5 py-1 text-[12px] text-white backdrop-blur-sm transition-colors hover:bg-black/55"
           >
             Close
           </button>
-          <div className="absolute bottom-3 left-4 right-4 text-white">
-            <p className="caption text-white/70">{u.city}, {u.country}</p>
-            <h2 className="text-h2 mt-0.5 text-white">{u.name}</h2>
+          <div className="absolute bottom-4 left-5 right-5 text-white">
+            <p className="font-mono text-[10px] tracking-[0.08em] text-white/70">
+              {u.city.toUpperCase()}, {u.country.toUpperCase()}
+            </p>
+            <h2 className="mt-1 text-[22px] font-medium tracking-tight">{u.name}</h2>
           </div>
         </div>
 
@@ -54,20 +61,20 @@ export function MatchDetail({
           <p className="label">Why this match</p>
           <p className="body mt-2 text-secondary">{row.why}</p>
 
-          <div className="mt-6 space-y-4">
+          <div className="mt-7 space-y-0">
             {row.factors.map((f) => (
-              <div key={f.key} className="border-b border-border pb-4 last:border-0">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[13px] font-medium">{f.label}</span>
-                  <StatusBadge status={f.tone} />
+              <div key={f.key} className="grid grid-cols-[1fr_auto] gap-3 border-b border-border py-3.5">
+                <div>
+                  <p className="text-[13px] font-medium">{f.label}</p>
+                  <p className="mt-0.5 text-[14px]">{f.value}</p>
+                  <p className="caption mt-1">{f.detail}</p>
                 </div>
-                <p className="mt-1 text-[14px]">{f.value}</p>
-                <p className="caption mt-1">{f.detail}</p>
+                <StatusBadge status={f.tone} />
               </div>
             ))}
           </div>
 
-          <div className="mt-6 grid gap-3 border-t border-border pt-5 text-[13px]">
+          <div className="mt-6 space-y-2.5 border-t border-border pt-5 text-[13px]">
             <Row k="Program" v={fieldLabels[profile.field]} />
             <Row k="Intl tuition (demo)" v={`$${u.tuitionIntlUsd.toLocaleString()}/yr`} />
             <Row k="Aid" v={u.aid.summary} />
@@ -109,7 +116,7 @@ export function MatchDetail({
 
 function Row({ k, v }: { k: string; v: string }) {
   return (
-    <div className="grid grid-cols-[120px_1fr] gap-3">
+    <div className="grid grid-cols-[130px_1fr] gap-3">
       <span className="text-tertiary">{k}</span>
       <span className="text-primary">{v}</span>
     </div>

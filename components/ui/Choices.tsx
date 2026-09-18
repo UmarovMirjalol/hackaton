@@ -2,7 +2,6 @@
 
 import { cn } from "@/lib/cn";
 
-/** ToggleGroup-style control (shadcn / Radix pattern): compact, obvious selected state */
 export function Segmented<T extends string>({
   value,
   onChange,
@@ -15,7 +14,7 @@ export function Segmented<T extends string>({
   return (
     <div
       role="group"
-      className="inline-flex max-w-full flex-wrap gap-0.5 rounded-[var(--radius-md)] border border-border bg-surface-muted p-0.5"
+      className="inline-flex max-w-full flex-wrap gap-px rounded-[var(--radius-md)] border border-border bg-border p-px"
     >
       {options.map((opt) => {
         const active = opt.value === value;
@@ -26,11 +25,10 @@ export function Segmented<T extends string>({
             aria-pressed={active}
             onClick={() => onChange(opt.value)}
             className={cn(
-              "min-h-8 flex-1 rounded-[calc(var(--radius-md)-1px)] px-2.5 text-[12.5px] font-medium transition-colors",
+              "min-h-9 flex-1 rounded-[calc(var(--radius-md)-1px)] px-2.5 text-[12.5px] font-medium transition-colors duration-150",
               active
-                ? "bg-surface text-primary shadow-[0_0_0_1px_var(--border)]"
-                : "text-secondary hover:text-primary",
-              "transition-[background-color,color,box-shadow,transform] duration-150",
+                ? "bg-surface text-primary"
+                : "bg-surface-muted/80 text-secondary hover:bg-surface hover:text-primary",
             )}
           >
             {opt.label}
@@ -73,10 +71,10 @@ export function ChoiceGrid<T extends string>({
               onChange(next as T[]);
             }}
             className={cn(
-              "rounded-[var(--radius-md)] border px-3 py-2.5 text-left transition-[background-color,border-color,transform] duration-150",
+              "border px-3.5 py-3 text-left transition-[background-color,border-color] duration-150 rounded-[var(--radius-md)]",
               on
-                ? "border-accent bg-accent-subtle"
-                : "border-border bg-surface hover:border-primary/25",
+                ? "border-primary bg-surface shadow-[inset_3px_0_0_0_var(--accent)]"
+                : "border-border bg-surface hover:border-border-strong",
             )}
           >
             <div className="text-[13.5px] font-medium text-primary">{opt.label}</div>

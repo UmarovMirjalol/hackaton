@@ -1,22 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8f8f6;
+  /* Route — editorial ink system */
+  --background: #f5f5f2;
   --surface: #ffffff;
-  --surface-muted: #f0efeb;
-  --text-primary: #0c0d0f;
-  --text-secondary: #52565e;
-  --text-tertiary: #868b94;
-  --border: #e2e2dc;
-  --accent: #0d6e68;
-  --accent-hover: #0a5853;
-  --accent-subtle: #e8f3f2;
-  --success: #1a6844;
+  --surface-muted: #ecece7;
+  --text-primary: #111110;
+  --text-secondary: #5c5c57;
+  --text-tertiary: #8b8b84;
+  --border: #e0e0da;
+  --border-strong: #c8c8c0;
+  --accent: #c23b22;
+  --accent-hover: #a3311c;
+  --accent-subtle: #f8ebe8;
+  --success: #1f6b45;
+  --success-subtle: #e8f3ec;
   --warning: #8a6500;
+  --warning-subtle: #f7f0dc;
   --error: #b42318;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  --error-subtle: #f8e9e7;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --shadow-sm: 0 1px 0 rgba(17, 17, 16, 0.04);
+  --shadow-panel: 0 12px 40px -16px rgba(17, 17, 16, 0.18);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --space-page: clamp(1rem, 3vw, 1.75rem);
+  --content: 68rem;
 }
 
 @theme inline {
@@ -27,14 +37,15 @@
   --color-secondary: var(--text-secondary);
   --color-tertiary: var(--text-tertiary);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-subtle: var(--accent-subtle);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-error: var(--error);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
 }
 
 * {
@@ -48,40 +59,55 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
   font-size: 15px;
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent-subtle);
+  color: var(--text-primary);
 }
 
 .label {
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-tertiary);
 }
 
 .meta {
-  font-family: var(--font-mono), monospace;
-  font-size: 12px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11.5px;
+  letter-spacing: -0.01em;
   color: var(--text-tertiary);
 }
 
 .text-display {
-  font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+  font-size: clamp(2rem, 4.2vw, 2.75rem);
   font-weight: 500;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  letter-spacing: -0.038em;
+  line-height: 1.05;
 }
 
 .text-h1 {
-  font-size: 1.5rem;
+  font-size: clamp(1.375rem, 2.4vw, 1.75rem);
   font-weight: 500;
-  letter-spacing: -0.025em;
-  line-height: 1.2;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
 }
 
 .text-h2 {
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   font-weight: 500;
   letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.text-h3 {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
 }
 
 .body {
@@ -91,38 +117,74 @@ body {
 
 .small {
   font-size: 0.8125rem;
+  line-height: 1.45;
 }
 
 .caption {
   font-size: 0.75rem;
+  line-height: 1.4;
   color: var(--text-tertiary);
 }
 
 .page-title {
   font-weight: 500;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
 }
 
 .enter {
-  animation: fade-in 160ms ease-out;
+  animation: enter 220ms var(--ease) both;
 }
 
-@keyframes fade-in {
+.enter-delay {
+  animation: enter 280ms var(--ease) both;
+  animation-delay: 60ms;
+}
+
+@keyframes enter {
   from {
     opacity: 0;
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-muted) 0%, #f4f4f0 50%, var(--surface-muted) 100%);
+  background-size: 200% 100%;
+  animation: pulse-soft 1.2s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+.task-done-pop {
+  animation: enter 180ms var(--ease);
 }
 
 input[type="range"] {
   accent-color: var(--accent);
+  height: 2px;
 }
 
 input:focus-visible,
 button:focus-visible,
-a:focus-visible {
+a:focus-visible,
+[role="button"]:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+.hairline {
+  border-color: var(--border);
 }

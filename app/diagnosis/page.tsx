@@ -15,11 +15,21 @@ export default function DiagnosisPage() {
   const strategy = [
     ...diagnosis.goals.map((g) => ({ text: g.evidence, tone: "good" as const })),
     ...(diagnosis.constraints.some((c) => c.label.toLowerCase().includes("aid"))
-      ? [{ text: "Prioritize campuses where aid policy matches your contribution level.", tone: "mixed" as const }]
+      ? [
+          {
+            text: "Prioritize campuses where aid policy matches your contribution level.",
+            tone: "mixed" as const,
+          },
+        ]
       : []),
     ...(diagnosis.gaps.length
       ? [{ text: diagnosis.gaps[0], tone: "watch" as const }]
-      : [{ text: "Build a balanced list: reach, fit, and one funding-safe option.", tone: "mixed" as const }]),
+      : [
+          {
+            text: "Build a balanced list: reach, fit, and one funding-safe option.",
+            tone: "mixed" as const,
+          },
+        ]),
   ].slice(0, 4);
 
   return (
@@ -30,77 +40,79 @@ export default function DiagnosisPage() {
       action={<Button href="/universities">See matches</Button>}
       footer={
         <NextUp
-          title="Review your matches"
+          title="Review campuses ranked for your constraints"
           detail="Each recommendation includes why it fits your profile."
           href="/universities"
           cta="Open matches"
         />
       }
     >
-      <div className="grid gap-10 lg:grid-cols-12">
-        <div className="space-y-10 lg:col-span-8">
-          <Section title="Strong fits" tone="good">
-            {diagnosis.strengths.length ? (
-              diagnosis.strengths.map((s) => <InsightRow key={s.label} title={s.label} body={s.evidence} />)
-            ) : (
-              <p className="body text-secondary">Add a GPA or test score to surface strengths.</p>
-            )}
-          </Section>
-
-          <Section title="Watchouts" tone="watch">
-            {diagnosis.constraints.length || diagnosis.gaps.length ? (
-              <>
-                {diagnosis.constraints.map((s) => (
-                  <InsightRow key={s.label} title={s.label} body={s.evidence} />
-                ))}
-                {diagnosis.gaps.map((g) => (
-                  <InsightRow key={g} title="Gap on file" body={g} />
-                ))}
-              </>
-            ) : (
-              <p className="body text-secondary">No major constraints flagged yet.</p>
-            )}
-          </Section>
-
-          <Section title="Strategy" tone="mixed">
-            {strategy.map((s, i) => (
-              <div key={i} className="flex gap-3 border-b border-border py-3 last:border-0">
-                <StatusBadge status={s.tone} />
-                <p className="body flex-1 text-secondary">{s.text}</p>
-              </div>
+      <div className="grid gap-12 lg:grid-cols-12">
+        <div className="space-y-12 lg:col-span-8">
+          <Section title="Strong signals" tone="good" empty="Add a GPA or test score to surface strengths.">
+            {diagnosis.strengths.map((s) => (
+              <InsightRow key={s.label} title={s.label} body={s.evidence} />
             ))}
           </Section>
+
+          <Section
+            title="Constraints & gaps"
+            tone="watch"
+            empty="No major constraints flagged yet."
+          >
+            {diagnosis.constraints.map((s) => (
+              <InsightRow key={s.label} title={s.label} body={s.evidence} />
+            ))}
+            {diagnosis.gaps.map((g) => (
+              <InsightRow key={g} title="Gap on file" body={g} />
+            ))}
+          </Section>
+
+          <section>
+            <div className="mb-4 flex items-baseline justify-between gap-3">
+              <h2 className="text-h2">Strategy</h2>
+              <StatusBadge status="mixed" />
+            </div>
+            <ol className="space-y-0 border-t border-border">
+              {strategy.map((s, i) => (
+                <li
+                  key={i}
+                  className="grid grid-cols-[2rem_1fr] gap-3 border-b border-border py-3.5"
+                >
+                  <span className="font-mono text-[11px] text-tertiary">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <p className="text-[14px] leading-6 text-secondary">{s.text}</p>
+                </li>
+              ))}
+            </ol>
+          </section>
         </div>
 
         <aside className="lg:col-span-4">
-          <div className="border-l border-border pl-5 lg:sticky lg:top-28">
-            <p className="label">Snapshot</p>
-            <p className="text-h3 mt-2">{named}</p>
-            <dl className="mt-4 space-y-2 small">
-              <div className="flex justify-between gap-4">
-                <dt className="text-tertiary">Field</dt>
-                <dd className="font-medium">{fieldLabels[profile.field]}</dd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <dt className="text-tertiary">Aid</dt>
-                <dd className="font-medium capitalize">{profile.aidNeed}</dd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <dt className="text-tertiary">Countries</dt>
-                <dd className="font-medium text-right">
-                  {profile.countries.map((c) => countryLabels[c]).join(", ")}
-                </dd>
-              </div>
+          <div className="border border-border bg-surface p-5 lg:sticky lg:top-28">
+            <p className="label">Candidate snapshot</p>
+            <p className="mt-2 text-[22px] font-medium tracking-tight">{named}</p>
+            <dl className="mt-5 space-y-3 text-[13px]">
+              <Snap k="Field" v={fieldLabels[profile.field]} />
+              <Snap k="Aid" v={profile.aidNeed} />
+              <Snap
+                k="Countries"
+                v={profile.countries.map((c) => countryLabels[c]).join(", ")}
+              />
               {profile.satStatus === "done" ? (
-                <div className="flex justify-between gap-4">
-                  <dt className="text-tertiary">SAT</dt>
-                  <dd className="font-medium">
-                    {profile.satMath}/{profile.satEbrw}
-                  </dd>
-                </div>
+                <Snap k="SAT" v={`${profile.satMath} / ${profile.satEbrw}`} />
+              ) : (
+                <Snap k="SAT" v={profile.satStatus} />
+              )}
+              {profile.englishExam !== "none" ? (
+                <Snap
+                  k="English"
+                  v={`${profile.englishExam.toUpperCase()} ${profile.englishScore || ""}`.trim()}
+                />
               ) : null}
             </dl>
-            <p className="caption mt-4">{CATALOG_NOTE}</p>
+            <p className="caption mt-5">{CATALOG_NOTE}</p>
             <Button href="/profile" variant="secondary" className="mt-4 w-full">
               Edit profile
             </Button>
@@ -115,27 +127,43 @@ function Section({
   title,
   tone,
   children,
+  empty,
 }: {
   title: string;
   tone: "good" | "watch" | "mixed";
   children: React.ReactNode;
+  empty: string;
 }) {
+  const items = (Array.isArray(children) ? children : [children]).filter(Boolean);
   return (
     <section>
-      <div className="mb-3 flex items-center gap-2">
-        <h2 className="text-h3">{title}</h2>
+      <div className="mb-4 flex items-baseline justify-between gap-3">
+        <h2 className="text-h2">{title}</h2>
         <StatusBadge status={tone} />
       </div>
-      <div className="divide-y divide-border">{children}</div>
+      {items.length ? (
+        <div className="border-t border-border">{items}</div>
+      ) : (
+        <p className="body text-secondary">{empty}</p>
+      )}
     </section>
   );
 }
 
 function InsightRow({ title, body }: { title: string; body: string }) {
   return (
-    <div className="grid gap-1 py-3 sm:grid-cols-5 sm:gap-4">
-      <p className="small font-medium sm:col-span-2">{title}</p>
-      <p className="body text-secondary sm:col-span-3">{body}</p>
+    <div className="grid gap-1 border-b border-border py-3.5 sm:grid-cols-5 sm:gap-6">
+      <p className="text-[13px] font-medium sm:col-span-2">{title}</p>
+      <p className="text-[14px] leading-6 text-secondary sm:col-span-3">{body}</p>
+    </div>
+  );
+}
+
+function Snap({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="flex justify-between gap-4 border-b border-border pb-2.5 last:border-0">
+      <dt className="text-tertiary">{k}</dt>
+      <dd className="text-right font-medium capitalize">{v}</dd>
     </div>
   );
 }

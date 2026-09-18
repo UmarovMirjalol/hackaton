@@ -45,28 +45,32 @@ export default function UniversitiesPage() {
     <AppShell
       eyebrow="Matches"
       title="Curated for your constraints"
-      lede="Each row explains why it appears. Adjust field, aid, or countries — the list reorders immediately."
-      action={<Button onClick={() => goCompare()}>Compare selected</Button>}
+      lede="Each campus explains why it appears. Change field, aid, countries, or budget — the list reorders immediately."
+      action={
+        <Button onClick={() => goCompare()}>
+          Compare {compareIds.length >= 2 ? `(${compareIds.length})` : "selected"}
+        </Button>
+      }
       footer={
         <NextUp
           title={
             compareIds.length >= 2
-              ? "Compare your two selections"
+              ? "Compare your selections side by side"
               : "Select two campuses to compare"
           }
-          detail={`${compareIds.length} selected`}
+          detail={`${compareIds.length} selected · ${visible.length} in view`}
           href="/compare"
           cta="Compare"
-          onClick={goCompare}
+          onClick={() => goCompare()}
         />
       }
     >
-      <div className="grid gap-10 lg:grid-cols-12">
-        <aside className="lg:col-span-4 lg:sticky lg:top-24 lg:self-start">
-          <p className="label mb-3">Live profile inputs</p>
-          <div className="space-y-5 border-y border-border py-4">
+      <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
+        <aside className="lg:col-span-3 lg:sticky lg:top-28 lg:self-start">
+          <p className="label mb-4">Live inputs</p>
+          <div className="space-y-6">
             <div>
-              <p className="small mb-2 text-secondary">Field</p>
+              <p className="small mb-2 font-medium text-secondary">Field</p>
               <Segmented<Field>
                 value={profile.field}
                 onChange={(v) => setProfile({ field: v })}
@@ -80,20 +84,20 @@ export default function UniversitiesPage() {
               />
             </div>
             <div>
-              <p className="small mb-2 text-secondary">Aid</p>
+              <p className="small mb-2 font-medium text-secondary">Aid</p>
               <Segmented<AidNeed>
                 value={profile.aidNeed}
                 onChange={(v) => setProfile({ aidNeed: v })}
                 options={[
                   { value: "full", label: "Full" },
-                  { value: "substantial", label: "Substantial" },
+                  { value: "substantial", label: "Sub." },
                   { value: "some", label: "Some" },
-                  { value: "none", label: "Can pay" },
+                  { value: "none", label: "Pay" },
                 ]}
               />
             </div>
             <div>
-              <p className="small mb-2 text-secondary">Countries</p>
+              <p className="small mb-2 font-medium text-secondary">Countries</p>
               <div className="flex flex-wrap gap-1.5">
                 {(Object.keys(countryLabels) as CountryId[]).map((id) => {
                   const on = profile.countries.includes(id);
@@ -109,10 +113,10 @@ export default function UniversitiesPage() {
                         setProfile({ countries: next });
                       }}
                       className={cn(
-                        "rounded-[var(--radius-sm)] border px-2 py-1 text-[12px] font-medium",
+                        "border px-2 py-1 text-[12px] font-medium transition-colors rounded-[var(--radius-sm)]",
                         on
-                          ? "border-accent bg-accent-subtle text-accent"
-                          : "border-border text-secondary hover:text-primary",
+                          ? "border-primary bg-primary text-white"
+                          : "border-border text-secondary hover:border-border-strong hover:text-primary",
                       )}
                     >
                       {countryLabels[id]}
@@ -122,7 +126,7 @@ export default function UniversitiesPage() {
               </div>
             </div>
             <div>
-              <p className="small mb-2 text-secondary">
+              <p className="small mb-2 font-medium text-secondary">
                 Budget ${Number(profile.annualBudget || 0).toLocaleString()}/yr
               </p>
               <input
@@ -136,17 +140,22 @@ export default function UniversitiesPage() {
               />
             </div>
           </div>
-          <p className="caption mt-3">{FIT_METHODOLOGY}</p>
-          <p className="caption mt-1">{IMAGE_DISCLAIMER}</p>
+          <p className="caption mt-6 border-t border-border pt-4">{FIT_METHODOLOGY}</p>
+          <p className="caption mt-2">{IMAGE_DISCLAIMER}</p>
         </aside>
 
-        <section className="lg:col-span-8" key={filterSig}>
+        <section className="lg:col-span-9" key={filterSig}>
           {visible.length === 0 ? (
-            <p className="body text-secondary">No campuses in your country list.</p>
+            <div className="border border-dashed border-border px-5 py-12 text-center">
+              <p className="text-[16px] font-medium">No campuses in your country list</p>
+              <p className="body mt-2 text-secondary">
+                Enable at least one country in the filters to see matches.
+              </p>
+            </div>
           ) : (
-            <ul className="divide-y divide-border">
+            <ul className="space-y-0">
               {visible.map((row, i) => (
-                <li key={`${row.university.id}-${row.fitIndex}`} className="py-6 first:pt-0">
+                <li key={`${row.university.id}-${row.fitIndex}`} className="py-7 first:pt-0">
                   <UniversityCard
                     row={row}
                     rank={i + 1}
