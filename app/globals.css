@@ -106,8 +106,50 @@ body {
   }
 }
 
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes check-pop {
+  0% {
+    transform: scale(0.92);
+  }
+  60% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .enter {
   animation: fade-up 160ms ease-out;
+}
+
+.stagger-in {
+  animation: stagger-in 280ms ease-out both;
+}
+
+.task-done-pop {
+  animation: check-pop 220ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter,
+  .stagger-in,
+  .task-done-pop,
+  .uni-card,
+  .uni-card img {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 input[type="range"] {

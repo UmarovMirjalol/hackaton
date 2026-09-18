@@ -3,13 +3,14 @@
 import { AppShell } from "@/components/AppShell";
 import { SourceCitation, StatusBadge } from "@/components/ui/Badges";
 import { Button } from "@/components/ui/Button";
+import { CampusThumb } from "@/components/UniversityCard";
 import { cn } from "@/lib/cn";
 import { useDerived, useRoute } from "@/lib/store";
 import type { TaskStatus } from "@/lib/types";
 
 export default function RoadmapPage() {
   const { taskStatus, setTaskStatus, profile } = useRoute();
-  const { roadmap, next } = useDerived();
+  const { roadmap, next, compare } = useDerived();
   const months = [...new Set(roadmap.map((t) => t.month))];
 
   return (
@@ -22,6 +23,25 @@ export default function RoadmapPage() {
           : "Tasks are generated from the current shortlist and exam status — not a generic senior-year calendar."
       }
     >
+      <div className="mb-8 flex gap-2 overflow-x-auto pb-1">
+        {compare.slice(0, 3).map((c) => (
+          <div
+            key={c.university.id}
+            className="flex min-w-[200px] flex-1 items-center gap-3 rounded-[var(--radius-lg)] border border-border bg-surface p-2 transition-colors hover:border-primary/30"
+          >
+            <CampusThumb
+              universityId={c.university.id}
+              alt={c.university.shortName}
+              className="h-12 w-16 rounded-[var(--radius-sm)]"
+            />
+            <div className="min-w-0">
+              <p className="truncate text-[13px] font-medium">{c.university.shortName}</p>
+              <p className="meta truncate">{c.university.city}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div className="grid gap-8 lg:grid-cols-12">
         <section className="lg:col-span-8">
           {months.map((month) => (
@@ -41,8 +61,10 @@ export default function RoadmapPage() {
                       <li
                         key={task.id}
                         className={cn(
-                          "rounded-[var(--radius-lg)] border border-border bg-surface p-3.5 transition-colors",
+                          "group rounded-[var(--radius-lg)] border border-border bg-surface p-3.5 transition-[border-color,box-shadow,opacity] duration-200",
+                          "hover:border-primary/25 hover:shadow-[0_6px_18px_-12px_rgba(17,19,24,0.2)]",
                           status === "done" && "opacity-55",
+                          status === "done" && "task-done-pop",
                         )}
                       >
                         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -54,10 +76,15 @@ export default function RoadmapPage() {
                             <p className="mt-1.5 max-w-xl text-[13px] leading-5 text-secondary">
                               {task.reason}
                             </p>
+                            <p className="meta mt-2 max-h-0 overflow-hidden opacity-0 transition-all duration-200 group-hover:max-h-8 group-hover:opacity-100">
+                              Effort · {task.effort}
+                            </p>
                           </div>
                           <div className="text-right">
                             <p className="meta">{task.deadline}</p>
-                            <p className="mt-1 text-[11.5px] text-tertiary">{task.effort}</p>
+                            <p className="mt-1 text-[11.5px] text-tertiary opacity-70 transition-opacity group-hover:opacity-100">
+                              {task.effort}
+                            </p>
                           </div>
                         </div>
                         <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -82,9 +109,13 @@ export default function RoadmapPage() {
           ))}
         </section>
 
-        {/* Ramp / Linear “needs attention” — one elevated next action */}
         <aside className="lg:col-span-4">
-          <div className="rounded-[var(--radius-lg)] border-2 border-primary bg-surface p-4 lg:sticky lg:top-14">
+          <div
+            className={cn(
+              "rounded-[var(--radius-lg)] border-2 border-primary bg-surface p-4 transition-[box-shadow,transform] duration-200 lg:sticky lg:top-14",
+              (taskStatus[next?.id ?? ""] ?? "todo") !== "todo" && "border-accent",
+            )}
+          >
             <p className="label">Next up</p>
             {next ? (
               <>
@@ -110,8 +141,17 @@ export default function RoadmapPage() {
                 >
                   {(taskStatus[next.id] ?? "todo") === "todo"
                     ? "Mark as started"
-                    : "Advance this task"}
+                    : (taskStatus[next.id] ?? "todo") === "started"
+                      ? "Mark as done"
+                      : "Reopen"}
                 </Button>
+                {(taskStatus[next.id] ?? "todo") !== "todo" ? (
+                  <p className="mt-2 text-center font-mono text-[11px] text-accent">
+                    {(taskStatus[next.id] ?? "todo") === "done"
+                      ? "Completed — next task is ready"
+                      : "Started — keep going"}
+                  </p>
+                ) : null}
               </>
             ) : (
               <p className="mt-3 text-[13.5px] text-secondary">The list is empty.</p>

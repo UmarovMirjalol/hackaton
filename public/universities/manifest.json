@@ -1,0 +1,86 @@
+{
+  "mit": {
+    "src": "/universities/mit.jpg",
+    "caption": "Stata Center, MIT campus",
+    "commonsTitle": "MIT's Stata Center.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:MIT%27s_Stata_Center.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "brown": {
+    "src": "/universities/brown.jpg",
+    "caption": "Brown University main campus",
+    "commonsTitle": "Brown University - Main Campus 02.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Brown_University_-_Main_Campus_02.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "waterloo": {
+    "src": "/universities/waterloo.jpg",
+    "caption": "University of Waterloo campus",
+    "commonsTitle": "University of Waterloo (Waterloo Campus) - Waterloo, Ontario.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:University_of_Waterloo_%28Waterloo_Campus%29_-_Waterloo%2C_Ontario.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "toronto": {
+    "src": "/universities/toronto.jpg",
+    "caption": "Convocation Hall, University of Toronto",
+    "commonsTitle": "Convocation Hall, University of Toronto Northeastern entrance.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Convocation_Hall%2C_University_of_Toronto_Northeastern_entrance.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "gatech": {
+    "src": "/universities/gatech.jpg",
+    "caption": "Tech Tower / administration, Georgia Tech",
+    "commonsTitle": "Lettie Pate Whitehead Evans Administration Building.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lettie_Pate_Whitehead_Evans_Administration_Building.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "ucl": {
+    "src": "/universities/ucl.jpg",
+    "caption": "Wilkins Building, UCL",
+    "commonsTitle": "Wilkins Building, University College London, UK - 20120201-01.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Wilkins_Building%2C_University_College_London%2C_UK_-_20120201-01.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "lse": {
+    "src": "/universities/lse.jpg",
+    "caption": "London School of Economics, Houghton Street",
+    "commonsTitle": "LondonSchoolofEconomics cford.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:LondonSchoolofEconomics_cford.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "tudelft": {
+    "src": "/universities/tudelft.jpg",
+    "caption": "Aula, TU Delft",
+    "commonsTitle": "TU Delft Aula.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:TU_Delft_Aula.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "tum": {
+    "src": "/universities/tum.jpg",
+    "caption": "Technical University of Munich",
+    "commonsTitle": "Technische Universitaet Muenchen-1.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Technische_Universitaet_Muenchen-1.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "eth": {
+    "src": "/universities/eth.jpg",
+    "caption": "ETH Zurich main building",
+    "commonsTitle": "ETH Zurich, Hauptgeb\u00e4ude.1.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:ETH_Zurich%2C_Hauptgeb%C3%A4ude.1.jpg",
+    "demoNote": "Wikimedia Commons campus photograph. Demo recognition imagery \u2014 not an official partnership."
+  },
+  "minerva": {
+    "src": "/universities/minerva.jpg",
+    "caption": "San Francisco (Minerva rotation city context)",
+    "commonsTitle": "San Francisco from Twin Peaks September 2013 panorama 5 edit.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:San_Francisco_from_Twin_Peaks_September_2013_panorama_5_edit.jpg",
+    "demoNote": "Place context only \u2014 not a Minerva campus building. Demo imagery."
+  },
+  "nyuad": {
+    "src": "/universities/nyuad.jpg",
+    "caption": "Abu Dhabi skyline (NYUAD place context)",
+    "commonsTitle": "Skyline of Abu Dhabi.jpg",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Skyline_of_Abu_Dhabi.jpg",
+    "demoNote": "Place context for NYU Abu Dhabi \u2014 not an official campus photograph. Demo imagery."
+  }
+}

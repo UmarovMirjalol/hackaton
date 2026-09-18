@@ -1,8 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { CampusThumb } from "@/components/UniversityCard";
 import { SourceCitation, StatusBadge } from "@/components/ui/Badges";
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/cn";
+import { IMAGE_DISCLAIMER } from "@/lib/media";
 import { useDerived, useRoute } from "@/lib/store";
 import { CATALOG_NOTE } from "@/lib/universities";
 
@@ -17,6 +21,8 @@ const ROWS = [
 export default function ComparePage() {
   const { profile } = useRoute();
   const { compare } = useDerived();
+  const [hoverCol, setHoverCol] = useState<string | null>(null);
+  const [hoverRow, setHoverRow] = useState<string | null>(null);
 
   return (
     <AppShell
@@ -37,7 +43,6 @@ export default function ComparePage() {
         </div>
       ) : (
         <>
-          {/* Stripe DataTable pattern: sticky criteria column, aligned cells */}
           <div className="hidden overflow-hidden rounded-[var(--radius-lg)] border border-border md:block">
             <table className="w-full border-collapse text-left text-[13.5px]">
               <thead className="bg-surface-muted">
@@ -46,30 +51,72 @@ export default function ComparePage() {
                     For you
                   </th>
                   {compare.map((c) => (
-                    <th key={c.university.id} className="border-b border-border px-4 py-3">
-                      <div className="text-[16px] font-semibold tracking-tight">
-                        {c.university.shortName}
+                    <th
+                      key={c.university.id}
+                      className={cn(
+                        "border-b border-border px-4 py-3 transition-colors duration-150",
+                        hoverCol === c.university.id && "bg-accent-subtle/60",
+                      )}
+                      onMouseEnter={() => setHoverCol(c.university.id)}
+                      onMouseLeave={() => setHoverCol(null)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <CampusThumb
+                          universityId={c.university.id}
+                          alt={c.university.shortName}
+                          className="h-10 w-14 rounded-[var(--radius-sm)]"
+                        />
+                        <div>
+                          <div className="text-[16px] font-semibold tracking-tight">
+                            {c.university.shortName}
+                          </div>
+                          <div className="meta mt-0.5">Fit {c.fitIndex}</div>
+                        </div>
                       </div>
-                      <div className="meta mt-0.5">Fit {c.fitIndex}</div>
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody className="bg-surface">
                 {ROWS.map((row) => (
-                  <tr key={row.key} className="align-top">
+                  <tr
+                    key={row.key}
+                    className={cn(
+                      "align-top transition-colors duration-150",
+                      hoverRow === row.key && "bg-surface-muted/70",
+                    )}
+                    onMouseEnter={() => setHoverRow(row.key)}
+                    onMouseLeave={() => setHoverRow(null)}
+                  >
                     <th className="border-b border-border px-4 py-3.5 text-[12.5px] font-medium text-secondary">
                       {row.label}
                     </th>
                     {compare.map((c) => {
                       const f = c.factors.find((x) => x.key === row.key)!;
+                      const lit =
+                        hoverCol === c.university.id || hoverRow === row.key;
                       return (
-                        <td key={c.university.id} className="border-b border-border px-4 py-3.5">
+                        <td
+                          key={c.university.id}
+                          className={cn(
+                            "border-b border-border px-4 py-3.5 transition-colors duration-150",
+                            lit && "bg-accent-subtle/40",
+                          )}
+                          onMouseEnter={() => setHoverCol(c.university.id)}
+                          onMouseLeave={() => setHoverCol(null)}
+                        >
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="font-medium">{f.value}</span>
                             <StatusBadge status={f.tone} />
                           </div>
-                          <p className="mt-1 text-[12px] leading-5 text-tertiary">{f.detail}</p>
+                          <p
+                            className={cn(
+                              "mt-1 text-[12px] leading-5 text-tertiary transition-opacity duration-150",
+                              lit ? "opacity-100" : "opacity-80",
+                            )}
+                          >
+                            {f.detail}
+                          </p>
                         </td>
                       );
                     })}
@@ -109,32 +156,39 @@ export default function ComparePage() {
             </table>
           </div>
 
-          {/* Mobile: stacked sections (Stripe responsive table transform) */}
           <div className="space-y-6 md:hidden">
             {compare.map((c) => (
               <article
                 key={c.university.id}
-                className="rounded-[var(--radius-lg)] border border-border bg-surface p-4"
+                className="overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface"
               >
-                <h2 className="text-[18px] font-semibold tracking-tight">{c.university.name}</h2>
-                <p className="meta mt-1">Fit {c.fitIndex}</p>
-                <p className="mt-3 text-[13.5px] leading-6 text-secondary">{c.why}</p>
-                <dl className="mt-4 space-y-3 border-t border-border pt-3">
-                  {c.factors.map((f) => (
-                    <div key={f.key}>
-                      <dt className="flex items-center gap-2 text-[12px] text-tertiary">
-                        {f.label}
-                        <StatusBadge status={f.tone} />
-                      </dt>
-                      <dd className="text-[13.5px] font-medium">{f.value}</dd>
-                    </div>
-                  ))}
-                </dl>
+                <CampusThumb
+                  universityId={c.university.id}
+                  alt={c.university.name}
+                  className="aspect-[2/1] w-full"
+                />
+                <div className="p-4">
+                  <h2 className="text-[18px] font-semibold tracking-tight">{c.university.name}</h2>
+                  <p className="meta mt-1">Fit {c.fitIndex}</p>
+                  <p className="mt-3 text-[13.5px] leading-6 text-secondary">{c.why}</p>
+                  <dl className="mt-4 space-y-3 border-t border-border pt-3">
+                    {c.factors.map((f) => (
+                      <div key={f.key}>
+                        <dt className="flex items-center gap-2 text-[12px] text-tertiary">
+                          {f.label}
+                          <StatusBadge status={f.tone} />
+                        </dt>
+                        <dd className="text-[13.5px] font-medium">{f.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
               </article>
             ))}
           </div>
 
           <p className="mt-5 text-[11.5px] leading-5 text-tertiary">{CATALOG_NOTE}</p>
+          <p className="mt-2 text-[11.5px] leading-5 text-tertiary">{IMAGE_DISCLAIMER}</p>
         </>
       )}
     </AppShell>

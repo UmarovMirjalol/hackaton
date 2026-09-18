@@ -18,12 +18,12 @@ export function Button({
   ...props
 }: Props) {
   const styles = cn(
-    "inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40",
+    "inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border font-medium transition-[background-color,border-color,color,transform] duration-150 disabled:cursor-not-allowed disabled:opacity-40 active:scale-[0.98]",
     size === "md" ? "h-9 px-3.5 text-[13.5px]" : "h-8 px-2.5 text-[12.5px]",
     variant === "primary" &&
-      "border-accent bg-accent text-white hover:bg-accent-hover hover:border-accent-hover",
+      "border-accent bg-accent text-white hover:bg-accent-hover hover:border-accent-hover hover:-translate-y-px",
     variant === "secondary" &&
-      "border-border bg-surface text-primary hover:bg-surface-muted",
+      "border-border bg-surface text-primary hover:bg-surface-muted hover:-translate-y-px",
     variant === "ghost" &&
       "border-transparent bg-transparent text-secondary hover:bg-surface-muted hover:text-primary",
     variant === "danger" &&

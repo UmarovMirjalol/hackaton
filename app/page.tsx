@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { campusImage } from "@/lib/media";
 import { demoProfile } from "@/lib/types";
 import { useRoute } from "@/lib/store";
 
@@ -58,8 +60,11 @@ export default function LandingPage() {
   );
 }
 
-/** Product-surface preview (Vercel/Linear pattern): show the tool, not artwork */
 function RoutePreview() {
+  const mit = campusImage("mit");
+  const nyuad = campusImage("nyuad");
+  const brown = campusImage("brown");
+
   return (
     <div className="overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface shadow-[0_1px_0_rgba(17,19,24,0.04)]">
       <div className="flex items-center gap-1.5 border-b border-border bg-surface-muted px-3 py-2">
@@ -67,6 +72,27 @@ function RoutePreview() {
         <span className="h-2 w-2 rounded-full bg-border" />
         <span className="h-2 w-2 rounded-full bg-border" />
         <span className="ml-2 font-mono text-[11px] text-tertiary">route · working preview</span>
+      </div>
+
+      <div className="grid grid-cols-3 gap-px bg-border">
+        {[mit, nyuad, brown].map((img, i) =>
+          img ? (
+            <div key={img.src} className="group relative aspect-[4/3] overflow-hidden bg-surface-muted">
+              <Image
+                src={img.src}
+                alt={img.caption}
+                fill
+                sizes="200px"
+                className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                priority={i === 0}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+              <p className="absolute bottom-2 left-2 font-mono text-[10px] text-white/90">
+                {i === 0 ? "MIT" : i === 1 ? "Abu Dhabi" : "Brown"}
+              </p>
+            </div>
+          ) : null,
+        )}
       </div>
 
       <div className="p-5 sm:p-6">
@@ -105,6 +131,9 @@ function RoutePreview() {
               SAT skipped — score already on file
             </li>
           </ul>
+          <p className="mt-4 text-[10.5px] leading-4 text-tertiary">
+            Preview photos from Wikimedia Commons — demo imagery, not official partnerships.
+          </p>
         </div>
       </div>
     </div>

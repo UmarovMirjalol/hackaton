@@ -1,23 +1,33 @@
 "use client";
 
 import { AppShell } from "@/components/AppShell";
-import { StatusBadge } from "@/components/ui/Badges";
+import { UniversityCard } from "@/components/UniversityCard";
 import { Button } from "@/components/ui/Button";
 import { Segmented } from "@/components/ui/Choices";
 import { cn } from "@/lib/cn";
+import { IMAGE_DISCLAIMER } from "@/lib/media";
 import { useDerived, useRoute } from "@/lib/store";
-import type { AidNeed, CountryId, Field } from "@/lib/types";
+import type { AidNeed, CountryId, Field, Profile } from "@/lib/types";
 import { CATALOG_NOTE, FIT_METHODOLOGY, countryLabels, fieldLabels } from "@/lib/universities";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export default function UniversitiesPage() {
   const { profile, setProfile, compareIds, toggleCompare, setCompareIds } = useRoute();
   const { recs } = useDerived();
+  const [flash, setFlash] = useState(false);
 
   const visible = useMemo(
     () => recs.filter((r) => profile.countries.includes(r.university.countryId)),
     [recs, profile.countries],
   );
+
+  const filterSig = `${profile.field}|${profile.aidNeed}|${profile.countries.join(",")}`;
+
+  const bumpFilters = (patch: Partial<Profile>) => {
+    setProfile(patch);
+    setFlash(true);
+    window.setTimeout(() => setFlash(false), 420);
+  };
 
   return (
     <AppShell
@@ -45,13 +55,23 @@ export default function UniversitiesPage() {
       <div className="grid gap-8 lg:grid-cols-12">
         <aside className="lg:col-span-4">
           <div className="lg:sticky lg:top-14">
-            <p className="label mb-2.5">Adjust the facts</p>
+            <div className="mb-2.5 flex items-center justify-between gap-2">
+              <p className="label">Adjust the facts</p>
+              <span
+                className={cn(
+                  "font-mono text-[10px] uppercase tracking-[0.08em] text-accent transition-opacity duration-300",
+                  flash ? "opacity-100" : "opacity-0",
+                )}
+              >
+                List updated
+              </span>
+            </div>
             <div className="space-y-4 rounded-[var(--radius-lg)] border border-border bg-surface p-3.5">
               <div>
                 <p className="mb-2 text-[12.5px] font-medium text-secondary">Field</p>
                 <Segmented<Field>
                   value={profile.field}
-                  onChange={(v) => setProfile({ field: v })}
+                  onChange={(v) => bumpFilters({ field: v })}
                   options={[
                     { value: "cs", label: "CS" },
                     { value: "engineering", label: "Eng" },
@@ -65,7 +85,7 @@ export default function UniversitiesPage() {
                 <p className="mb-2 text-[12.5px] font-medium text-secondary">Aid</p>
                 <Segmented<AidNeed>
                   value={profile.aidNeed}
-                  onChange={(v) => setProfile({ aidNeed: v })}
+                  onChange={(v) => bumpFilters({ aidNeed: v })}
                   options={[
                     { value: "full", label: "Full" },
                     { value: "substantial", label: "Substantial" },
@@ -88,12 +108,12 @@ export default function UniversitiesPage() {
                             ? profile.countries.filter((c) => c !== id)
                             : [...profile.countries, id];
                           if (next.length === 0) return;
-                          setProfile({ countries: next });
+                          bumpFilters({ countries: next });
                         }}
                         className={cn(
-                          "rounded-[var(--radius-sm)] border px-2 py-1 text-[12px] font-medium transition-colors",
+                          "rounded-[var(--radius-sm)] border px-2 py-1 text-[12px] font-medium transition-[background-color,border-color,color,transform] duration-150",
                           on
-                            ? "border-accent bg-accent-subtle text-accent"
+                            ? "scale-[1.02] border-accent bg-accent-subtle text-accent"
                             : "border-border bg-surface text-secondary hover:text-primary",
                         )}
                       >
@@ -106,71 +126,36 @@ export default function UniversitiesPage() {
             </div>
             <p className="mt-3 text-[11.5px] leading-5 text-tertiary">{FIT_METHODOLOGY}</p>
             <p className="mt-2 text-[11.5px] leading-5 text-tertiary">{CATALOG_NOTE}</p>
+            <p className="mt-2 text-[11.5px] leading-5 text-tertiary">{IMAGE_DISCLAIMER}</p>
           </div>
         </aside>
 
-        <section className="lg:col-span-8">
+        <section className="lg:col-span-8" key={filterSig}>
           {visible.length === 0 ? (
             <div className="rounded-[var(--radius-lg)] border border-dashed border-border bg-surface px-5 py-10">
-              <p className="text-[18px] font-semibold tracking-tight">No campus matches this country list.</p>
+              <p className="text-[18px] font-semibold tracking-tight">
+                No campus matches this country list.
+              </p>
               <p className="mt-2 max-w-md text-[13.5px] text-secondary">
-                Add a country back, or loosen aid. Route will not invent universities outside the catalog.
+                Add a country back, or loosen aid. Route will not invent universities outside the
+                catalog.
               </p>
             </div>
           ) : (
-            <ul className="divide-y divide-border rounded-[var(--radius-lg)] border border-border bg-surface">
+            <ul className="space-y-5">
               {visible.map((row, i) => (
-                <li key={row.university.id} className="enter px-4 py-5 sm:px-5">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="meta">
-                        {String(i + 1).padStart(2, "0")} · {row.university.city},{" "}
-                        {row.university.country}
-                      </p>
-                      <h2 className="mt-1 text-[20px] font-semibold tracking-tight">
-                        {row.university.name}
-                      </h2>
-                    </div>
-                    <div className="text-right">
-                      <p className="label">Fit index</p>
-                      <p className="font-mono text-[20px] font-medium tabular-nums">{row.fitIndex}</p>
-                    </div>
-                  </div>
-
-                  <p className="mt-3 max-w-2xl text-[14px] leading-6 text-secondary">{row.why}</p>
-
-                  <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-                    {row.factors.map((f) => (
-                      <div key={f.key} className="min-w-0">
-                        <dt className="flex items-center gap-2 text-[12px] text-tertiary">
-                          {f.label}
-                          <StatusBadge status={f.tone} />
-                        </dt>
-                        <dd className="mt-0.5 text-[13.5px] font-medium text-primary">{f.value}</dd>
-                        <dd className="mt-0.5 text-[12px] leading-5 text-tertiary">{f.detail}</dd>
-                      </div>
-                    ))}
-                  </dl>
-
-                  <div className="mt-4 flex flex-wrap items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => toggleCompare(row.university.id)}
-                      className={cn(
-                        "text-[13px] font-medium underline decoration-border underline-offset-4",
-                        compareIds.includes(row.university.id)
-                          ? "text-accent"
-                          : "text-secondary hover:text-primary",
-                      )}
-                    >
-                      {compareIds.includes(row.university.id)
-                        ? "In comparison"
-                        : "Add to comparison (max 3)"}
-                    </button>
-                    <span className="meta">
-                      {row.university.application} · {fieldLabels[profile.field]}
-                    </span>
-                  </div>
+                <li
+                  key={`${filterSig}-${row.university.id}`}
+                  className="stagger-in"
+                  style={{ animationDelay: `${i * 45}ms` }}
+                >
+                  <UniversityCard
+                    row={row}
+                    rank={i + 1}
+                    selected={compareIds.includes(row.university.id)}
+                    onToggleCompare={() => toggleCompare(row.university.id)}
+                    fieldLabel={fieldLabels[profile.field]}
+                  />
                 </li>
               ))}
             </ul>

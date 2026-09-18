@@ -41,9 +41,9 @@ export function StepNav({ compact }: { compact?: boolean }) {
               href={locked ? "/profile" : step.href}
               aria-current={active ? "step" : undefined}
               className={cn(
-                "whitespace-nowrap rounded-[var(--radius-sm)] px-1 py-1 text-[12px] font-medium sm:text-[13px]",
+                "relative whitespace-nowrap rounded-[var(--radius-sm)] px-1 py-1 text-[12px] font-medium transition-colors duration-150 sm:text-[13px]",
                 active
-                  ? "text-primary"
+                  ? "text-primary after:absolute after:inset-x-1 after:bottom-0 after:h-px after:bg-accent"
                   : locked
                     ? "text-tertiary"
                     : "text-secondary hover:text-primary",
