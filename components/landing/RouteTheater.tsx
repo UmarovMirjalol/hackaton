@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Reveal } from "@/components/Reveal";
 import { StageCanvas, StageCopy } from "./StageCanvas";
 import { JOURNEY_STAGES, type StageId } from "./sample";
 import { cn } from "@/lib/cn";
@@ -53,7 +54,7 @@ export function RouteTheater() {
   return (
     <section id="how-it-works" className="locus-theater scroll-mt-20" aria-labelledby="theater-heading">
       <div className="route-frame">
-        <div className="locus-theater-intro">
+        <Reveal className="locus-theater-intro">
           <p className="label">How LOCUS works</p>
           <h2 id="theater-heading" className="locus-display-sm mt-3">
             One spine. Five stages.
@@ -62,7 +63,7 @@ export function RouteTheater() {
             Select a stage — or scroll the path — and watch the product state change. This is the
             same journey you enter after onboarding.
           </p>
-        </div>
+        </Reveal>
 
         <div className="locus-theater-layout">
           {/* Spine */}

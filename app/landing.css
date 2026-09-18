@@ -223,12 +223,18 @@ html {
   content: "";
   position: absolute;
   inset: 0 0 auto 0;
-  height: min(72vh, 44rem);
+  height: min(78vh, 48rem);
   pointer-events: none;
   background:
-    radial-gradient(ellipse 70% 55% at 70% 20%, rgba(11, 111, 106, 0.14), transparent 70%),
-    radial-gradient(ellipse 50% 40% at 10% 60%, rgba(11, 111, 106, 0.07), transparent 65%);
+    radial-gradient(ellipse 70% 55% at 72% 18%, rgba(11, 111, 106, 0.18), transparent 70%),
+    radial-gradient(ellipse 48% 42% at 8% 58%, rgba(11, 111, 106, 0.09), transparent 65%);
   z-index: 0;
+  animation: hero-wash 14s var(--landing-ease) infinite alternate;
+}
+
+@keyframes hero-wash {
+  from { opacity: 0.85; transform: scale(1) translateY(0); }
+  to { opacity: 1; transform: scale(1.04) translateY(-1.5%); }
 }
 
 .locus-hero > .route-frame {
@@ -237,11 +243,40 @@ html {
 }
 
 .locus-hero-top {
-  max-width: 42rem;
+  max-width: 44rem;
+}
+
+.locus-brand-mark {
+  animation: enter 700ms var(--landing-ease) both;
 }
 
 .locus-hero-title {
   margin-top: 0.85rem;
+}
+
+/* Line-mask typography reveal */
+.locus-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+
+.locus-line-inner {
+  display: block;
+  transform: translateY(110%);
+  filter: blur(6px);
+  animation: line-rise 900ms var(--ease-expo) both;
+}
+
+.locus-line:nth-child(2) .locus-line-inner {
+  animation-delay: 120ms;
+}
+
+@keyframes line-rise {
+  to {
+    transform: translateY(0);
+    filter: blur(0);
+  }
 }
 
 .locus-hero-lede {
@@ -250,6 +285,7 @@ html {
   font-size: 1.08rem;
   line-height: 1.6;
   color: var(--text-secondary);
+  animation: enter 800ms var(--landing-ease) 220ms both;
 }
 
 .locus-hero-cta {
@@ -257,6 +293,7 @@ html {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  animation: enter 800ms var(--landing-ease) 320ms both;
 }
 
 @media (min-width: 640px) {
@@ -272,6 +309,7 @@ html {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem 1.25rem;
+  animation: enter 800ms var(--landing-ease) 400ms both;
 }
 
 .locus-text-link {
@@ -280,19 +318,26 @@ html {
   text-decoration: underline;
   text-underline-offset: 4px;
   text-decoration-color: var(--border-strong);
-  transition: color var(--duration) var(--landing-ease);
+  transition:
+    color var(--duration) var(--landing-ease),
+    text-decoration-color var(--duration) var(--landing-ease),
+    letter-spacing var(--duration-slow) var(--landing-ease);
 }
 
 .locus-text-link:hover {
   color: var(--text-primary);
+  text-decoration-color: var(--signal);
+  letter-spacing: 0.02em;
 }
 
 .locus-text-link:disabled {
   opacity: 0.4;
 }
 
-/* Hero route band — the visual centerpiece */
+/* Hero route band — sliding ink indicator */
 .locus-hero-route {
+  --route-i: 2;
+  --route-n: 5;
   margin-top: clamp(2.5rem, 5vw, 3.5rem);
   display: flex;
   align-items: stretch;
@@ -302,6 +347,23 @@ html {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   scrollbar-width: none;
+  position: relative;
+  animation: enter 900ms var(--landing-ease) 480ms both;
+}
+
+.locus-hero-route::before {
+  content: "";
+  position: absolute;
+  left: calc((100% / var(--route-n)) * var(--route-i));
+  bottom: 0;
+  width: calc(100% / var(--route-n));
+  height: 2px;
+  background: var(--signal);
+  transition:
+    left 640ms var(--ease-spring),
+    width 640ms var(--ease-spring);
+  z-index: 2;
+  pointer-events: none;
 }
 
 .locus-hero-route::-webkit-scrollbar {
@@ -319,12 +381,14 @@ html {
   padding: 1.1rem 1.15rem 1.2rem;
   text-align: left;
   transition:
-    background-color var(--duration-slow) var(--landing-ease),
-    color var(--duration) var(--landing-ease);
+    background-color 520ms var(--landing-ease),
+    color var(--duration) var(--landing-ease),
+    transform 420ms var(--ease-spring);
 }
 
 .locus-hero-node:hover {
   background: color-mix(in srgb, var(--signal-subtle) 55%, transparent);
+  transform: translateY(-2px);
 }
 
 .locus-hero-node.is-active {
@@ -340,13 +404,21 @@ html {
   transition:
     background-color var(--duration) var(--landing-ease),
     border-color var(--duration) var(--landing-ease),
-    box-shadow var(--duration) var(--landing-ease);
+    box-shadow 520ms var(--ease-spring),
+    transform 520ms var(--ease-spring);
 }
 
 .locus-hero-node.is-active .locus-hero-node-dot {
   background: var(--signal);
   border-color: var(--signal);
-  box-shadow: 0 0 0 3px var(--signal-subtle);
+  box-shadow: 0 0 0 4px var(--signal-subtle);
+  transform: scale(1.25);
+  animation: pulse-dot 1.8s var(--landing-ease) infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 4px var(--signal-subtle); }
+  50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--signal-subtle) 40%, transparent); }
 }
 
 .locus-hero-node-label {
@@ -354,10 +426,12 @@ html {
   font-weight: 500;
   letter-spacing: -0.01em;
   color: var(--text-secondary);
+  transition: color var(--duration) var(--landing-ease), letter-spacing 420ms var(--landing-ease);
 }
 
 .locus-hero-node.is-active .locus-hero-node-label {
   color: var(--text-primary);
+  letter-spacing: 0.01em;
 }
 
 .locus-hero-node-join {
@@ -372,6 +446,7 @@ html {
 .locus-hero-canvas {
   margin-top: 0;
   border-top: 0;
+  animation: enter 1000ms var(--landing-ease) 560ms both;
 }
 
 /* ——— Stage canvas ——— */
@@ -398,16 +473,22 @@ html {
   inset: 0;
   padding: 1.35rem 1.35rem 1.6rem;
   opacity: 0;
-  transform: translateY(18px) scale(0.982);
+  transform: translateY(28px) scale(0.97);
+  filter: blur(10px);
+  clip-path: inset(18% 0 0 0);
   pointer-events: none;
   transition:
-    opacity 520ms var(--landing-ease),
-    transform 520ms var(--landing-ease);
+    opacity 640ms var(--ease-expo),
+    transform 720ms var(--ease-expo),
+    filter 720ms var(--ease-expo),
+    clip-path 780ms var(--ease-ink);
 }
 
 .locus-canvas-stage[data-active="true"] {
   opacity: 1;
   transform: none;
+  filter: blur(0);
+  clip-path: inset(0 0 0 0);
   pointer-events: auto;
   z-index: 1;
 }
@@ -520,11 +601,12 @@ html {
 }
 
 .locus-explore-media img {
-  transition: transform 700ms var(--landing-ease);
+  transition: transform 1100ms var(--ease-expo), filter 1100ms var(--ease-expo);
 }
 
 .locus-canvas:hover .locus-explore-media img {
-  transform: scale(1.04);
+  transform: scale(1.08);
+  filter: saturate(1.08) contrast(1.04);
 }
 
 .locus-explore-index {
@@ -692,8 +774,9 @@ html {
 
 .locus-spine-ink {
   width: 100%;
-  background: var(--signal);
-  transition: height 420ms var(--landing-ease);
+  background: linear-gradient(180deg, var(--signal), var(--signal-deep));
+  transition: height 640ms var(--ease-spring);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--signal) 35%, transparent);
 }
 
 .locus-spine-list {
@@ -710,7 +793,13 @@ html {
   padding: 0.55rem 0.35rem;
   text-align: left;
   width: 100%;
-  transition: opacity var(--duration) var(--landing-ease);
+  transition:
+    opacity var(--duration) var(--landing-ease),
+    transform 420ms var(--ease-spring);
+}
+
+.locus-spine-node:hover {
+  transform: translateX(4px);
 }
 
 .locus-spine-dot {
@@ -724,7 +813,8 @@ html {
   transition:
     background-color var(--duration) var(--landing-ease),
     border-color var(--duration) var(--landing-ease),
-    box-shadow var(--duration) var(--landing-ease);
+    box-shadow 520ms var(--ease-spring),
+    transform 520ms var(--ease-spring);
 }
 
 .locus-spine-node.is-past .locus-spine-dot,
@@ -734,7 +824,8 @@ html {
 }
 
 .locus-spine-node.is-active .locus-spine-dot {
-  box-shadow: 0 0 0 3px var(--signal-subtle);
+  box-shadow: 0 0 0 4px var(--signal-subtle);
+  transform: scale(1.3);
 }
 
 .locus-spine-meta {
@@ -985,9 +1076,17 @@ html {
   border: 1px solid color-mix(in srgb, var(--signal) 16%, var(--border));
   border-radius: var(--radius-xl);
   background:
-    radial-gradient(ellipse 80% 70% at 100% 0%, rgba(11, 111, 106, 0.12), transparent 55%),
+    radial-gradient(ellipse 80% 70% at 100% 0%, rgba(11, 111, 106, 0.14), transparent 55%),
     linear-gradient(145deg, var(--surface) 0%, color-mix(in srgb, var(--signal-subtle) 55%, var(--surface)) 100%);
   box-shadow: var(--shadow-soft);
+  transition:
+    transform 520ms var(--ease-out),
+    box-shadow 520ms var(--ease-out);
+}
+
+.locus-finale-inner:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lift);
 }
 
 .locus-footer {
@@ -1016,16 +1115,39 @@ html {
   .locus-spine-ink,
   .locus-why-panel,
   .locus-explore-media img,
-  .locus-story-compare-media img {
+  .locus-story-compare-media img,
+  .locus-hero::before,
+  .locus-line-inner,
+  .locus-brand-mark,
+  .locus-hero-lede,
+  .locus-hero-cta,
+  .locus-hero-aside,
+  .locus-hero-route,
+  .locus-hero-canvas,
+  .locus-hero-node,
+  .locus-hero-node-dot,
+  .locus-finale-inner {
     transition: none !important;
+    animation: none !important;
+  }
+
+  .locus-line-inner,
+  .locus-canvas-stage,
+  .locus-brand-mark,
+  .locus-hero-lede,
+  .locus-hero-cta,
+  .locus-hero-aside,
+  .locus-hero-route,
+  .locus-hero-canvas {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    clip-path: none;
   }
 
   .locus-canvas:hover .locus-explore-media img,
-  .locus-story-compare-media:hover img {
-    transform: none;
-  }
-
-  .locus-canvas-stage {
+  .locus-story-compare-media:hover img,
+  .locus-finale-inner:hover {
     transform: none;
   }
 }

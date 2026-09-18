@@ -21,6 +21,7 @@ export function CampusScrollPreview({
   const active = rows.find((r) => r.university.id === activeId) ?? rows[0] ?? null;
   const [displayId, setDisplayId] = useState<string | null>(active?.university.id ?? null);
   const [leavingId, setLeavingId] = useState<string | null>(null);
+  const [wipeDir, setWipeDir] = useState<"down" | "up">("down");
 
   useEffect(() => {
     const next = active?.university.id ?? null;
@@ -30,6 +31,10 @@ export function CampusScrollPreview({
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    const from = rows.findIndex((r) => r.university.id === displayId);
+    const to = rows.findIndex((r) => r.university.id === next);
+    setWipeDir(to >= from ? "down" : "up");
+
     if (reduce) {
       setDisplayId(next);
       setLeavingId(null);
@@ -38,9 +43,9 @@ export function CampusScrollPreview({
 
     setLeavingId(displayId);
     setDisplayId(next);
-    const t = window.setTimeout(() => setLeavingId(null), 700);
+    const t = window.setTimeout(() => setLeavingId(null), 900);
     return () => window.clearTimeout(t);
-  }, [active?.university.id, displayId]);
+  }, [active?.university.id, displayId, rows]);
 
   if (!rows.length || !active) return null;
 
@@ -71,7 +76,7 @@ export function CampusScrollPreview({
       </div>
 
       <aside className="campus-scroll-preview" aria-hidden={false}>
-        <div className="campus-scroll-stage">
+        <div className={cn("campus-scroll-stage", `wipe-${wipeDir}`)}>
           {rows.map((row) => {
             const id = row.university.id;
             const isCurrent = id === displayId;

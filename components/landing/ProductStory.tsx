@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { StatusBadge } from "@/components/ui/Badges";
+import { Reveal } from "@/components/Reveal";
 import { cn } from "@/lib/cn";
 import {
   SAMPLE_DIAGNOSIS,
@@ -21,7 +22,7 @@ export function ProductStory() {
   return (
     <section id="what-you-get" className="locus-story scroll-mt-20" aria-labelledby="story-heading">
       <div className="route-frame">
-        <div className="locus-story-head">
+        <Reveal className="locus-story-head">
           <p className="label">What you get</p>
           <h2 id="story-heading" className="locus-display mt-4 max-w-3xl">
             Not a list of universities.
@@ -32,10 +33,10 @@ export function ProductStory() {
             LOCUS turns your facts into diagnosis, ranked campuses with reasons, a side-by-side
             decision, and one next action — in that order.
           </p>
-        </div>
+        </Reveal>
 
         {/* Step 1 — Diagnosis as typographic block */}
-        <div className="locus-story-block">
+        <Reveal className="locus-story-block" delay={60}>
           <div className="locus-story-index">
             <span className="meta">01</span>
             <span className="locus-story-line" aria-hidden />
@@ -55,11 +56,11 @@ export function ProductStory() {
               ))}
             </ul>
           </div>
-        </div>
+        </Reveal>
 
         {/* Step 2 — Recommendation as full-bleed visual moment */}
         {top ? (
-          <div className="locus-story-block locus-story-reco">
+          <Reveal className="locus-story-block locus-story-reco" delay={80}>
             <div className="locus-story-index">
               <span className="meta">02</span>
               <span className="locus-story-line" aria-hidden />
@@ -114,12 +115,12 @@ export function ProductStory() {
                 </div>
               </div>
             </div>
-          </div>
+          </Reveal>
         ) : null}
 
         {/* Step 3 — Compare as editorial columns */}
         {top && second ? (
-          <div className="locus-story-block">
+          <Reveal className="locus-story-block" delay={100}>
             <div className="locus-story-index">
               <span className="meta">03</span>
               <span className="locus-story-line" aria-hidden />
@@ -153,12 +154,12 @@ export function ProductStory() {
                 })}
               </div>
             </div>
-          </div>
+          </Reveal>
         ) : null}
 
         {/* Step 4 — Next action focal */}
         {SAMPLE_NEXT ? (
-          <div className="locus-story-block locus-story-act">
+          <Reveal className="locus-story-block locus-story-act" delay={120}>
             <div className="locus-story-index">
               <span className="meta">04</span>
               <span className="locus-story-line" aria-hidden />
@@ -186,7 +187,7 @@ export function ProductStory() {
                 </div>
               </div>
             </div>
-          </div>
+          </Reveal>
         ) : null}
       </div>
     </section>

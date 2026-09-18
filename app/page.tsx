@@ -110,9 +110,14 @@ export default function LandingPage() {
             <div className="locus-hero-top">
               <p className="locus-brand-mark">LOCUS</p>
               <h1 className="locus-display locus-hero-title">
-                Your profile
-                <br />
-                <em>becomes a route.</em>
+                <span className="locus-line">
+                  <span className="locus-line-inner">Your profile</span>
+                </span>
+                <span className="locus-line">
+                  <span className="locus-line-inner">
+                    <em>becomes a route.</em>
+                  </span>
+                </span>
               </h1>
               <p className="locus-hero-lede">
                 Turn academics, budget, countries, and goals into a personalized admissions path —
@@ -143,7 +148,15 @@ export default function LandingPage() {
             </div>
 
             {/* Horizontal route as visual centerpiece */}
-            <div className="locus-hero-route" role="tablist" aria-label="Sample route stages">
+            <div
+              className="locus-hero-route"
+              role="tablist"
+              aria-label="Sample route stages"
+              style={{
+                ["--route-i" as string]: JOURNEY_STAGES.findIndex((s) => s.id === heroStage),
+                ["--route-n" as string]: JOURNEY_STAGES.length,
+              }}
+            >
               {JOURNEY_STAGES.map((step, i) => (
                 <button
                   key={step.id}
@@ -174,7 +187,7 @@ export default function LandingPage() {
         {/* ——— Final CTA ——— */}
         <section id="your-route" className="locus-finale scroll-mt-20" aria-labelledby="finale-heading">
           <div className="route-frame">
-            <div className="locus-finale-inner">
+            <div className="locus-finale-inner reveal is-in">
               <p className="label">Your route</p>
               <h2 id="finale-heading" className="locus-display-sm mt-4 max-w-2xl">
                 Your route starts with your profile.
