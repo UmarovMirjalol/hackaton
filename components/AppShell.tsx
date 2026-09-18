@@ -18,14 +18,19 @@ const NAV = [
   { href: "/roadmap", label: "Act" },
 ] as const;
 
-export function JourneyRail() {
+export function JourneyRail({ alwaysShow = false }: { alwaysShow?: boolean }) {
   const pathname = usePathname();
   const { profile } = useRoute();
   const ready = profileReady(profile);
   const pct = profileCompleteness(profile);
 
   return (
-    <div className="hidden border-b border-border bg-surface/60 md:block">
+    <div
+      className={cn(
+        "border-b border-border bg-surface/60",
+        alwaysShow ? "block" : "hidden md:block",
+      )}
+    >
       <div className="route-frame flex items-center gap-1 overflow-x-auto py-0">
         <p className="label mr-3 shrink-0 py-2.5">Your route</p>
         {JOURNEY.map((step) => {

@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { NextUp } from "@/components/NextUp";
-import { CampusThumb } from "@/components/UniversityCard";
-import { SourceCitation, StatusBadge } from "@/components/ui/Badges";
+import { StatusBadge, SourceCitation } from "@/components/ui/Badges";
 import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/States";
+import { CampusThumb } from "@/components/UniversityCard";
 import { cn } from "@/lib/cn";
 import { IMAGE_DISCLAIMER } from "@/lib/media";
 import { useDerived, useRoute } from "@/lib/store";
@@ -49,15 +50,15 @@ export default function ComparePage() {
       }
     >
       {compare.length < 2 ? (
-        <div className="border border-dashed border-border px-6 py-14 text-center">
-          <p className="text-[18px] font-medium tracking-tight">Pick at least two campuses</p>
-          <p className="body mt-2 text-secondary">
-            Use “Add to compare” on the matches list, then return here.
-          </p>
-          <Button href="/results" className="mt-6" variant="signal">
-            Back to results
-          </Button>
-        </div>
+        <EmptyState
+          title="Pick at least two campuses"
+          detail="Use “Add to compare” on the matches list, then return here to see tradeoffs side by side."
+          action={
+            <Button href="/results" variant="signal">
+              Back to results
+            </Button>
+          }
+        />
       ) : (
         <>
           <div className="hidden overflow-x-auto md:block">
@@ -168,7 +169,7 @@ export default function ComparePage() {
                   alt={c.university.name}
                   className="aspect-[2/1] w-full"
                 />
-                <h2 className="mt-4 text-[18px] font-medium tracking-tight">{c.university.name}</h2>
+                <h2 className="mt-4 text-h2 tracking-tight">{c.university.name}</h2>
                 <p className="meta mt-1">Fit {c.fitIndex}</p>
                 <p className="mt-3 text-[14px] leading-6 text-secondary">{c.why}</p>
                 <dl className="mt-5 space-y-3 border-t border-border pt-4">

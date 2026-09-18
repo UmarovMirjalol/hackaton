@@ -109,9 +109,9 @@ export default function ResultsPage() {
           </div>
         </div>
         <aside className="lg:col-span-5">
-          <div className="border border-border bg-surface p-5">
+          <div className="panel p-5">
             <p className="label">On file</p>
-            <p className="mt-2 text-[22px] font-medium tracking-tight">
+            <p className="mt-2 text-h2 tracking-tight">
               {profile.firstName} {profile.lastName}
             </p>
             <dl className="mt-4 space-y-2.5 text-[13px]">
@@ -186,10 +186,10 @@ export default function ResultsPage() {
                 setProfile({ countries: next });
               }}
               className={cn(
-                "h-8 border px-2.5 text-[12px] font-medium rounded-[var(--radius-sm)]",
+                "h-8 border px-2.5 text-[12px] font-medium rounded-[var(--radius-sm)] transition-colors duration-[var(--duration)]",
                 on
-                  ? "border-primary bg-primary text-white"
-                  : "border-border text-secondary hover:text-primary",
+                  ? "border-[var(--signal)] bg-[var(--signal)] text-white"
+                  : "border-border text-secondary hover:border-border-strong hover:text-primary",
               )}
             >
               {countryLabels[id]}
@@ -312,8 +312,8 @@ function ResultCard({
 
       <div>
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h3 className="text-[18px] font-medium tracking-tight">{u.name}</h3>
+          <div className="min-w-0">
+            <h3 className="text-h2 tracking-tight">{u.name}</h3>
             <p className="meta mt-1">
               {u.city} · {u.country} · Fit {row.fitIndex}
             </p>
@@ -323,12 +323,12 @@ function ResultCard({
 
         <div className="mt-4 border-l-2 border-[var(--signal)] pl-4">
           <p className="label">Match reasons</p>
-          <p className="mt-1.5 text-[15px] leading-6 text-secondary">{row.why}</p>
+          <p className="body mt-1.5 text-secondary">{row.why}</p>
         </div>
 
         <div
           className={cn(
-            "mt-4 min-h-[5.5rem] border-l-2 border-border pl-4",
+            "mt-4 border-l-2 border-border pl-4",
             explanationPending && "opacity-80",
           )}
           aria-busy={explanationPending}
@@ -336,11 +336,11 @@ function ResultCard({
           <p className="label">Why this fits you</p>
           {explanation ? (
             <>
-              <p className="mt-1.5 text-[14px] leading-6 text-secondary">{explanation.whyItFits}</p>
+              <p className="mt-1.5 text-[13.5px] leading-6 text-secondary">{explanation.whyItFits}</p>
               {explanation.keyReasons.length ? (
                 <ul className="mt-2 space-y-1">
                   {explanation.keyReasons.map((reason) => (
-                    <li key={reason} className="text-[13px] leading-5 text-tertiary">
+                    <li key={reason} className="caption leading-5">
                       · {reason}
                     </li>
                   ))}
@@ -352,24 +352,24 @@ function ResultCard({
           )}
         </div>
 
-        <dl className="mt-5 grid gap-3 text-[13px] sm:grid-cols-2">
+        <dl className="mt-5 grid gap-3 sm:grid-cols-2">
           <div>
-            <dt className="text-tertiary">Program signal</dt>
-            <dd className="font-medium">
+            <dt className="caption">Program signal</dt>
+            <dd className="mt-0.5 text-[13px] font-medium">
               {row.factors.find((f) => f.key === "academic")?.value ?? "—"}
             </dd>
           </div>
           <div>
-            <dt className="text-tertiary">Aid</dt>
-            <dd className="font-medium">{u.aid.summary}</dd>
+            <dt className="caption">Aid</dt>
+            <dd className="mt-0.5 text-[13px] font-medium leading-5">{u.aid.summary}</dd>
           </div>
           <div>
-            <dt className="text-tertiary">Key requirement</dt>
-            <dd className="font-medium">{u.english}</dd>
+            <dt className="caption">Key requirement</dt>
+            <dd className="mt-0.5 text-[13px] font-medium leading-5">{u.english}</dd>
           </div>
           <div>
-            <dt className="text-tertiary">Next deadline</dt>
-            <dd className="font-medium">
+            <dt className="caption">Next deadline</dt>
+            <dd className="mt-0.5 text-[13px] font-medium">
               {nextDeadline ? `${nextDeadline.label}: ${nextDeadline.date}` : "—"}
             </dd>
           </div>
@@ -450,10 +450,10 @@ function ChipGroup({
             type="button"
             onClick={() => onChange(v)}
             className={cn(
-              "h-8 border px-2.5 text-[12px] font-medium rounded-[var(--radius-sm)]",
+              "h-8 border px-2.5 text-[12px] font-medium rounded-[var(--radius-sm)] transition-colors duration-[var(--duration)]",
               value === v
-                ? "border-primary bg-primary text-white"
-                : "border-border bg-surface text-secondary hover:text-primary",
+                ? "border-[var(--signal)] bg-[var(--signal)] text-white"
+                : "border-border bg-surface text-secondary hover:border-border-strong hover:text-primary",
             )}
           >
             {l}

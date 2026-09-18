@@ -13,7 +13,7 @@ import {
 } from "@/lib/ai/diagnosis-explanation-shared";
 import { cn } from "@/lib/cn";
 import { synthesize } from "@/lib/diagnosis";
-import { JOURNEY, profileCompleteness } from "@/lib/journey";
+import { profileCompleteness } from "@/lib/journey";
 import { recommended } from "@/lib/matching";
 import { profileReady } from "@/lib/onboarding";
 import { buildRoadmap } from "@/lib/roadmap";
@@ -21,6 +21,7 @@ import { routeInputFingerprint } from "@/lib/route-fingerprint";
 import { useRoute } from "@/lib/store";
 import type { Profile } from "@/lib/types";
 import { countryLabels, fieldLabels } from "@/lib/universities";
+import { JourneyRail } from "@/components/AppShell";
 import "./analyze.css";
 
 /** Meaningful staging — mirrors real work already done in-memory, not fake AI. */
@@ -254,47 +255,7 @@ export default function AnalyzePage() {
           </Link>
           <p className="meta tabular-nums">{pct}% profile · saved locally</p>
         </div>
-        <div className="border-t border-border bg-surface/70">
-          <div className="route-frame flex items-center gap-1 overflow-x-auto">
-            <p className="label mr-3 shrink-0 py-2.5">Your route</p>
-            {JOURNEY.map((step, i) => {
-              const profileDone = i === 0;
-              const current = step.id === "analyze";
-              const upcoming = i > 1;
-              return (
-                <span
-                  key={step.id}
-                  className={cn(
-                    "relative flex shrink-0 items-center gap-2 px-3 py-2.5 text-[12.5px] font-medium",
-                    current && "text-primary",
-                    profileDone && !current && "text-secondary",
-                    upcoming && "text-tertiary",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "h-1.5 w-1.5 shrink-0 rounded-full",
-                      current && "bg-[var(--signal)] shadow-[0_0_0_3px_var(--signal-subtle)]",
-                      profileDone && !current && "bg-[var(--signal)]",
-                      upcoming && "border border-border-strong bg-transparent",
-                    )}
-                    aria-hidden
-                  />
-                  {profileDone && !current ? (
-                    <span className="text-[var(--signal)]">✓ </span>
-                  ) : null}
-                  {step.label}
-                  {current ? (
-                    <span
-                      className="absolute inset-x-3 -bottom-px h-0.5 bg-[var(--signal)]"
-                      aria-hidden
-                    />
-                  ) : null}
-                </span>
-              );
-            })}
-          </div>
-        </div>
+        <JourneyRail alwaysShow />
       </header>
 
       <main className="route-frame az-main">

@@ -20,7 +20,10 @@ export default function LandingPage() {
         className="mx-auto flex items-center justify-between px-[var(--space-page)] py-4"
         style={{ maxWidth: "var(--content)" }}
       >
-        <span className="text-[15px] font-semibold tracking-tight">Route</span>
+        <span className="text-[15px] font-semibold tracking-tight inline-flex items-center gap-2">
+          Route
+          <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)]" aria-hidden />
+        </span>
         <Link
           href={ready ? "/results" : "/onboarding"}
           className="small text-secondary hover:text-primary"
