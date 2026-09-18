@@ -10,6 +10,8 @@ import { NextUp } from "@/components/NextUp";
 import { StatusBadge } from "@/components/ui/Badges";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
+import { useRecommendationExplanations } from "@/lib/ai/use-recommendation-explanations";
+import type { RecommendationExplanation } from "@/lib/ai/recommendation-explanation-shared";
 import { campusImage, IMAGE_DISCLAIMER } from "@/lib/media";
 import { profileReady } from "@/lib/onboarding";
 import { useDerived, useRoute } from "@/lib/store";
@@ -27,6 +29,12 @@ export default function ResultsPage() {
   const visible = useMemo(
     () => recs.filter((r) => profile.countries.includes(r.university.countryId)),
     [recs, profile.countries],
+  );
+
+  const { byUniversityId: explanations } = useRecommendationExplanations(
+    profile,
+    visible,
+    hydrated && profileReady(profile),
   );
 
   useEffect(() => {
@@ -207,13 +215,15 @@ export default function ResultsPage() {
 
       <ul className="space-y-0">
         {visible.map((row, i) => (
-          <li key={`${row.university.id}-${row.fitIndex}`}>
+          <li key={`${row.university.id}-${row.fitIndex}-${row.why.slice(0, 24)}`}>
             <ResultCard
               row={row}
               rank={i + 1}
               selected={compareIds.includes(row.university.id)}
               onToggle={() => toggleCompare(row.university.id)}
               onOpen={() => setDetail(row)}
+              explanation={explanations[row.university.id]?.explanation ?? null}
+              explanationPending={explanations[row.university.id]?.pending ?? false}
             />
           </li>
         ))}
@@ -257,12 +267,16 @@ function ResultCard({
   selected,
   onToggle,
   onOpen,
+  explanation,
+  explanationPending,
 }: {
   row: RankedUniversity;
   rank: number;
   selected: boolean;
   onToggle: () => void;
   onOpen: () => void;
+  explanation: RecommendationExplanation | null;
+  explanationPending: boolean;
 }) {
   const img = campusImage(row.university.id);
   const u = row.university;
@@ -302,8 +316,34 @@ function ResultCard({
         </div>
 
         <div className="mt-4 border-l-2 border-[var(--signal)] pl-4">
-          <p className="label">Why this fits you</p>
+          <p className="label">Match reasons</p>
           <p className="mt-1.5 text-[15px] leading-6 text-secondary">{row.why}</p>
+        </div>
+
+        <div
+          className={cn(
+            "mt-4 min-h-[5.5rem] border-l-2 border-border pl-4",
+            explanationPending && "opacity-80",
+          )}
+          aria-busy={explanationPending}
+        >
+          <p className="label">Why this fits you</p>
+          {explanation ? (
+            <>
+              <p className="mt-1.5 text-[14px] leading-6 text-secondary">{explanation.whyItFits}</p>
+              {explanation.keyReasons.length ? (
+                <ul className="mt-2 space-y-1">
+                  {explanation.keyReasons.map((reason) => (
+                    <li key={reason} className="text-[13px] leading-5 text-tertiary">
+                      · {reason}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </>
+          ) : (
+            <p className="meta mt-2">Preparing explanation…</p>
+          )}
         </div>
 
         <dl className="mt-5 grid gap-3 text-[13px] sm:grid-cols-2">
