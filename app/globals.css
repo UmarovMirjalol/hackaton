@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f1ebe3;
+  --surface: #faf6f0;
+  --surface-muted: #e6dfd4;
+  --text-primary: #1b1814;
+  --text-secondary: #5c564c;
+  --text-tertiary: #8a8276;
+  --border: #d2c9bb;
+  --accent: #b5461f;
+  --accent-hover: #953914;
+  --success: #2e5a42;
+  --warning: #8a5a1c;
+  --error: #8f2d2d;
+  --radius-sm: 2px;
+  --radius-md: 5px;
+  --radius-lg: 10px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-tertiary: var(--text-tertiary);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --font-sans: var(--font-instrument-sans);
+  --font-serif: var(--font-newsreader);
+  --font-mono: var(--font-ibm-plex-mono);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  min-height: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.font-serif {
+  font-family: var(--font-serif), ui-serif, Georgia, serif;
+}
+
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+.label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.meta {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--text-tertiary);
+}
+
+.page-title {
+  font-family: var(--font-serif), ui-serif, Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.enter {
+  animation: fade-up 280ms ease-out;
+}
+
+input[type="range"] {
+  accent-color: var(--accent);
+}
