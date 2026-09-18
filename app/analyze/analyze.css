@@ -173,6 +173,22 @@
   border-top: 1px dashed var(--border);
 }
 
+.az-what-matters {
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.az-what-matters li {
+  padding-left: 0.85rem;
+  border-left: 2px solid var(--border-strong);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
 .az-aside {
   min-width: 0;
 }

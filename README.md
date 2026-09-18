@@ -8,7 +8,7 @@ Deterministic matching on your constraints (not a black-box AI score). Demo cata
 
 1. **Landing** — start or try demo
 2. **Onboarding** (`/onboarding`) — 7 guided steps with validation
-3. **Analyze** (`/analyze`) — staged run of the real match engine
+3. **Analyze** (`/analyze`) — deterministic diagnosis, plus an optional concise Gemini explanation of that diagnosis (falls back when AI is unavailable)
 4. **Results** (`/results`) — why-first recommendations + live filters
 5. **Compare** — side-by-side tradeoffs
 6. **Roadmap** — actionable monthly tasks with completion state
@@ -26,4 +26,13 @@ Open [http://127.0.0.1:4567](http://127.0.0.1:4567).
 
 **Try demo profile** loads Amira Hassan and runs analysis immediately.
 
-State: `localStorage` key `route.admissions.v3`. No backend.
+State: `localStorage` key `route.admissions.v3`. Matching stays local — no backend required.
+
+### Optional Gemini (server-only)
+
+Copy `.env.example` → `.env.local` and set `GEMINI_API_KEY`. Never use `NEXT_PUBLIC_GEMINI_API_KEY`.
+
+- Connectivity check: `GET` / `POST` `/api/ai/ping`
+- Diagnosis explanation: `POST` `/api/ai/diagnosis-explanation` (structured JSON; deterministic fallback if the key is missing or the call fails)
+
+Without a key, `/analyze` still shows the full deterministic diagnosis and a local explanation.

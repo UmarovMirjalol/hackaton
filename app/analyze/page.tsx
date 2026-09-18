@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Alert, EmptyState, LoadingBlock } from "@/components/ui/States";
+import {
+  buildDiagnosisExplanationContext,
+  diagnosisExplanationCacheKey,
+  fallbackDiagnosisExplanation,
+  type DiagnosisExplanation,
+} from "@/lib/ai/diagnosis-explanation-shared";
 import { cn } from "@/lib/cn";
 import { synthesize } from "@/lib/diagnosis";
 import { JOURNEY, profileCompleteness } from "@/lib/journey";
@@ -100,8 +106,10 @@ export default function AnalyzePage() {
   const router = useRouter();
   const [stage, setStage] = useState(0);
   const [phase, setPhase] = useState<"loading" | "ready">("loading");
+  const [explanation, setExplanation] = useState<DiagnosisExplanation | null>(null);
   const timersRef = useRef<number[]>([]);
   const cancelledRef = useRef(false);
+  const explanationKeyRef = useRef<string>("");
 
   const diagnosis = useMemo(() => synthesize(profile), [profile]);
   const recs = useMemo(() => recommended(profile, 6), [profile]);
@@ -115,6 +123,10 @@ export default function AnalyzePage() {
   );
   const evidence = useMemo(() => profileEvidence(profile), [profile]);
   const priorities = useMemo(() => searchPriorities(profile), [profile]);
+  const explanationContext = useMemo(
+    () => buildDiagnosisExplanationContext(profile, diagnosis, priorities),
+    [profile, diagnosis, priorities],
+  );
   const pct = profileCompleteness(profile);
   const ready = profileReady(profile);
 
@@ -168,6 +180,47 @@ export default function AnalyzePage() {
     profile.countries.join(","),
     router,
   ]);
+
+  // Fetch personalized explanation in parallel with the loading stages.
+  // Deterministic diagnosis stays visible even if this fails or is slow.
+  useEffect(() => {
+    if (!hydrated || !ready) return;
+
+    const key = diagnosisExplanationCacheKey(explanationContext);
+    if (explanationKeyRef.current === key && explanation) return;
+
+    explanationKeyRef.current = key;
+    const fallback = fallbackDiagnosisExplanation(explanationContext);
+    setExplanation(fallback);
+
+    const ac = new AbortController();
+    fetch("/api/ai/diagnosis-explanation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ context: explanationContext }),
+      signal: ac.signal,
+    })
+      .then(async (res) => {
+        const data = (await res.json()) as {
+          explanation?: DiagnosisExplanation;
+        };
+        if (ac.signal.aborted) return;
+        if (
+          data.explanation &&
+          typeof data.explanation.summary === "string" &&
+          Array.isArray(data.explanation.whatMatters)
+        ) {
+          setExplanation(data.explanation);
+        }
+      })
+      .catch(() => {
+        // Keep deterministic fallback already set — never surface API errors.
+      });
+
+    return () => ac.abort();
+    // Keyed by context hash so profile/diagnosis changes refetch once — not every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated, ready, diagnosisExplanationCacheKey(explanationContext)]);
 
   if (!hydrated) {
     return (
@@ -336,6 +389,20 @@ export default function AnalyzePage() {
                     <p className="body mt-3 text-secondary">No hard constraints flagged from this profile.</p>
                   )}
                 </section>
+
+                {explanation ? (
+                  <section className="az-block az-explanation" aria-label="Personalized explanation">
+                    <h2 className="label">Personalized explanation</h2>
+                    <p className="body mt-3 max-w-2xl text-secondary">{explanation.summary}</p>
+                    {explanation.whatMatters.length > 0 ? (
+                      <ul className="az-what-matters">
+                        {explanation.whatMatters.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </section>
+                ) : null}
 
                 <section className="az-block">
                   <h2 className="label">What this means</h2>

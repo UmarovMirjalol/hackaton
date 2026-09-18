@@ -49,6 +49,10 @@ export function isGeminiConfigured(): boolean {
 export async function generateAIResponse(input: {
   prompt: string;
   model?: string;
+  /** Narrow system role — never include secrets or full catalogs. */
+  systemInstruction?: string;
+  /** Ask Gemini for JSON (application/json MIME). Caller must validate. */
+  json?: boolean;
 }): Promise<GenerateAIResult> {
   const prompt = input.prompt?.trim();
   if (!prompt) {
@@ -64,12 +68,17 @@ export async function generateAIResponse(input: {
   }
 
   const model = input.model?.trim() || getGeminiModel();
+  const systemInstruction = input.systemInstruction?.trim();
 
   try {
     const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model,
       contents: prompt,
+      config: {
+        ...(systemInstruction ? { systemInstruction } : {}),
+        ...(input.json ? { responseMimeType: "application/json" } : {}),
+      },
     });
 
     const text = response.text?.trim() ?? "";
