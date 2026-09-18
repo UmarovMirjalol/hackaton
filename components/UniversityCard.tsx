@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import Image from "next/image";
+import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/Badges";
 import { cn } from "@/lib/cn";
 import { campusImage } from "@/lib/media";
@@ -12,15 +13,19 @@ export function UniversityCard({
   rank,
   selected,
   onToggleCompare,
+  onViewMatch,
   fieldLabel,
   style,
+  featured,
 }: {
   row: RankedUniversity;
   rank: number;
   selected: boolean;
   onToggleCompare: () => void;
+  onViewMatch: () => void;
   fieldLabel: string;
   style?: CSSProperties;
+  featured?: boolean;
 }) {
   const img = campusImage(row.university.id);
   const primaryFactors = row.factors.filter((f) =>
@@ -30,8 +35,9 @@ export function UniversityCard({
   return (
     <article
       className={cn(
-        "group uni-card overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface transition-[border-color,box-shadow,transform] duration-200",
-        "hover:border-primary/25 hover:shadow-[0_8px_24px_-12px_rgba(17,19,24,0.18)]",
+        "group uni-card overflow-hidden rounded-[var(--radius-lg)] border bg-surface transition-[border-color,box-shadow] duration-200",
+        featured ? "border-primary/20 shadow-[var(--shadow-md)]" : "border-border",
+        "hover:border-primary/25 hover:shadow-[var(--shadow-md)]",
       )}
       style={style}
     >
@@ -108,21 +114,21 @@ export function UniversityCard({
           ))}
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
+        <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-3">
+          <Button size="sm" onClick={onViewMatch}>
+            View match
+          </Button>
           <button
             type="button"
             onClick={onToggleCompare}
             className={cn(
-              "text-[13px] font-medium transition-colors",
+              "small font-medium transition-colors",
               selected ? "text-accent" : "text-secondary hover:text-primary",
             )}
           >
-            {selected ? "In comparison" : "Add to comparison"}
-            <span className="ml-1 inline-block transition-transform duration-200 group-hover:translate-x-0.5">
-              →
-            </span>
+            {selected ? "In comparison" : "Compare"}
           </button>
-          <span className="meta opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:opacity-100">
+          <span className="meta ml-auto hidden sm:inline">
             {row.university.application} · {fieldLabel}
           </span>
         </div>

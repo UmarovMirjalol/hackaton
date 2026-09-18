@@ -1,31 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  /* Cool stone neutrals — Stripe/Notion calm, not warm cream */
-  --background: #f4f5f7;
+  --background: #f6f5f2;
   --surface: #ffffff;
-  --surface-muted: #ebedf0;
-  --text-primary: #111318;
-  --text-secondary: #5c6370;
-  --text-tertiary: #8b929e;
-  --border: #d8dce3;
-  /* Deep teal — one accent; works as weight/contrast in grayscale */
-  --accent: #0b6e6a;
+  --surface-muted: #eeede8;
+  --text-primary: #0f1114;
+  --text-secondary: #5a5f6a;
+  --text-tertiary: #8b909a;
+  --border: #ddded9;
+  --accent: #0a6b67;
   --accent-hover: #085854;
-  --accent-subtle: #e4f2f1;
-  --success: #1f6b45;
-  --warning: #9a6700;
+  --accent-subtle: #e3f0ef;
+  --success: #1a6b45;
+  --warning: #946200;
   --error: #b42318;
-  --radius-sm: 2px;
+  --radius-sm: 4px;
   --radius-md: 6px;
-  --radius-lg: 8px;
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 32px;
-  --space-7: 48px;
+  --radius-lg: 10px;
+  --shadow-sm: 0 1px 0 rgba(15, 17, 20, 0.04);
+  --shadow-md: 0 8px 24px -12px rgba(15, 17, 20, 0.12);
 }
 
 @theme inline {
@@ -44,9 +37,6 @@
   --color-error: var(--error);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --radius-sm: var(--radius-sm);
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
 }
 
 * {
@@ -67,32 +57,75 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
 }
 
-.font-mono {
-  font-family: var(--font-mono), ui-monospace, monospace;
+.text-display {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 550;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
-/* Section / meta labels — product tone, not editorial caps shout */
+.text-h1 {
+  font-size: clamp(1.625rem, 3vw, 2rem);
+  font-weight: 550;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+}
+
+.text-h2 {
+  font-size: 1.25rem;
+  font-weight: 550;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.text-h3 {
+  font-size: 1rem;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.body {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.small {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.caption {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--text-tertiary);
+}
+
 .label {
-  font-size: 12px;
+  font-size: 0.6875rem;
   font-weight: 500;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--text-tertiary);
 }
 
 .meta {
   font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 12px;
-  letter-spacing: 0.01em;
+  font-size: 0.75rem;
   color: var(--text-tertiary);
 }
 
 .page-title {
   font-weight: 550;
   letter-spacing: -0.025em;
-  line-height: 1.15;
+  line-height: 1.12;
+}
+
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
 }
 
 @keyframes fade-up {
@@ -109,7 +142,7 @@ body {
 @keyframes stagger-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -119,10 +152,7 @@ body {
 
 @keyframes check-pop {
   0% {
-    transform: scale(0.92);
-  }
-  60% {
-    transform: scale(1.04);
+    transform: scale(0.94);
   }
   100% {
     transform: scale(1);
@@ -130,25 +160,22 @@ body {
 }
 
 .enter {
-  animation: fade-up 160ms ease-out;
+  animation: fade-up 180ms ease-out;
 }
 
 .stagger-in {
-  animation: stagger-in 280ms ease-out both;
+  animation: stagger-in 260ms ease-out both;
 }
 
 .task-done-pop {
-  animation: check-pop 220ms ease-out;
+  animation: check-pop 200ms ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .enter,
   .stagger-in,
-  .task-done-pop,
-  .uni-card,
-  .uni-card img {
+  .task-done-pop {
     animation: none !important;
-    transition: none !important;
   }
 }
 

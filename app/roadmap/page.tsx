@@ -1,6 +1,7 @@
 "use client";
 
 import { AppShell } from "@/components/AppShell";
+import { NextUp } from "@/components/NextUp";
 import { SourceCitation, StatusBadge } from "@/components/ui/Badges";
 import { Button } from "@/components/ui/Button";
 import { CampusThumb } from "@/components/UniversityCard";
@@ -12,47 +13,50 @@ export default function RoadmapPage() {
   const { taskStatus, setTaskStatus, profile } = useRoute();
   const { roadmap, next, compare } = useDerived();
   const months = [...new Set(roadmap.map((t) => t.month))];
+  const doneCount = roadmap.filter((t) => taskStatus[t.id] === "done").length;
 
   return (
     <AppShell
-      eyebrow="05 · Roadmap"
-      title="What to do with the shortlist."
+      eyebrow="Route"
+      title="Your admissions route."
       lede={
         profile.englishExam !== "none"
-          ? `IELTS/TOEFL is already on file (${profile.englishExam.toUpperCase()}${profile.englishScore ? ` ${profile.englishScore}` : ""}), so it is not a mandatory task.${profile.satStatus === "done" ? " SAT is already scored — it is not on this plan." : profile.satStatus === "planned" ? " SAT is still planned for U.S. campuses." : ""}`
-          : "Tasks are generated from the current shortlist and exam status — not a generic senior-year calendar."
+          ? `Exams on file: ${profile.englishExam.toUpperCase()}${profile.englishScore ? ` ${profile.englishScore}` : ""}${profile.satStatus === "done" ? " · SAT scored" : ""}. Tasks skip work already done.`
+          : "Generated from your shortlist and profile — not a generic senior-year calendar."
+      }
+      footer={
+        next ? (
+          <NextUp
+            title={next.title}
+            detail={`${doneCount}/${roadmap.length} tasks complete`}
+            href="#next"
+            cta="Focus next task"
+          />
+        ) : undefined
       }
     >
-      <div className="mb-8 flex gap-2 overflow-x-auto pb-1">
+      <div className="mb-8 flex gap-2 overflow-x-auto">
         {compare.slice(0, 3).map((c) => (
-          <div
-            key={c.university.id}
-            className="flex min-w-[200px] flex-1 items-center gap-3 rounded-[var(--radius-lg)] border border-border bg-surface p-2 transition-colors hover:border-primary/30"
-          >
+          <div key={c.university.id} className="flex min-w-[180px] items-center gap-2 py-1">
             <CampusThumb
               universityId={c.university.id}
               alt={c.university.shortName}
-              className="h-12 w-16 rounded-[var(--radius-sm)]"
+              className="h-10 w-14 rounded-[var(--radius-sm)]"
             />
             <div className="min-w-0">
-              <p className="truncate text-[13px] font-medium">{c.university.shortName}</p>
-              <p className="meta truncate">{c.university.city}</p>
+              <p className="small truncate font-medium">{c.university.shortName}</p>
+              <p className="caption truncate">{c.university.city}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-12">
+      <div className="grid gap-10 lg:grid-cols-12">
         <section className="lg:col-span-8">
           {months.map((month) => (
-            <div key={month} className="mb-8">
-              <div className="mb-3 flex items-center gap-3">
-                <h2 className="font-mono text-[12px] font-medium tracking-[0.08em] text-tertiary">
-                  {month}
-                </h2>
-                <div className="h-px flex-1 bg-border" />
-              </div>
-              <ul className="space-y-2">
+            <div key={month} className="mb-8 border-l border-border pl-5">
+              <h2 className="label -ml-5 mb-4 bg-background pl-5">{month}</h2>
+              <ul className="space-y-4">
                 {roadmap
                   .filter((t) => t.month === month)
                   .map((task) => {
@@ -61,42 +65,40 @@ export default function RoadmapPage() {
                       <li
                         key={task.id}
                         className={cn(
-                          "group rounded-[var(--radius-lg)] border border-border bg-surface p-3.5 transition-[border-color,box-shadow,opacity] duration-200",
-                          "hover:border-primary/25 hover:shadow-[0_6px_18px_-12px_rgba(17,19,24,0.2)]",
-                          status === "done" && "opacity-55",
-                          status === "done" && "task-done-pop",
+                          "group relative pl-4 transition-opacity duration-200",
+                          status === "done" && "opacity-50 task-done-pop",
                         )}
                       >
-                        <div className="flex flex-wrap items-start justify-between gap-3">
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <h3 className="text-[14.5px] font-medium">{task.title}</h3>
-                              <StatusBadge status={status} />
-                            </div>
-                            <p className="mt-1.5 max-w-xl text-[13px] leading-5 text-secondary">
-                              {task.reason}
-                            </p>
-                            <p className="meta mt-2 max-h-0 overflow-hidden opacity-0 transition-all duration-200 group-hover:max-h-8 group-hover:opacity-100">
-                              Effort · {task.effort}
-                            </p>
+                        <span
+                          className={cn(
+                            "absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full border-2 bg-background",
+                            status === "done"
+                              ? "border-accent bg-accent"
+                              : status === "started"
+                                ? "border-accent"
+                                : "border-border",
+                          )}
+                        />
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div>
+                            <h3 className="small font-medium">{task.title}</h3>
+                            <p className="body mt-1 max-w-xl text-secondary">{task.reason}</p>
                           </div>
-                          <div className="text-right">
-                            <p className="meta">{task.deadline}</p>
-                            <p className="mt-1 text-[11.5px] text-tertiary opacity-70 transition-opacity group-hover:opacity-100">
-                              {task.effort}
-                            </p>
-                          </div>
+                          <StatusBadge status={status} />
                         </div>
-                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <p className="meta mt-2">
+                          {task.deadline} · {task.effort}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2 opacity-100 transition-opacity md:opacity-70 md:group-hover:opacity-100">
                           <Button
                             size="sm"
                             variant={status === "todo" ? "primary" : "secondary"}
                             onClick={() => setTaskStatus(task.id, nextStatus(status))}
                           >
                             {status === "todo"
-                              ? "Mark as started"
+                              ? "Mark started"
                               : status === "started"
-                                ? "Mark as done"
+                                ? "Mark done"
                                 : "Reopen"}
                           </Button>
                           {task.source ? <SourceCitation {...task.source} /> : null}
@@ -109,53 +111,33 @@ export default function RoadmapPage() {
           ))}
         </section>
 
-        <aside className="lg:col-span-4">
-          <div
-            className={cn(
-              "rounded-[var(--radius-lg)] border-2 border-primary bg-surface p-4 transition-[box-shadow,transform] duration-200 lg:sticky lg:top-14",
-              (taskStatus[next?.id ?? ""] ?? "todo") !== "todo" && "border-accent",
-            )}
-          >
+        <aside className="lg:col-span-4" id="next">
+          <div className="border-l-2 border-primary pl-4 lg:sticky lg:top-28">
             <p className="label">Next up</p>
             {next ? (
               <>
-                <h2 className="mt-2 text-[20px] font-semibold leading-snug tracking-tight">
-                  {next.title}
-                </h2>
-                <p className="mt-2.5 text-[13.5px] leading-6 text-secondary">{next.reason}</p>
-                <dl className="mt-4 space-y-0 text-[13px]">
-                  <div className="flex justify-between gap-4 border-t border-border py-2">
+                <h2 className="text-h2 mt-2">{next.title}</h2>
+                <p className="body mt-2 text-secondary">{next.reason}</p>
+                <dl className="mt-4 space-y-2 small">
+                  <div className="flex justify-between gap-4 border-t border-border pt-2">
                     <dt className="text-tertiary">Deadline</dt>
-                    <dd className="text-right font-medium">{next.deadline}</dd>
+                    <dd className="font-medium">{next.deadline}</dd>
                   </div>
-                  <div className="flex justify-between gap-4 border-t border-border py-2">
+                  <div className="flex justify-between gap-4 border-t border-border pt-2">
                     <dt className="text-tertiary">Effort</dt>
-                    <dd className="text-right font-medium">{next.effort}</dd>
+                    <dd className="font-medium">{next.effort}</dd>
                   </div>
                 </dl>
                 <Button
-                  className="mt-3 w-full"
+                  className="mt-4 w-full"
                   onClick={() =>
                     setTaskStatus(next.id, nextStatus(taskStatus[next.id] ?? "todo"))
                   }
                 >
-                  {(taskStatus[next.id] ?? "todo") === "todo"
-                    ? "Mark as started"
-                    : (taskStatus[next.id] ?? "todo") === "started"
-                      ? "Mark as done"
-                      : "Reopen"}
+                  {(taskStatus[next.id] ?? "todo") === "todo" ? "Mark as started" : "Advance"}
                 </Button>
-                {(taskStatus[next.id] ?? "todo") !== "todo" ? (
-                  <p className="mt-2 text-center font-mono text-[11px] text-accent">
-                    {(taskStatus[next.id] ?? "todo") === "done"
-                      ? "Completed — next task is ready"
-                      : "Started — keep going"}
-                  </p>
-                ) : null}
               </>
-            ) : (
-              <p className="mt-3 text-[13.5px] text-secondary">The list is empty.</p>
-            )}
+            ) : null}
           </div>
         </aside>
       </div>

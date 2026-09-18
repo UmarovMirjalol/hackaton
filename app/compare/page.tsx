@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { NextUp } from "@/components/NextUp";
 import { CampusThumb } from "@/components/UniversityCard";
 import { SourceCitation, StatusBadge } from "@/components/ui/Badges";
 import { Button } from "@/components/ui/Button";
@@ -9,6 +10,7 @@ import { cn } from "@/lib/cn";
 import { IMAGE_DISCLAIMER } from "@/lib/media";
 import { useDerived, useRoute } from "@/lib/store";
 import { CATALOG_NOTE } from "@/lib/universities";
+import { fieldLabels } from "@/lib/universities";
 
 const ROWS = [
   { key: "aid", label: "Financial aid" },
@@ -26,10 +28,18 @@ export default function ComparePage() {
 
   return (
     <AppShell
-      eyebrow="04 · Compare"
-      title="How these options differ for you."
-      lede={`Not a spreadsheet of rankings. The columns are read against ${profile.aidNeed === "full" ? "a full-aid constraint" : "your aid setting"} and ${profile.field === "cs" ? "computer science" : profile.field}.`}
-      action={<Button href="/roadmap">Build the roadmap</Button>}
+      eyebrow="Compare"
+      title="Tradeoffs, side by side."
+      lede={`${compare.length} campuses against your ${profile.aidNeed === "full" ? "full-aid" : "aid"} and ${fieldLabels[profile.field] ?? profile.field} direction. No overall winner — only differences that matter to you.`}
+      action={<Button href="/roadmap">Build route</Button>}
+      footer={
+        <NextUp
+          title="Turn the shortlist into a timeline"
+          detail="Tasks skip exams you already completed."
+          href="/roadmap"
+          cta="Open route"
+        />
+      }
     >
       {compare.length < 2 ? (
         <div className="rounded-[var(--radius-lg)] border border-dashed border-border bg-surface px-5 py-10">

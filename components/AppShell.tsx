@@ -4,67 +4,96 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
+import { JOURNEY, profileCompleteness, profileReady, stepComplete } from "@/lib/journey";
 import { useRoute } from "@/lib/store";
 
-const STEPS = [
-  { href: "/profile", id: "profile", label: "Profile" },
-  { href: "/diagnosis", id: "diagnosis", label: "Diagnosis" },
-  { href: "/universities", id: "universities", label: "Universities" },
-  { href: "/compare", id: "compare", label: "Compare" },
-  { href: "/roadmap", id: "roadmap", label: "Roadmap" },
+const NAV = [
+  { href: "/universities", label: "Matches" },
+  { href: "/compare", label: "Compare" },
+  { href: "/roadmap", label: "Route" },
 ] as const;
 
-export function StepNav({ compact }: { compact?: boolean }) {
+export function JourneyRail() {
   const pathname = usePathname();
   const { profile } = useRoute();
-  const ready = Boolean(profile.firstName && profile.homeCountry);
-  const current = STEPS.findIndex((s) => pathname.startsWith(s.href));
+  const ready = profileReady(profile);
 
   return (
-    <nav
-      aria-label="Route progress"
-      className={cn("flex items-center gap-0 overflow-x-auto", compact && "text-[12px]")}
-    >
-      {STEPS.map((step, i) => {
-        const active = pathname.startsWith(step.href);
-        const locked = i > 0 && !ready && step.id !== "profile";
-        const done = current > i && ready;
-        return (
-          <span key={step.id} className="flex items-center">
-            {i > 0 ? (
-              <span
-                className={cn("mx-1.5 hidden h-px w-3 sm:block", done ? "bg-accent/40" : "bg-border")}
-                aria-hidden
-              />
-            ) : null}
-            <Link
-              href={locked ? "/profile" : step.href}
-              aria-current={active ? "step" : undefined}
-              className={cn(
-                "relative whitespace-nowrap rounded-[var(--radius-sm)] px-1 py-1 text-[12px] font-medium transition-colors duration-150 sm:text-[13px]",
-                active
-                  ? "text-primary after:absolute after:inset-x-1 after:bottom-0 after:h-px after:bg-accent"
-                  : locked
-                    ? "text-tertiary"
-                    : "text-secondary hover:text-primary",
-              )}
-            >
-              <span
+    <div className="hidden border-b border-border/80 bg-surface/50 md:block">
+      <div className="mx-auto flex max-w-6xl items-center gap-1 px-4 py-2 sm:px-6">
+        {JOURNEY.map((step, i) => {
+          const active = pathname.startsWith(step.href);
+          const done = stepComplete(step.id, pathname, profile);
+          const locked = i > 0 && !ready && step.id !== "profile";
+          return (
+            <span key={step.id} className="flex items-center">
+              {i > 0 ? <span className="mx-1 h-px w-3 bg-border" aria-hidden /> : null}
+              <Link
+                href={locked ? "/profile" : step.href}
+                aria-current={active ? "step" : undefined}
                 className={cn(
-                  "mr-1.5 hidden font-mono text-[10px] sm:inline",
-                  active ? "text-accent" : "text-tertiary",
+                  "flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-1 text-[12px] font-medium transition-colors",
+                  active ? "text-primary" : done ? "text-secondary" : "text-tertiary hover:text-primary",
                 )}
               >
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              {step.label}
+                <span
+                  className={cn(
+                    "flex h-4 w-4 items-center justify-center rounded-full border text-[9px]",
+                    done && !active
+                      ? "border-accent/40 bg-accent-subtle text-accent"
+                      : active
+                        ? "border-accent bg-accent text-white"
+                        : "border-border text-tertiary",
+                  )}
+                >
+                  {done && !active ? "✓" : i + 1}
+                </span>
+                {step.label}
+              </Link>
+            </span>
+          );
+        })}
+        <span className="ml-auto meta hidden lg:inline">
+          {profileCompleteness(profile)}% profile · saved locally
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function MobileNav() {
+  const pathname = usePathname();
+  return (
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm md:hidden"
+      aria-label="Primary"
+    >
+      <div className="grid grid-cols-4">
+        {NAV.map((item) => {
+          const active = pathname.startsWith(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex flex-col items-center py-2.5 text-[11px] font-medium",
+                active ? "text-accent" : "text-tertiary",
+              )}
+            >
+              {item.label}
             </Link>
-          </span>
-        );
-      })}
-      <span className="sr-only">
-        Step {Math.max(current, 0) + 1} of {STEPS.length}
-      </span>
+          );
+        })}
+        <Link
+          href="/profile"
+          className={cn(
+            "flex flex-col items-center py-2.5 text-[11px] font-medium",
+            pathname.startsWith("/profile") ? "text-accent" : "text-tertiary",
+          )}
+        >
+          Profile
+        </Link>
+      </div>
     </nav>
   );
 }
@@ -75,38 +104,67 @@ export function AppShell({
   title,
   lede,
   action,
+  footer,
 }: {
   children: ReactNode;
   eyebrow?: string;
   title?: string;
   lede?: string;
   action?: ReactNode;
+  footer?: ReactNode;
 }) {
-  const { hydrated } = useRoute();
+  const { hydrated, profile } = useRoute();
+  const pathname = usePathname();
+
   return (
-    <div className="min-h-dvh">
-      <header className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6">
+    <div className="min-h-dvh pb-16 md:pb-0">
+      <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <Link href="/" className="text-[15px] font-semibold tracking-tight">
             Route
           </Link>
-          <StepNav />
+          <nav className="hidden items-center gap-6 md:flex" aria-label="Product">
+            {NAV.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "text-[13px] font-medium transition-colors",
+                  pathname.startsWith(item.href) ? "text-primary" : "text-secondary hover:text-primary",
+                )}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+          <Link
+            href="/profile"
+            className={cn(
+              "text-[13px] font-medium",
+              pathname.startsWith("/profile") ? "text-accent" : "text-secondary hover:text-primary",
+            )}
+          >
+            {profile.firstName ? profile.firstName : "Profile"}
+          </Link>
         </div>
+        <JourneyRail />
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-9">
-        {!hydrated ? <p className="meta mb-5">Loading the saved route…</p> : null}
+
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        {!hydrated ? <p className="meta mb-4">Loading your route…</p> : null}
         {(eyebrow || title) && (
-          <div className="mb-7 max-w-2xl enter">
+          <header className="mb-6 max-w-2xl enter">
             {eyebrow ? <p className="label mb-2">{eyebrow}</p> : null}
-            {title ? <h1 className="page-title text-[28px] sm:text-[34px]">{title}</h1> : null}
-            {lede ? (
-              <p className="mt-2.5 max-w-xl text-[14.5px] leading-6 text-secondary">{lede}</p>
-            ) : null}
-            {action ? <div className="mt-4">{action}</div> : null}
-          </div>
+            {title ? <h1 className="page-title text-h1">{title}</h1> : null}
+            {lede ? <p className="body mt-2 text-secondary">{lede}</p> : null}
+            {action ? <div className="mt-4 flex flex-wrap gap-2">{action}</div> : null}
+          </header>
         )}
         {children}
       </main>
+
+      {footer}
+      <MobileNav />
     </div>
   );
 }

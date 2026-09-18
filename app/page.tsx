@@ -24,15 +24,14 @@ export default function LandingPage() {
       <main className="mx-auto grid max-w-6xl gap-10 px-4 pb-16 pt-4 sm:px-6 lg:grid-cols-12 lg:gap-8 lg:pt-8">
         <section className="flex flex-col justify-center lg:col-span-5">
           <p className="label mb-3">University applications</p>
-          <h1 className="page-title text-[36px] sm:text-[44px]">
+          <h1 className="text-display">
             Your application,
             <br />
             mapped out.
           </h1>
-          <p className="mt-4 max-w-md text-[15px] leading-6 text-secondary">
-            Enter a school record, a budget, and the countries you will actually apply in.
-            Route returns a shortlist with reasons, a comparison against your constraints,
-            and a month-by-month plan. It does not invent an admissions chance.
+          <p className="body mt-4 max-w-md text-secondary">
+            For students applying internationally. Route turns your record, budget, and country list
+            into matches with reasons, a comparison, and a month-by-month admissions route.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-2.5">
             <Button href="/profile">Build my route</Button>

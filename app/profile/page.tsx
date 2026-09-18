@@ -1,10 +1,12 @@
 "use client";
 
 import { AppShell } from "@/components/AppShell";
+import { NextUp } from "@/components/NextUp";
 import { Button } from "@/components/ui/Button";
 import { ChoiceGrid, Segmented } from "@/components/ui/Choices";
 import { Field, Input } from "@/components/ui/Field";
 import { cn } from "@/lib/cn";
+import { profileCompleteness } from "@/lib/journey";
 import { useRoute } from "@/lib/store";
 import {
   demoProfile,
@@ -15,7 +17,6 @@ import {
   type Field as StudyField,
   type GradYear,
   type Interest,
-  type Profile,
 } from "@/lib/types";
 import { countryLabels } from "@/lib/universities";
 import { useRouter } from "next/navigation";
@@ -34,17 +35,37 @@ export default function ProfilePage() {
   const [step, setStep] = useState(0);
   const router = useRouter();
   const current = STEPS[step];
-  const complete = useMemo(() => completeness(profile), [profile]);
+  const complete = useMemo(() => profileCompleteness(profile), [profile]);
 
   return (
     <AppShell
-      eyebrow="01 · Profile"
-      title="What is actually true about you."
-      lede="Five short groups. Answer what you know. Leave blanks — Route will mark them as gaps instead of inventing a story."
+      eyebrow="Profile"
+      title={complete >= 65 ? "Your candidate snapshot." : "Build your profile."}
+      lede={
+        complete >= 65
+          ? "This is what Route uses for matches and your admissions route. Edit any section."
+          : "One group at a time. Skip what you do not know — gaps stay visible."
+      }
+      footer={
+        complete >= 40 ? (
+          <NextUp
+            title="See how Route reads your profile"
+            detail={`${complete}% complete`}
+            href="/diagnosis"
+            cta="View insights"
+          />
+        ) : undefined
+      }
     >
+      <div className="mb-6 h-1 overflow-hidden rounded-full bg-surface-muted">
+        <div
+          className="h-full bg-accent transition-[width] duration-300 ease-out"
+          style={{ width: `${complete}%` }}
+        />
+      </div>
       <div className="grid gap-8 lg:grid-cols-12">
-        <aside className="lg:col-span-4">
-          <ol className="space-y-1 rounded-[var(--radius-lg)] border border-border bg-surface p-2">
+        <aside className="hidden lg:col-span-4 lg:block">
+          <ol className="space-y-1">
             {STEPS.map((s, i) => (
               <li key={s.id}>
                 <button
@@ -93,7 +114,7 @@ export default function ProfilePage() {
           </button>
         </aside>
 
-        <section className="rounded-[var(--radius-lg)] border border-border bg-surface p-4 enter sm:p-5 lg:col-span-8">
+        <section className="enter lg:col-span-8">
           {current.id === "about" && (
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="First name">
@@ -259,20 +280,24 @@ export default function ProfilePage() {
           )}
 
           {current.id === "goals" && (
-            <div className="space-y-6">
-              <Field label="Intended field">
-                <ChoiceGrid<StudyField>
-                  value={profile.field}
-                  onChange={(v) => setProfile({ field: v as StudyField })}
-                  options={[
-                    { value: "cs", label: "Computer science" },
-                    { value: "engineering", label: "Engineering" },
-                    { value: "economics", label: "Economics" },
-                    { value: "biology", label: "Biology / life sciences" },
-                    { value: "undecided", label: "Undeclared" },
-                  ]}
-                />
-              </Field>
+            <div className="space-y-8">
+              <div>
+                <p className="caption mb-2">Academic direction</p>
+                <h2 className="text-h2">What are you planning to study?</h2>
+                <div className="mt-4">
+                  <ChoiceGrid<StudyField>
+                    value={profile.field}
+                    onChange={(v) => setProfile({ field: v as StudyField })}
+                    options={[
+                      { value: "cs", label: "Computer science" },
+                      { value: "engineering", label: "Engineering" },
+                      { value: "economics", label: "Economics" },
+                      { value: "biology", label: "Biology / life sciences" },
+                      { value: "undecided", label: "I'm still exploring" },
+                    ]}
+                  />
+                </div>
+              </div>
               <Field label="What should the campus actually be good at?">
                 <ChoiceGrid<Interest>
                   multiple
@@ -311,25 +336,11 @@ export default function ProfilePage() {
             {step < STEPS.length - 1 ? (
               <Button onClick={() => setStep((s) => s + 1)}>Continue</Button>
             ) : (
-              <Button onClick={() => router.push("/diagnosis")}>See diagnosis</Button>
+              <Button onClick={() => router.push("/diagnosis")}>View insights</Button>
             )}
           </div>
         </section>
       </div>
     </AppShell>
   );
-}
-
-function completeness(p: Profile) {
-  const checks = [
-    p.firstName,
-    p.homeCountry,
-    p.gpa,
-    p.countries.length,
-    p.field,
-    p.englishExam !== "none" ? p.englishScore : true,
-    p.satStatus === "done" ? p.satMath : true,
-  ];
-  const n = checks.filter(Boolean).length;
-  return Math.round((n / checks.length) * 100);
 }
