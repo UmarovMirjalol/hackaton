@@ -14,6 +14,8 @@ import { campusImage, IMAGE_DISCLAIMER } from "@/lib/media";
 import { profileReady } from "@/lib/onboarding";
 import { useDerived, useRoute } from "@/lib/store";
 import type { AidNeed, CountryId, Field, RankedUniversity } from "@/lib/types";
+import { Alert, EmptyState } from "@/components/ui/States";
+import { DEMO_DATA_NOTICE } from "@/lib/journey";
 import { FIT_METHODOLOGY, countryLabels, fieldLabels } from "@/lib/universities";
 
 export default function ResultsPage() {
@@ -218,15 +220,22 @@ export default function ResultsPage() {
       </ul>
 
       {!visible.length ? (
-        <div className="border border-dashed border-border px-5 py-12 text-center">
-          <p className="text-[16px] font-medium">No campuses match your country filters</p>
-          <Button href="/onboarding" className="mt-4" variant="secondary">
-            Adjust profile
-          </Button>
-        </div>
+        <EmptyState
+          className="mt-2"
+          title="No campuses match your country filters"
+          detail="Widen countries in your profile, or adjust field and aid filters above."
+          action={
+            <Button href="/onboarding" variant="secondary">
+              Adjust profile
+            </Button>
+          }
+        />
       ) : null}
 
-      <p className="caption mt-8">{FIT_METHODOLOGY}</p>
+      <Alert tone="info" className="mt-8" title="Demo catalog">
+        {DEMO_DATA_NOTICE}
+      </Alert>
+      <p className="caption mt-3">{FIT_METHODOLOGY}</p>
       <p className="caption mt-1">{IMAGE_DISCLAIMER}</p>
 
       <MatchDetail

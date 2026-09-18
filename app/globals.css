@@ -1,34 +1,81 @@
 @import "tailwindcss";
 
+/*
+  Route design tokens — foundation
+  Premium editorial admissions product.
+  Accent: signal teal. Ink for strong actions. Cool stone surfaces.
+*/
+
 :root {
+  /* Surfaces */
   --background: #f4f5f7;
   --surface: #ffffff;
   --surface-muted: #ebeef2;
+  --surface-tint: #f7f9f9;
+
+  /* Ink / text */
   --ink: #0b0d12;
   --text-primary: #0b0d12;
   --text-secondary: #5b6170;
   --text-tertiary: #8a919e;
+
+  /* Borders */
   --border: #dde1e8;
   --border-strong: #c3c9d4;
+
+  /* Actions */
   --accent: #0b0d12;
   --accent-hover: #2a2f3a;
   --accent-subtle: #e8eaef;
+
+  /* Brand / progress / “why” rails */
   --signal: #0d6e6a;
   --signal-hover: #0a5854;
   --signal-subtle: #e6f3f2;
+
+  /* Semantic */
   --success: #1a6844;
   --success-subtle: #e7f3ec;
   --warning: #8a6500;
   --warning-subtle: #f6f0dc;
   --error: #b42318;
   --error-subtle: #f8e9e7;
+  --info: #0d6e6a;
+  --info-subtle: #e6f3f2;
+
+  /* Radius — tight product chrome */
   --radius-sm: 3px;
   --radius-md: 5px;
   --radius-lg: 8px;
-  --shadow-panel: 0 24px 64px -28px rgba(11, 13, 18, 0.28);
+  --radius-xl: 12px;
+
+  /* Elevation — restrained */
+  --shadow-panel: 0 18px 40px -28px rgba(11, 13, 18, 0.32);
+  --shadow-focus: 0 0 0 3px var(--signal-subtle);
+
+  /* Motion */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 120ms;
+  --duration: 180ms;
+  --duration-slow: 280ms;
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
   --space-page: clamp(1rem, 3vw, 2rem);
+  --space-section: clamp(1.75rem, 4vw, 2.75rem);
+
+  /* Layout */
   --content: 72rem;
+  --content-wide: 84rem;
+  --content-narrow: 40rem;
 }
 
 @theme inline {
@@ -49,6 +96,7 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-error: var(--error);
+  --color-info: var(--info);
   --font-sans: var(--font-plex-sans);
   --font-mono: var(--font-plex-mono);
 }
@@ -72,6 +120,8 @@ body {
   color: var(--text-primary);
 }
 
+/* ——— Typography ——— */
+
 .label {
   font-size: 11px;
   font-weight: 500;
@@ -83,6 +133,7 @@ body {
 .meta {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
   color: var(--text-tertiary);
 }
 
@@ -130,8 +181,35 @@ body {
   letter-spacing: -0.032em;
 }
 
+/* ——— Layout helpers ——— */
+
+.route-frame {
+  width: 100%;
+  max-width: var(--content);
+  margin-inline: auto;
+  padding-inline: var(--space-page);
+}
+
+.panel {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+}
+
+.panel-muted {
+  border: 1px solid var(--border);
+  background: var(--surface-muted);
+  border-radius: var(--radius-lg);
+}
+
+.hairline {
+  border-top: 1px solid var(--border);
+}
+
+/* ——— Motion ——— */
+
 .enter {
-  animation: enter 280ms var(--ease) both;
+  animation: enter var(--duration-slow) var(--ease) both;
 }
 
 @keyframes enter {
@@ -171,6 +249,16 @@ body {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .enter,
+  .progress-bar,
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* ——— Form chrome ——— */
+
 input[type="range"] {
   accent-color: var(--signal);
 }
@@ -178,7 +266,8 @@ input[type="range"] {
 input:focus-visible,
 button:focus-visible,
 a:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+select:focus-visible {
   outline: 2px solid var(--signal);
   outline-offset: 2px;
 }

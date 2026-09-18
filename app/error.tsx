@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
+import { Alert } from "@/components/ui/States";
 
 export default function ErrorPage({
   error,
@@ -10,15 +11,21 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   return (
-    <div className="mx-auto max-w-lg px-6 py-24">
-      <p className="label">Something broke</p>
-      <h1 className="page-title mt-3 text-[36px]">The route could not be rendered.</h1>
-      <p className="mt-3 text-[14px] text-secondary">{error.message}</p>
-      <div className="mt-6 flex gap-3">
-        <Button onClick={reset}>Try again</Button>
-        <Button href="/" variant="secondary">
-          Start over
-        </Button>
+    <div className="route-frame py-24">
+      <div className="mx-auto max-w-lg">
+        <p className="label">Something broke</p>
+        <h1 className="page-title mt-3 text-h1">The route could not be rendered.</h1>
+        <Alert tone="error" className="mt-5" title="Error">
+          {error.message}
+        </Alert>
+        <div className="mt-6 flex gap-3">
+          <Button onClick={reset} variant="signal">
+            Try again
+          </Button>
+          <Button href="/" variant="secondary">
+            Start over
+          </Button>
+        </div>
       </div>
     </div>
   );

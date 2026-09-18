@@ -31,11 +31,11 @@ export function NextUp({
           {detail ? <p className="caption mt-0.5">{detail}</p> : null}
         </div>
         {onClick ? (
-          <Button onClick={onClick} className="shrink-0" disabled={disabled}>
+          <Button onClick={onClick} variant="signal" className="shrink-0" disabled={disabled}>
             {cta}
           </Button>
         ) : (
-          <Button href={href} className="shrink-0">
+          <Button href={href} variant="signal" className="shrink-0">
             {cta}
           </Button>
         )}
