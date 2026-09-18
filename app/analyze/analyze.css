@@ -1,0 +1,208 @@
+/* Analyze / Understand — foundation-aligned diagnosis experience */
+
+.az-shell {
+  min-height: 100dvh;
+  background: var(--background);
+  color: var(--text-primary);
+}
+
+.az-top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--background) 90%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.az-main {
+  padding-block: var(--space-8) var(--space-12);
+}
+
+.az-loading {
+  max-width: 36rem;
+}
+
+.az-stages {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--border);
+}
+
+.az-stage {
+  display: grid;
+  grid-template-columns: 1.25rem 1fr;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+  opacity: 0.35;
+  transition: opacity var(--duration-slow) var(--ease);
+}
+
+.az-stage.is-shown {
+  opacity: 1;
+}
+
+.az-stage-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-top: 0.4rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-strong);
+  background: transparent;
+  transition: background-color var(--duration) ease, border-color var(--duration) ease,
+    box-shadow var(--duration) ease;
+}
+
+.az-stage.is-done .az-stage-dot,
+.az-stage.is-active .az-stage-dot {
+  border-color: var(--signal);
+  background: var(--signal);
+}
+
+.az-stage.is-active .az-stage-dot {
+  box-shadow: 0 0 0 3px var(--signal-subtle);
+}
+
+.az-stage-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+}
+
+.az-stage.is-shown .az-stage-label {
+  color: var(--text-primary);
+}
+
+.az-result-grid {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.az-next {
+  padding: var(--space-6);
+}
+
+@media (min-width: 1100px) {
+  .az-result-grid {
+    grid-template-columns: minmax(0, 1fr) 16.5rem;
+    gap: var(--space-10) var(--space-10);
+    align-items: start;
+  }
+
+  .az-narrative {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .az-aside {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    position: sticky;
+    top: 5.5rem;
+  }
+
+  .az-next {
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+
+.az-narrative {
+  min-width: 0;
+  max-width: 44rem;
+}
+
+.az-block {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border);
+}
+
+.az-signal-list {
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.az-signal {
+  padding-left: 0.85rem;
+  border-left: 2px solid var(--signal);
+}
+
+.az-signal.is-constraint {
+  border-left-color: var(--warning);
+}
+
+.az-signal-title {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.az-signal-evidence {
+  display: grid;
+  gap: 0.15rem;
+  margin-top: 0.35rem;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.az-priorities {
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.az-priorities li {
+  display: grid;
+  grid-template-columns: 1.75rem 1fr;
+  gap: 0.65rem;
+  align-items: baseline;
+  font-size: 14.5px;
+}
+
+.az-goals {
+  padding-top: var(--space-4);
+  border-top: 1px dashed var(--border);
+}
+
+.az-aside {
+  min-width: 0;
+}
+
+.az-evidence {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.az-evidence li {
+  display: grid;
+  grid-template-columns: 1rem 1fr;
+  gap: 0.5rem;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+@media (max-width: 1099px) {
+  .az-narrative {
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter,
+  .az-stage {
+    animation: none;
+    transition: none;
+  }
+}
