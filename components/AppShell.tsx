@@ -8,9 +8,9 @@ import { JOURNEY, profileCompleteness, profileReady, stepComplete } from "@/lib/
 import { useRoute } from "@/lib/store";
 
 const NAV = [
-  { href: "/universities", label: "Matches" },
+  { href: "/results", label: "Results" },
   { href: "/compare", label: "Compare" },
-  { href: "/roadmap", label: "Route" },
+  { href: "/roadmap", label: "Roadmap" },
 ] as const;
 
 export function JourneyRail() {
@@ -21,7 +21,7 @@ export function JourneyRail() {
   return (
     <div className="hidden border-b border-border md:block">
       <div
-        className="mx-auto flex max-w-[var(--content)] items-center gap-0 px-[var(--space-page)]"
+        className="mx-auto flex items-center overflow-x-auto px-[var(--space-page)]"
         style={{ maxWidth: "var(--content)" }}
       >
         {JOURNEY.map((step, i) => {
@@ -31,29 +31,24 @@ export function JourneyRail() {
           return (
             <Link
               key={step.id}
-              href={locked ? "/profile" : step.href}
+              href={locked ? "/onboarding" : step.href}
               aria-current={active ? "step" : undefined}
               className={cn(
-                "relative flex items-center gap-2 px-3 py-2.5 text-[12px] font-medium transition-colors",
+                "relative flex shrink-0 items-center gap-2 px-3 py-2.5 text-[12px] font-medium transition-colors",
                 active ? "text-primary" : done ? "text-secondary" : "text-tertiary hover:text-primary",
               )}
             >
-              <span
-                className={cn(
-                  "font-mono text-[10px] tabular-nums",
-                  active ? "text-accent" : "text-tertiary",
-                )}
-              >
+              <span className={cn("font-mono text-[10px]", active ? "text-[var(--signal)]" : "text-tertiary")}>
                 {String(i + 1).padStart(2, "0")}
               </span>
               {step.label}
               {active ? (
-                <span className="absolute inset-x-3 -bottom-px h-px bg-accent" aria-hidden />
+                <span className="absolute inset-x-3 -bottom-px h-0.5 bg-[var(--signal)]" aria-hidden />
               ) : null}
             </Link>
           );
         })}
-        <span className="ml-auto meta hidden lg:inline py-2.5">
+        <span className="meta ml-auto hidden py-2.5 lg:inline">
           {profileCompleteness(profile)}% · saved locally
         </span>
       </div>
@@ -63,10 +58,7 @@ export function JourneyRail() {
 
 function MobileNav() {
   const pathname = usePathname();
-  const items = [
-    { href: "/profile", label: "Profile" },
-    ...NAV,
-  ] as const;
+  const items = [{ href: "/onboarding", label: "Profile" }, ...NAV] as const;
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
@@ -74,23 +66,19 @@ function MobileNav() {
     >
       <div className="grid grid-cols-4">
         {items.map((item) => {
-          const active = pathname.startsWith(item.href);
+          const active =
+            pathname.startsWith(item.href) ||
+            (item.href === "/onboarding" && pathname.startsWith("/profile"));
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium transition-colors",
-                active ? "text-accent" : "text-tertiary",
+                "flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium",
+                active ? "text-[var(--signal)]" : "text-tertiary",
               )}
             >
               {item.label}
-              <span
-                className={cn(
-                  "h-0.5 w-4 rounded-full transition-colors",
-                  active ? "bg-accent" : "bg-transparent",
-                )}
-              />
             </Link>
           );
         })}
@@ -124,7 +112,7 @@ export function AppShell({
           className="mx-auto flex items-center justify-between gap-4 px-[var(--space-page)] py-3"
           style={{ maxWidth: "var(--content)" }}
         >
-          <Link href="/" className="text-[15px] font-semibold tracking-[-0.02em]">
+          <Link href="/" className="text-[15px] font-semibold tracking-tight">
             Route
           </Link>
           <nav className="hidden items-center gap-5 md:flex" aria-label="Product">
@@ -134,9 +122,7 @@ export function AppShell({
                 href={item.href}
                 className={cn(
                   "text-[13px] font-medium transition-colors",
-                  pathname.startsWith(item.href)
-                    ? "text-primary"
-                    : "text-secondary hover:text-primary",
+                  pathname.startsWith(item.href) ? "text-primary" : "text-secondary hover:text-primary",
                 )}
               >
                 {item.label}
@@ -144,10 +130,12 @@ export function AppShell({
             ))}
           </nav>
           <Link
-            href="/profile"
+            href="/onboarding"
             className={cn(
-              "text-[13px] font-medium transition-colors",
-              pathname.startsWith("/profile") ? "text-accent" : "text-secondary hover:text-primary",
+              "text-[13px] font-medium",
+              pathname.startsWith("/onboarding") || pathname.startsWith("/profile")
+                ? "text-[var(--signal)]"
+                : "text-secondary hover:text-primary",
             )}
           >
             {profile.firstName || "Profile"}
@@ -161,14 +149,13 @@ export function AppShell({
         style={{ maxWidth: "var(--content)" }}
       >
         {!hydrated ? (
-          <div className="mb-6 space-y-2" aria-live="polite">
+          <div className="mb-6 space-y-2">
             <div className="skeleton h-3 w-24" />
-            <div className="skeleton h-7 w-64 max-w-full" />
-            <div className="skeleton h-4 w-96 max-w-full" />
+            <div className="skeleton h-8 w-72 max-w-full" />
           </div>
         ) : null}
         {(eyebrow || title) && (
-          <header className="mb-6 enter sm:mb-8">
+          <header className="mb-8 enter">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
               <div className="max-w-2xl">
                 {eyebrow ? <p className="label mb-2">{eyebrow}</p> : null}
@@ -179,7 +166,7 @@ export function AppShell({
             </div>
           </header>
         )}
-        <div className="enter-delay">{children}</div>
+        {children}
       </main>
 
       {footer}

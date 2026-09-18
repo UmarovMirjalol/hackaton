@@ -1,20 +1,21 @@
 # Route
 
-A small admissions product that turns a high-school profile — academics, exams, countries, budget, and goals — into a university **application route**: a diagnosis, a reasoned shortlist, a comparison, and a month-by-month plan.
+Admissions navigation: **profile → analysis → personalized results → compare → roadmap**.
 
-This is a hackathon-ready demo. Rankings use a transparent **fit index**, not an invented admissions probability. Deadlines and aid notes are a **demo catalog** and must be confirmed on each university site.
+Deterministic matching on your constraints (not a black-box AI score). Demo catalog deadlines must be verified on each campus site.
 
-Visual system principles and per-screen references live in [`DESIGN.md`](./DESIGN.md). Campus photo credits are in [`ATTRIBUTION.md`](./ATTRIBUTION.md).
+## Flow
 
-## What you get
+1. **Landing** — start or try demo
+2. **Onboarding** (`/onboarding`) — 7 guided steps with validation
+3. **Analyze** (`/analyze`) — staged run of the real match engine
+4. **Results** (`/results`) — why-first recommendations + live filters
+5. **Compare** — side-by-side tradeoffs
+6. **Roadmap** — actionable monthly tasks with completion state
 
-1. **Profile** — five short groups, not a 25-field wall.
-2. **Diagnosis** — a synthesis with strengths, constraints, and explicit gaps.
-3. **Universities** — explanations plus live controls (field / aid / countries) that reorder the list.
-4. **Compare** — two or three campuses against *your* constraints.
-5. **Roadmap** — tasks that skip work already done (for example, IELTS already on file).
+Legacy paths `/profile`, `/diagnosis`, `/universities` redirect into the new flow.
 
-## Run locally
+## Run
 
 ```bash
 npm install
@@ -23,10 +24,6 @@ npm run dev
 
 Open [http://127.0.0.1:4567](http://127.0.0.1:4567).
 
-Use **Open the demo student** on the landing page to walk the full path as Amira Hassan (IB, Kenya, CS, SAT done, IELTS 7.5, full aid).
+**Try demo profile** loads Amira Hassan and runs analysis immediately.
 
-State is stored in `localStorage` (`route.admissions.v1`). No backend and no API keys.
-
-## Fit index
-
-Weighted sum (0–100): academic overlap 30%, aid feasibility 25%, location 20%, research alignment 15%, testing/language 10%. Documented in the product next to the list.
+State: `localStorage` key `route.admissions.v3`. No backend.

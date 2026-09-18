@@ -30,14 +30,20 @@ export default function ComparePage() {
       eyebrow="Compare"
       title="Tradeoffs, side by side"
       lede={`${compare.length} campuses against your ${profile.aidNeed === "full" ? "full-aid" : "aid"} need and ${fieldLabels[profile.field] ?? profile.field} direction. No overall winner — only differences that matter.`}
-      action={compare.length >= 2 ? <Button href="/roadmap">Build route</Button> : undefined}
+      action={
+        compare.length >= 2 ? (
+          <Button href="/roadmap" variant="signal">
+            Build roadmap
+          </Button>
+        ) : undefined
+      }
       footer={
         compare.length >= 2 ? (
           <NextUp
             title="Turn the shortlist into a monthly timeline"
             detail="Tasks skip exams you already completed."
             href="/roadmap"
-            cta="Open route"
+            cta="Open roadmap"
           />
         ) : undefined
       }
@@ -48,8 +54,8 @@ export default function ComparePage() {
           <p className="body mt-2 text-secondary">
             Use “Add to compare” on the matches list, then return here.
           </p>
-          <Button href="/universities" className="mt-6">
-            Back to matches
+          <Button href="/results" className="mt-6" variant="signal">
+            Back to results
           </Button>
         </div>
       ) : (

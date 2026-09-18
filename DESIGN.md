@@ -1,37 +1,25 @@
 # Route — Design System
 
-Original visual language. Principles inspired by Linear / Stripe / Notion restraint — not clones.
+## Product flow
 
-## System tokens
+Landing → Onboarding (7 steps) → Analyze → Results → Compare → Roadmap
+
+## Visual system
 
 | Token | Value | Role |
 | --- | --- | --- |
-| Background | `#F6F7F8` | Cool stone canvas (not warm cream) |
+| Background | `#F4F5F7` | Cool stone |
 | Surface | `#FFFFFF` | Work surfaces |
-| Surface muted | `#ECECE7` | Nested chrome |
-| Text | `#111110` / `#5C5C57` / `#8B8B84` | Hierarchy from tone |
-| Accent | `#0C2D48` deep navy | Single signal for CTAs; cool, trustworthy, not terracotta/purple |
-| Borders | `#E0E0DA` | Structure from lines, not elevation |
-| Radius | 2 / 4 / 6px | Tight product controls |
-| Type | IBM Plex Sans + IBM Plex Mono | Distinctive professional sans |
-| Motion | 150–220ms ease | State feedback only |
+| Ink / primary CTA | `#0B0D12` | Strong actions |
+| Signal | `#0D6E6A` | Progress, primary product CTAs, “why” rails |
+| Type | IBM Plex Sans + Mono | Distinctive, professional |
+| Radius | 3 / 5 / 8px | Tight product chrome |
+| Structure | Hairlines + typography | No card grids as decoration |
 
-**Avoid:** purple/teal AI gradients, glassmorphism, glow, giant cards, fake stats, emoji UI, cream+terracotta+serif clusters.
+**Avoid:** purple gradients, cream+terracotta clusters, glassmorphism, fake AI waiters, decorative card stacks.
 
-## Components
+## Architecture
 
-- Buttons: primary (accent fill), secondary (border), ghost
-- Inputs: 40px height, accent ring on focus
-- Segmented / ChoiceGrid: hairline borders, inset accent bar when selected
-- Status badges: soft semantic fills (no rainbow borders)
-- Navigation: numbered journey rail + underline active mark
-- NextUp: sticky bottom bar with one clear CTA
-
-## Screens
-
-1. **Landing** — Product interface first (campus photo + why). Brand + one CTA pair.
-2. **Profile** — Guided questions, progress segments, dossier when complete.
-3. **Insights** — Analytical signals from real profile data + snapshot panel.
-4. **Matches** — Editorial list with live filters; every row explains fit.
-5. **Compare** — Side-by-side tradeoffs with hover highlight.
-6. **Route** — Timeline with shortlist strip, progress, focused next task.
+- Single profile source of truth: `lib/persist.ts` + `useSyncExternalStore`
+- Match / diagnosis / roadmap: deterministic `lib/matching.ts`, `lib/diagnosis.ts`, `lib/roadmap.ts`
+- Analyze UI stages the real computation — does not invent results

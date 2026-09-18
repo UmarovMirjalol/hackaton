@@ -73,7 +73,7 @@ export function ChoiceGrid<T extends string>({
             className={cn(
               "border px-3.5 py-3 text-left transition-[background-color,border-color] duration-150 rounded-[var(--radius-md)]",
               on
-                ? "border-primary bg-surface shadow-[inset_3px_0_0_0_var(--accent)]"
+                ? "border-primary bg-surface shadow-[inset_3px_0_0_0_var(--signal)]"
                 : "border-border bg-surface hover:border-border-strong",
             )}
           >

@@ -34,6 +34,10 @@ export type Profile = {
   interests: Interest[];
   researchExperience: boolean;
   recLettersStarted: boolean;
+  /** Free-text activities summary (optional) */
+  activities: string;
+  /** Free-text achievements (optional) */
+  achievements: string;
 };
 
 export type University = {
@@ -129,6 +133,8 @@ export const defaultProfile: Profile = {
   interests: ["research", "building"],
   researchExperience: false,
   recLettersStarted: false,
+  activities: "",
+  achievements: "",
 };
 
 export const demoProfile: Profile = {
@@ -151,4 +157,7 @@ export const demoProfile: Profile = {
   interests: ["research", "building"],
   researchExperience: true,
   recLettersStarted: false,
+  activities:
+    "Robotics captain · Math circle mentor · Built a scholarship-finder web app for classmates",
+  achievements: "National olympiad shortlist · School research fair winner (ML for crop disease)",
 };

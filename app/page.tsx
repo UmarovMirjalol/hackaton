@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { campusImage } from "@/lib/media";
+import { profileReady } from "@/lib/onboarding";
 import { useRoute } from "@/lib/store";
 
 export default function LandingPage() {
-  const { loadDemo, profile } = useRoute();
+  const { loadDemo, profile, hydrated } = useRoute();
   const router = useRouter();
   const mit = campusImage("mit");
-  const hasSaved = Boolean(profile.firstName);
+  const ready = profileReady(profile);
 
   return (
     <div className="min-h-dvh bg-background">
@@ -19,108 +20,110 @@ export default function LandingPage() {
         className="mx-auto flex items-center justify-between px-[var(--space-page)] py-4"
         style={{ maxWidth: "var(--content)" }}
       >
-        <span className="text-[15px] font-semibold tracking-[-0.02em]">Route</span>
+        <span className="text-[15px] font-semibold tracking-tight">Route</span>
         <Link
-          href={hasSaved ? "/universities" : "/profile"}
-          className="small text-secondary transition-colors hover:text-primary"
+          href={ready ? "/results" : "/onboarding"}
+          className="small text-secondary hover:text-primary"
         >
-          {hasSaved ? `Continue as ${profile.firstName}` : "Open saved profile"}
+          {ready ? `Continue as ${profile.firstName}` : "Resume profile"}
         </Link>
       </header>
 
       <main
-        className="mx-auto grid gap-10 px-[var(--space-page)] pb-20 pt-6 lg:grid-cols-12 lg:gap-8 lg:pt-12"
+        className="mx-auto grid items-end gap-12 px-[var(--space-page)] pb-20 pt-8 lg:grid-cols-12 lg:gap-10 lg:pt-16"
         style={{ maxWidth: "var(--content)" }}
       >
-        <div className="enter lg:col-span-5 lg:pt-4">
-          <p className="label">International admissions</p>
-          <h1 className="text-display mt-3">
-            Map the route.
+        <div className="enter lg:col-span-5">
+          <p className="label">Admissions navigation</p>
+          <h1 className="text-display mt-4">
+            Profile in.
             <br />
-            <span className="text-secondary">Know the why.</span>
+            Route out.
           </h1>
-          <p className="body mt-5 max-w-sm text-secondary">
-            Profile → insights → matches → compare → monthly route. Built for applicants who need
-            reasons, not match percentages.
+          <p className="body mt-5 max-w-md text-secondary">
+            Build a profile, run a transparent analysis, see why each campus fits, then follow a
+            monthly application roadmap — with exams you already finished removed.
           </p>
-          <div className="mt-8 flex flex-col gap-2 sm:flex-row sm:items-center">
-            <Button href="/profile">Start profile</Button>
+          <div className="mt-8 flex flex-col gap-2 sm:flex-row">
+            <Button href="/onboarding" size="lg" variant="signal">
+              Build your profile
+            </Button>
             <Button
+              size="lg"
               variant="secondary"
+              disabled={!hydrated}
               onClick={() => {
                 loadDemo();
-                router.push("/diagnosis");
+                router.push("/analyze");
               }}
             >
               Try demo profile
             </Button>
           </div>
-          <ol className="mt-10 space-y-2 border-t border-border pt-6">
+
+          <ol className="mt-12 space-y-3 border-t border-border pt-6">
             {[
-              "Constraints reshape the shortlist live",
-              "Every campus shows why it appears",
-              "The route skips exams you already finished",
-            ].map((line, i) => (
-              <li key={line} className="flex gap-3 text-[13px] text-secondary">
-                <span className="font-mono text-[11px] text-tertiary">
-                  {String(i + 1).padStart(2, "0")}
+              ["01", "Build profile", "Academics, tests, interests, aid"],
+              ["02", "Analyze", "Deterministic match on your constraints"],
+              ["03", "Act", "Compare campuses · follow the roadmap"],
+            ].map(([n, t, d]) => (
+              <li key={n} className="grid grid-cols-[2rem_1fr] gap-3 text-[13px]">
+                <span className="meta">{n}</span>
+                <span>
+                  <span className="font-medium">{t}</span>
+                  <span className="text-secondary"> — {d}</span>
                 </span>
-                {line}
               </li>
             ))}
           </ol>
         </div>
 
-        <div className="enter-delay lg:col-span-7">
+        <div className="enter lg:col-span-7">
           <div className="overflow-hidden border border-border bg-surface shadow-[var(--shadow-panel)]">
             <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
-              <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
-                <span className="text-[12px] font-medium">Matches</span>
-              </div>
-              <span className="meta">Demo preview</span>
+              <span className="text-[12px] font-medium">Results preview</span>
+              <span className="meta">Why-first recommendations</span>
             </div>
             {mit ? (
-              <div className="relative aspect-[2.2/1] bg-surface-muted">
+              <div className="relative aspect-[2.1/1] bg-surface-muted">
                 <Image
                   src={mit.src}
                   alt={mit.caption}
                   fill
                   priority
                   className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 640px"
+                  sizes="(max-width:1024px) 100vw, 720px"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-4 text-white sm:p-5">
-                  <p className="font-mono text-[10px] tracking-[0.08em] text-white/70">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+                  <p className="font-mono text-[10px] tracking-[0.1em] text-white/70">
                     01 · CAMBRIDGE, US
                   </p>
-                  <p className="mt-1 text-[20px] font-medium tracking-tight sm:text-[22px]">
+                  <p className="mt-1 text-[22px] font-medium tracking-tight">
                     Massachusetts Institute of Technology
                   </p>
-                  <p className="mt-2 max-w-md text-[13px] leading-5 text-white/85">
-                    Why this appears: quantitative CS path + need-based aid that can meet full
-                    demonstrated need.
+                  <p className="mt-2 max-w-lg text-[13px] leading-5 text-white/90">
+                    Why it fits: quantitative CS path + need-based aid that can meet full
+                    demonstrated need for a full-aid applicant.
                   </p>
                 </div>
               </div>
             ) : null}
-            <div className="grid divide-y divide-border sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-              <PreviewMeta k="Fit index" v="94" />
-              <PreviewMeta k="Aid signal" v="Meets full need" />
+            <div className="grid sm:grid-cols-3">
+              {[
+                ["Next", "Compare two campuses"],
+                ["Then", "Open your roadmap"],
+                ["Always", "Edit profile live"],
+              ].map(([k, v]) => (
+                <div key={k} className="border-t border-border px-4 py-3 sm:border-r sm:last:border-r-0">
+                  <p className="label">{k}</p>
+                  <p className="mt-1 text-[13px] font-medium">{v}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </main>
-    </div>
-  );
-}
-
-function PreviewMeta({ k, v }: { k: string; v: string }) {
-  return (
-    <div className="px-4 py-3">
-      <p className="label">{k}</p>
-      <p className="mt-1 text-[14px] font-medium">{v}</p>
     </div>
   );
 }

@@ -1,16 +1,15 @@
 import type { Profile } from "./types";
+import { profileReady } from "./onboarding";
 
 export const JOURNEY = [
-  { href: "/profile", id: "profile", label: "Profile" },
-  { href: "/diagnosis", id: "insights", label: "Insights" },
-  { href: "/universities", id: "matches", label: "Matches" },
+  { href: "/onboarding", id: "profile", label: "Profile" },
+  { href: "/analyze", id: "analyze", label: "Analyze" },
+  { href: "/results", id: "results", label: "Results" },
   { href: "/compare", id: "compare", label: "Compare" },
-  { href: "/roadmap", id: "route", label: "Route" },
+  { href: "/roadmap", id: "route", label: "Roadmap" },
 ] as const;
 
-export function profileReady(p: Profile) {
-  return Boolean(p.firstName && p.homeCountry && p.field);
-}
+export { profileReady };
 
 export function profileCompleteness(p: Profile) {
   const checks = [
@@ -21,11 +20,14 @@ export function profileCompleteness(p: Profile) {
     p.field,
     p.englishExam !== "none" ? p.englishScore : true,
     p.satStatus === "done" ? p.satMath : true,
+    p.interests.length,
   ];
   return Math.round((checks.filter(Boolean).length / checks.length) * 100);
 }
 
 export function journeyIndex(pathname: string) {
+  if (pathname.startsWith("/profile")) return 0;
+  if (pathname.startsWith("/diagnosis") || pathname.startsWith("/universities")) return 2;
   const i = JOURNEY.findIndex((s) => pathname.startsWith(s.href));
   return i === -1 ? 0 : i;
 }

@@ -1,6 +1,6 @@
 import { defaultProfile, type Profile, type TaskStatus } from "./types";
 
-export const STORAGE_KEY = "route.admissions.v2";
+export const STORAGE_KEY = "route.admissions.v3";
 
 export type Persisted = {
   profile: Profile;

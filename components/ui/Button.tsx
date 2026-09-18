@@ -6,8 +6,8 @@ import type { ButtonHTMLAttributes } from "react";
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   href?: string;
-  variant?: "primary" | "secondary" | "ghost" | "danger";
-  size?: "md" | "sm";
+  variant?: "primary" | "secondary" | "ghost" | "signal" | "danger";
+  size?: "md" | "sm" | "lg";
 };
 
 export function Button({
@@ -18,11 +18,14 @@ export function Button({
   ...props
 }: Props) {
   const styles = cn(
-    "inline-flex items-center justify-center gap-2 border font-medium transition-[background-color,border-color,color,box-shadow] duration-150 ease-[var(--ease)] disabled:cursor-not-allowed disabled:opacity-40 active:translate-y-px",
-    size === "md" ? "h-9 px-3.5 text-[13px]" : "h-8 px-2.5 text-[12px]",
-    "rounded-[var(--radius-md)]",
+    "inline-flex items-center justify-center gap-2 border font-medium transition-[background-color,border-color,color,opacity] duration-150 disabled:cursor-not-allowed disabled:opacity-40 active:opacity-90",
+    size === "lg" && "h-11 px-5 text-[14px] rounded-[var(--radius-md)]",
+    size === "md" && "h-10 px-4 text-[13px] rounded-[var(--radius-md)]",
+    size === "sm" && "h-8 px-3 text-[12px] rounded-[var(--radius-sm)]",
     variant === "primary" &&
-      "border-accent bg-accent text-white shadow-[var(--shadow-sm)] hover:bg-accent-hover hover:border-accent-hover",
+      "border-accent bg-accent text-white hover:bg-accent-hover hover:border-accent-hover",
+    variant === "signal" &&
+      "border-[var(--signal)] bg-[var(--signal)] text-white hover:bg-[var(--signal-hover)] hover:border-[var(--signal-hover)]",
     variant === "secondary" &&
       "border-border bg-surface text-primary hover:border-border-strong hover:bg-surface-muted",
     variant === "ghost" &&
