@@ -3,34 +3,28 @@
 import {
   createContext,
   useContext,
-  useEffect,
   useMemo,
-  useRef,
-  useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import { synthesize } from "./diagnosis";
-import { recommended } from "./matching";
-import { buildRoadmap, nextTask } from "./roadmap";
+import { rankUniversities, recommended } from "./matching";
 import {
-  defaultProfile,
-  type Profile,
-  type TaskStatus,
-} from "./types";
+  defaultPersisted,
+  getPersistedSnapshot,
+  subscribePersist,
+  writeStore,
+} from "./persist";
+import { buildRoadmap, nextTask } from "./roadmap";
+import { demoProfile, type Profile, type TaskStatus } from "./types";
 
-/** Bump when persisted shape changes so stale demos cannot resurrect old exam flags. */
-const STORAGE_KEY = "route.admissions.v2";
+type Persisted = ReturnType<typeof getPersistedSnapshot>;
 
-type Store = {
-  profile: Profile;
-  compareIds: string[];
-  taskStatus: Record<string, TaskStatus>;
+type Ctx = Persisted & {
   hydrated: boolean;
-};
-
-type Ctx = Store & {
   setProfile: (patch: Partial<Profile>) => void;
   replaceProfile: (profile: Profile) => void;
+  loadDemo: () => void;
   toggleCompare: (id: string) => void;
   setCompareIds: (ids: string[]) => void;
   setTaskStatus: (id: string, status: TaskStatus) => void;
@@ -39,100 +33,68 @@ type Ctx = Store & {
 
 const RouteContext = createContext<Ctx | null>(null);
 
+function usePersisted(): Persisted {
+  return useSyncExternalStore(
+    subscribePersist,
+    getPersistedSnapshot,
+    () => defaultPersisted,
+  );
+}
+
+function useClientHydrated() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+}
+
 export function RouteProvider({ children }: { children: ReactNode }) {
-  const [store, setStore] = useState<Store>({
-    profile: defaultProfile,
-    compareIds: [],
-    taskStatus: {},
-    hydrated: false,
-  });
-  /** Prevents localStorage hydrate from clobbering an early demo/profile write. */
-  const userWrote = useRef(false);
+  const persisted = usePersisted();
+  const hydrated = useClientHydrated();
 
-  useEffect(() => {
-    if (userWrote.current) {
-      setStore((s) => (s.hydrated ? s : { ...s, hydrated: true }));
-      return;
-    }
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Partial<Store>;
-        setStore((s) => {
-          if (userWrote.current) return { ...s, hydrated: true };
-          return {
-            ...s,
-            profile: { ...defaultProfile, ...parsed.profile },
-            compareIds: parsed.compareIds ?? [],
-            taskStatus: parsed.taskStatus ?? {},
-            hydrated: true,
-          };
-        });
-        return;
-      }
-    } catch {
-      // ignore broken storage
-    }
-    setStore((s) => ({ ...s, hydrated: true }));
-  }, []);
-
-  useEffect(() => {
-    if (!store.hydrated) return;
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        profile: store.profile,
-        compareIds: store.compareIds,
-        taskStatus: store.taskStatus,
-      }),
-    );
-  }, [store]);
-
-  const value = useMemo<Ctx>(
+  const actions = useMemo(
     () => ({
-      ...store,
-      setProfile: (patch) => {
-        userWrote.current = true;
-        setStore((s) => ({ ...s, profile: { ...s.profile, ...patch } }));
+      setProfile: (patch: Partial<Profile>) => {
+        const cur = getPersistedSnapshot();
+        writeStore({ ...cur, profile: { ...cur.profile, ...patch } });
       },
-      replaceProfile: (profile) => {
-        userWrote.current = true;
-        setStore((s) => ({
-          ...s,
-          profile,
+      replaceProfile: (profile: Profile) => {
+        writeStore({ profile, compareIds: [], taskStatus: {} });
+      },
+      loadDemo: () => {
+        writeStore({
+          profile: { ...demoProfile },
           compareIds: [],
           taskStatus: {},
-          hydrated: true,
-        }));
-      },
-      toggleCompare: (id) => {
-        userWrote.current = true;
-        setStore((s) => {
-          const has = s.compareIds.includes(id);
-          if (has) return { ...s, compareIds: s.compareIds.filter((x) => x !== id) };
-          if (s.compareIds.length >= 3) return s;
-          return { ...s, compareIds: [...s.compareIds, id] };
         });
       },
-      setCompareIds: (ids) => {
-        userWrote.current = true;
-        setStore((s) => ({ ...s, compareIds: ids.slice(0, 3) }));
+      toggleCompare: (id: string) => {
+        const cur = getPersistedSnapshot();
+        const has = cur.compareIds.includes(id);
+        let compareIds = cur.compareIds;
+        if (has) compareIds = compareIds.filter((x) => x !== id);
+        else if (compareIds.length < 3) compareIds = [...compareIds, id];
+        writeStore({ ...cur, compareIds });
       },
-      setTaskStatus: (id, status) => {
-        userWrote.current = true;
-        setStore((s) => ({ ...s, taskStatus: { ...s.taskStatus, [id]: status } }));
+      setCompareIds: (ids: string[]) => {
+        const cur = getPersistedSnapshot();
+        writeStore({ ...cur, compareIds: ids.slice(0, 3) });
+      },
+      setTaskStatus: (id: string, status: TaskStatus) => {
+        const cur = getPersistedSnapshot();
+        writeStore({ ...cur, taskStatus: { ...cur.taskStatus, [id]: status } });
       },
       reset: () => {
-        userWrote.current = true;
-        setStore({
-          profile: defaultProfile,
-          compareIds: [],
-          taskStatus: {},
-          hydrated: true,
-        });
+        writeStore(defaultPersisted);
       },
     }),
-    [store],
+    [],
+  );
+
+  const value = useMemo<Ctx>(
+    () => ({ ...persisted, hydrated, ...actions }),
+    [persisted, hydrated, actions],
   );
 
   return <RouteContext.Provider value={value}>{children}</RouteContext.Provider>;
@@ -147,13 +109,17 @@ export function useRoute() {
 export function useDerived() {
   const { profile, compareIds, taskStatus } = useRoute();
   const diagnosis = useMemo(() => synthesize(profile), [profile]);
+  const allRanked = useMemo(() => rankUniversities(profile), [profile]);
   const recs = useMemo(() => recommended(profile, 6), [profile]);
   const compare = useMemo(() => {
-    const picked = recs.filter((r) => compareIds.includes(r.university.id));
-    if (picked.length >= 2) return picked;
-    return recs.slice(0, 3);
-  }, [recs, compareIds]);
-  const roadmap = useMemo(() => buildRoadmap(profile, compare), [profile, compare]);
+    const byId = new Map(allRanked.map((r) => [r.university.id, r]));
+    return compareIds.map((id) => byId.get(id)).filter((r): r is NonNullable<typeof r> => Boolean(r));
+  }, [allRanked, compareIds]);
+  const roadmapPicks = useMemo(() => {
+    if (compare.length >= 2) return compare;
+    return recs.filter((r) => profile.countries.includes(r.university.countryId)).slice(0, 3);
+  }, [compare, recs, profile.countries]);
+  const roadmap = useMemo(() => buildRoadmap(profile, roadmapPicks), [profile, roadmapPicks]);
   const next = useMemo(() => nextTask(roadmap, taskStatus), [roadmap, taskStatus]);
-  return { diagnosis, recs, compare, roadmap, next };
+  return { diagnosis, recs, compare, roadmapPicks, roadmap, next };
 }

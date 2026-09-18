@@ -14,6 +14,7 @@ export function MatchDetail({
   onClose,
   onCompare,
   inCompare,
+  onOpenCompare,
 }: {
   row: RankedUniversity | null;
   profile: Profile;
@@ -21,6 +22,7 @@ export function MatchDetail({
   onClose: () => void;
   onCompare: () => void;
   inCompare: boolean;
+  onOpenCompare: () => void;
 }) {
   if (!open || !row) return null;
   const img = campusImage(row.university.id);
@@ -96,7 +98,7 @@ export function MatchDetail({
           <Button className="flex-1" variant="secondary" onClick={onCompare}>
             {inCompare ? "In comparison" : "Add to compare"}
           </Button>
-          <Button className="flex-1" href="/compare">
+          <Button className="flex-1" onClick={onOpenCompare}>
             Open compare
           </Button>
         </div>

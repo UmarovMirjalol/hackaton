@@ -11,7 +11,7 @@ import type { TaskStatus } from "@/lib/types";
 
 export default function RoadmapPage() {
   const { taskStatus, setTaskStatus, profile } = useRoute();
-  const { roadmap, next, compare } = useDerived();
+  const { roadmap, next, roadmapPicks } = useDerived();
   const months = [...new Set(roadmap.map((t) => t.month))];
   const doneCount = roadmap.filter((t) => taskStatus[t.id] === "done").length;
 
@@ -29,14 +29,17 @@ export default function RoadmapPage() {
           <NextUp
             title={next.title}
             detail={`${doneCount}/${roadmap.length} tasks complete`}
-            href="#next"
+            href="/roadmap"
             cta="Focus next task"
+            onClick={() =>
+              document.getElementById("next")?.scrollIntoView({ behavior: "smooth", block: "start" })
+            }
           />
         ) : undefined
       }
     >
       <div className="mb-8 flex gap-2 overflow-x-auto">
-        {compare.slice(0, 3).map((c) => (
+        {roadmapPicks.slice(0, 3).map((c) => (
           <div key={c.university.id} className="flex min-w-[180px] items-center gap-2 py-1">
             <CampusThumb
               universityId={c.university.id}

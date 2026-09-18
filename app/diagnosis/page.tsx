@@ -5,7 +5,7 @@ import { NextUp } from "@/components/NextUp";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/Badges";
 import { useDerived, useRoute } from "@/lib/store";
-import { CATALOG_NOTE } from "@/lib/universities";
+import { CATALOG_NOTE, countryLabels, fieldLabels } from "@/lib/universities";
 
 export default function DiagnosisPage() {
   const { profile } = useRoute();
@@ -79,16 +79,26 @@ export default function DiagnosisPage() {
             <dl className="mt-4 space-y-2 small">
               <div className="flex justify-between gap-4">
                 <dt className="text-tertiary">Field</dt>
-                <dd className="font-medium">{profile.field}</dd>
+                <dd className="font-medium">{fieldLabels[profile.field]}</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-tertiary">Aid</dt>
-                <dd className="font-medium">{profile.aidNeed}</dd>
+                <dd className="font-medium capitalize">{profile.aidNeed}</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-tertiary">Countries</dt>
-                <dd className="font-medium">{profile.countries.length}</dd>
+                <dd className="font-medium text-right">
+                  {profile.countries.map((c) => countryLabels[c]).join(", ")}
+                </dd>
               </div>
+              {profile.satStatus === "done" ? (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-tertiary">SAT</dt>
+                  <dd className="font-medium">
+                    {profile.satMath}/{profile.satEbrw}
+                  </dd>
+                </div>
+              ) : null}
             </dl>
             <p className="caption mt-4">{CATALOG_NOTE}</p>
             <Button href="/profile" variant="secondary" className="mt-4 w-full">

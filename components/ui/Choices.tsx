@@ -31,7 +31,6 @@ export function Segmented<T extends string>({
                 ? "bg-surface text-primary shadow-[0_0_0_1px_var(--border)]"
                 : "text-secondary hover:text-primary",
               "transition-[background-color,color,box-shadow,transform] duration-150",
-              active && "scale-[1.01]",
             )}
           >
             {opt.label}
@@ -76,8 +75,8 @@ export function ChoiceGrid<T extends string>({
             className={cn(
               "rounded-[var(--radius-md)] border px-3 py-2.5 text-left transition-[background-color,border-color,transform] duration-150",
               on
-                ? "scale-[1.01] border-accent bg-accent-subtle"
-                : "border-border bg-surface hover:border-primary/30",
+                ? "border-accent bg-accent-subtle"
+                : "border-border bg-surface hover:border-primary/25",
             )}
           >
             <div className="text-[13.5px] font-medium text-primary">{opt.label}</div>

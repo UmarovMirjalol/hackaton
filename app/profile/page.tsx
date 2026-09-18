@@ -9,7 +9,6 @@ import { cn } from "@/lib/cn";
 import { profileCompleteness } from "@/lib/journey";
 import { useRoute } from "@/lib/store";
 import {
-  demoProfile,
   type AidNeed,
   type CountryId,
   type Curriculum,
@@ -31,7 +30,7 @@ const STEPS = [
 ] as const;
 
 export default function ProfilePage() {
-  const { profile, setProfile, replaceProfile } = useRoute();
+  const { profile, setProfile, loadDemo } = useRoute();
   const [step, setStep] = useState(0);
   const router = useRouter();
   const current = STEPS[step];
@@ -57,11 +56,29 @@ export default function ProfilePage() {
         ) : undefined
       }
     >
-      <div className="mb-6 h-1 overflow-hidden rounded-full bg-surface-muted">
-        <div
-          className="h-full bg-accent transition-[width] duration-300 ease-out"
-          style={{ width: `${complete}%` }}
-        />
+      <div className="mb-4 lg:mb-6">
+        <div className="mb-2 flex items-center justify-between gap-2 lg:hidden">
+          <p className="label">
+            Step {step + 1} of {STEPS.length}
+          </p>
+          <button
+            type="button"
+            className="text-[12px] text-secondary underline decoration-border underline-offset-2"
+            onClick={() => {
+              loadDemo();
+              setStep(0);
+            }}
+          >
+            Try demo profile
+          </button>
+        </div>
+        <div className="h-1 overflow-hidden rounded-full bg-surface-muted">
+          <div
+            className="h-full bg-accent transition-[width] duration-300 ease-out"
+            style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+          />
+        </div>
+        <p className="mt-2 text-[13px] font-medium lg:hidden">{current.label}</p>
       </div>
       <div className="grid gap-8 lg:grid-cols-12">
         <aside className="hidden lg:col-span-4 lg:block">
@@ -106,7 +123,7 @@ export default function ProfilePage() {
             type="button"
             className="mt-4 text-[13px] text-secondary underline decoration-border underline-offset-4 hover:text-primary"
             onClick={() => {
-              replaceProfile(demoProfile);
+              loadDemo();
               setStep(0);
             }}
           >
