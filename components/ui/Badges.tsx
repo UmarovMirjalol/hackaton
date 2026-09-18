@@ -16,14 +16,14 @@ export function StatusBadge({
   return (
     <span
       className={cn(
-        "meta inline-flex items-center border px-1.5 py-0.5 text-[10px] uppercase tracking-[0.12em]",
+        "inline-flex items-center rounded-[var(--radius-sm)] border px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.06em]",
         status === "done" || status === "good"
-          ? "border-success/30 text-success"
+          ? "border-success/25 bg-success/5 text-success"
           : status === "watch"
-            ? "border-error/30 text-error"
+            ? "border-error/25 bg-error/5 text-error"
             : status === "started" || status === "mixed"
-              ? "border-warning/30 text-warning"
-              : "border-border text-tertiary",
+              ? "border-warning/25 bg-warning/5 text-warning"
+              : "border-border bg-surface-muted text-tertiary",
       )}
     >
       {map[status]}
@@ -43,7 +43,7 @@ export function SourceCitation({
       href={url}
       target="_blank"
       rel="noreferrer"
-      className="meta text-tertiary underline decoration-border underline-offset-4 hover:text-primary"
+      className="font-mono text-[11px] text-tertiary underline decoration-border underline-offset-4 hover:text-primary"
     >
       {label}
     </a>

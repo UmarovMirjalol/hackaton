@@ -1,21 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f1ebe3;
-  --surface: #faf6f0;
-  --surface-muted: #e6dfd4;
-  --text-primary: #1b1814;
-  --text-secondary: #5c564c;
-  --text-tertiary: #8a8276;
-  --border: #d2c9bb;
-  --accent: #b5461f;
-  --accent-hover: #953914;
-  --success: #2e5a42;
-  --warning: #8a5a1c;
-  --error: #8f2d2d;
+  /* Cool stone neutrals — Stripe/Notion calm, not warm cream */
+  --background: #f4f5f7;
+  --surface: #ffffff;
+  --surface-muted: #ebedf0;
+  --text-primary: #111318;
+  --text-secondary: #5c6370;
+  --text-tertiary: #8b929e;
+  --border: #d8dce3;
+  /* Deep teal — one accent; works as weight/contrast in grayscale */
+  --accent: #0b6e6a;
+  --accent-hover: #085854;
+  --accent-subtle: #e4f2f1;
+  --success: #1f6b45;
+  --warning: #9a6700;
+  --error: #b42318;
   --radius-sm: 2px;
-  --radius-md: 5px;
-  --radius-lg: 10px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
 }
 
 @theme inline {
@@ -28,12 +38,15 @@
   --color-border: var(--border);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
+  --color-accent-subtle: var(--accent-subtle);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-error: var(--error);
-  --font-sans: var(--font-instrument-sans);
-  --font-serif: var(--font-newsreader);
-  --font-mono: var(--font-ibm-plex-mono);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
 }
 
 * {
@@ -50,46 +63,42 @@ body {
 body {
   min-height: 100%;
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent) 22%, transparent);
-}
-
-.font-serif {
-  font-family: var(--font-serif), ui-serif, Georgia, serif;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
 .font-mono {
   font-family: var(--font-mono), ui-monospace, monospace;
 }
 
+/* Section / meta labels — product tone, not editorial caps shout */
 .label {
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
+  font-size: 12px;
   font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--text-tertiary);
 }
 
 .meta {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 12px;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   color: var(--text-tertiary);
 }
 
 .page-title {
-  font-family: var(--font-serif), ui-serif, Georgia, serif;
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-weight: 550;
+  letter-spacing: -0.025em;
   line-height: 1.15;
 }
 
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -98,7 +107,7 @@ body {
 }
 
 .enter {
-  animation: fade-up 280ms ease-out;
+  animation: fade-up 160ms ease-out;
 }
 
 input[type="range"] {

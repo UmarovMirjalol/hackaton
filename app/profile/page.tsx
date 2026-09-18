@@ -38,32 +38,49 @@ export default function ProfilePage() {
 
   return (
     <AppShell
-      eyebrow="01 — Profile"
+      eyebrow="01 · Profile"
       title="What is actually true about you."
       lede="Five short groups. Answer what you know. Leave blanks — Route will mark them as gaps instead of inventing a story."
     >
-      <div className="grid gap-10 lg:grid-cols-12">
+      <div className="grid gap-8 lg:grid-cols-12">
         <aside className="lg:col-span-4">
-          <ol className="space-y-3">
+          <ol className="space-y-1 rounded-[var(--radius-lg)] border border-border bg-surface p-2">
             {STEPS.map((s, i) => (
               <li key={s.id}>
                 <button
                   type="button"
                   onClick={() => setStep(i)}
                   className={cn(
-                    "w-full border-l-2 py-1 pl-3 text-left",
-                    i === step ? "border-accent" : "border-transparent",
+                    "w-full rounded-[var(--radius-md)] px-3 py-2 text-left transition-colors",
+                    i === step ? "bg-accent-subtle" : "hover:bg-surface-muted",
                   )}
                 >
-                  <div className={cn("text-[13px]", i === step ? "text-primary" : "text-secondary")}>
-                    {s.label}
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={cn(
+                        "font-mono text-[10px]",
+                        i === step ? "text-accent" : "text-tertiary",
+                      )}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span
+                      className={cn(
+                        "text-[13px] font-medium",
+                        i === step ? "text-primary" : "text-secondary",
+                      )}
+                    >
+                      {s.label}
+                    </span>
                   </div>
-                  {i === step ? <p className="mt-1 text-[12px] leading-5 text-tertiary">{s.why}</p> : null}
+                  {i === step ? (
+                    <p className="mt-1 pl-6 text-[12px] leading-5 text-tertiary">{s.why}</p>
+                  ) : null}
                 </button>
               </li>
             ))}
           </ol>
-          <p className="meta mt-8">{complete}% of the fields that change recommendations</p>
+          <p className="meta mt-5">{complete}% of the fields that change recommendations</p>
           <button
             type="button"
             className="mt-4 text-[13px] text-secondary underline decoration-border underline-offset-4 hover:text-primary"
@@ -76,7 +93,7 @@ export default function ProfilePage() {
           </button>
         </aside>
 
-        <section className="lg:col-span-8 enter">
+        <section className="rounded-[var(--radius-lg)] border border-border bg-surface p-4 enter sm:p-5 lg:col-span-8">
           {current.id === "about" && (
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="First name">
@@ -283,7 +300,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          <div className="mt-8 flex items-center justify-between gap-3 border-t border-border pt-5">
+          <div className="mt-7 flex items-center justify-between gap-3 border-t border-border pt-4">
             <Button
               variant="ghost"
               disabled={step === 0}

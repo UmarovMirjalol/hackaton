@@ -21,27 +21,42 @@ export function StepNav({ compact }: { compact?: boolean }) {
   const current = STEPS.findIndex((s) => pathname.startsWith(s.href));
 
   return (
-    <nav aria-label="Route progress" className={cn("flex items-center gap-0 overflow-x-auto", compact && "text-[12px]")}>
+    <nav
+      aria-label="Route progress"
+      className={cn("flex items-center gap-0 overflow-x-auto", compact && "text-[12px]")}
+    >
       {STEPS.map((step, i) => {
         const active = pathname.startsWith(step.href);
         const locked = i > 0 && !ready && step.id !== "profile";
+        const done = current > i && ready;
         return (
           <span key={step.id} className="flex items-center">
             {i > 0 ? (
-              <span className="mx-2 hidden h-px w-4 bg-border sm:block" aria-hidden />
+              <span
+                className={cn("mx-1.5 hidden h-px w-3 sm:block", done ? "bg-accent/40" : "bg-border")}
+                aria-hidden
+              />
             ) : null}
             <Link
               href={locked ? "/profile" : step.href}
               aria-current={active ? "step" : undefined}
               className={cn(
-                "whitespace-nowrap py-1 text-[12px] tracking-wide sm:text-[13px]",
+                "whitespace-nowrap rounded-[var(--radius-sm)] px-1 py-1 text-[12px] font-medium sm:text-[13px]",
                 active
-                  ? "border-b border-accent text-primary"
+                  ? "text-primary"
                   : locked
                     ? "text-tertiary"
                     : "text-secondary hover:text-primary",
               )}
             >
+              <span
+                className={cn(
+                  "mr-1.5 hidden font-mono text-[10px] sm:inline",
+                  active ? "text-accent" : "text-tertiary",
+                )}
+              >
+                {String(i + 1).padStart(2, "0")}
+              </span>
               {step.label}
             </Link>
           </span>
@@ -70,24 +85,24 @@ export function AppShell({
   const { hydrated } = useRoute();
   return (
     <div className="min-h-dvh">
-      <header className="border-b border-border/80">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <Link href="/" className="font-serif text-[20px] tracking-tight">
+      <header className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6">
+          <Link href="/" className="text-[15px] font-semibold tracking-tight">
             Route
           </Link>
           <StepNav />
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-        {!hydrated ? (
-          <p className="meta mb-6">Loading the saved route…</p>
-        ) : null}
+      <main className="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-9">
+        {!hydrated ? <p className="meta mb-5">Loading the saved route…</p> : null}
         {(eyebrow || title) && (
-          <div className="mb-8 max-w-3xl enter">
-            {eyebrow ? <p className="label mb-3">{eyebrow}</p> : null}
-            {title ? <h1 className="page-title text-[32px] sm:text-[40px]">{title}</h1> : null}
-            {lede ? <p className="mt-3 max-w-2xl text-[15px] leading-7 text-secondary">{lede}</p> : null}
-            {action ? <div className="mt-5">{action}</div> : null}
+          <div className="mb-7 max-w-2xl enter">
+            {eyebrow ? <p className="label mb-2">{eyebrow}</p> : null}
+            {title ? <h1 className="page-title text-[28px] sm:text-[34px]">{title}</h1> : null}
+            {lede ? (
+              <p className="mt-2.5 max-w-xl text-[14.5px] leading-6 text-secondary">{lede}</p>
+            ) : null}
+            {action ? <div className="mt-4">{action}</div> : null}
           </div>
         )}
         {children}

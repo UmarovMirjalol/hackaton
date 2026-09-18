@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/cn";
 import type {
   InputHTMLAttributes,
@@ -7,17 +9,17 @@ import type {
 } from "react";
 
 const field =
-  "w-full border border-border bg-surface px-3 text-[14px] text-primary outline-none transition-colors placeholder:text-tertiary focus:border-primary";
+  "w-full rounded-[var(--radius-md)] border border-border bg-surface px-3 text-[13.5px] text-primary outline-none transition-colors placeholder:text-tertiary focus:border-primary";
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
-  return <input {...props} className={cn(field, "h-10", props.className)} />;
+  return <input {...props} className={cn(field, "h-9", props.className)} />;
 }
 
 export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       {...props}
-      className={cn(field, "h-10 appearance-none bg-[length:12px] pr-8", props.className)}
+      className={cn(field, "h-9 appearance-none bg-[length:12px] pr-8", props.className)}
     />
   );
 }

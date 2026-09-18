@@ -4,6 +4,8 @@ A small admissions product that turns a high-school profile — academics, exams
 
 This is a hackathon-ready demo. Rankings use a transparent **fit index**, not an invented admissions probability. Deadlines and aid notes are a **demo catalog** and must be confirmed on each university site.
 
+Visual system principles and per-screen references live in [`DESIGN.md`](./DESIGN.md).
+
 ## What you get
 
 1. **Profile** — five short groups, not a 25-field wall.

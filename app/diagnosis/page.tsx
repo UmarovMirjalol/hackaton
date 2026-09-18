@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/Button";
 import { useDerived, useRoute } from "@/lib/store";
@@ -12,12 +13,12 @@ export default function DiagnosisPage() {
 
   return (
     <AppShell
-      eyebrow="02 — Diagnosis"
+      eyebrow="02 · Diagnosis"
       title={diagnosis.title}
       lede={diagnosis.summary}
       action={<Button href="/universities">See universities</Button>}
     >
-      <div className="grid gap-10 lg:grid-cols-12">
+      <div className="grid gap-8 lg:grid-cols-12">
         <section className="space-y-8 lg:col-span-8">
           <Block title="Strengths" empty="Not enough academic evidence yet — add a GPA or a test score.">
             {diagnosis.strengths.map((s) => (
@@ -36,23 +37,24 @@ export default function DiagnosisPage() {
           </Block>
         </section>
         <aside className="lg:col-span-4">
-          <div className="border border-border bg-surface p-5">
+          <div className="rounded-[var(--radius-lg)] border border-border bg-surface p-4">
             <p className="label">What Route still does not know</p>
             {diagnosis.gaps.length === 0 ? (
-              <p className="mt-3 text-[14px] leading-6 text-secondary">
-                Enough to rank a shortlist for {named}. Missing nuance still exists — this is not a counsellor.
+              <p className="mt-3 text-[13.5px] leading-6 text-secondary">
+                Enough to rank a shortlist for {named}. Missing nuance still exists — this is not a
+                counsellor.
               </p>
             ) : (
-              <ul className="mt-3 space-y-3">
+              <ul className="mt-3 space-y-2.5">
                 {diagnosis.gaps.map((g) => (
-                  <li key={g} className="text-[13px] leading-6 text-secondary">
+                  <li key={g} className="text-[13px] leading-5 text-secondary">
                     {g}
                   </li>
                 ))}
               </ul>
             )}
-            <p className="mt-5 text-[12px] leading-5 text-tertiary">{CATALOG_NOTE}</p>
-            <Button href="/profile" variant="secondary" className="mt-5 w-full">
+            <p className="mt-4 text-[11.5px] leading-5 text-tertiary">{CATALOG_NOTE}</p>
+            <Button href="/profile" variant="secondary" className="mt-4 w-full">
               Edit profile
             </Button>
           </div>
@@ -68,16 +70,18 @@ function Block({
   empty,
 }: {
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
   empty?: string;
 }) {
-  const items = Array.isArray(children) ? children : [children];
+  const items = Array.isArray(children) ? children.filter(Boolean) : [children];
   return (
     <div>
-      <h2 className="label mb-4">{title}</h2>
-      <div className="divide-y divide-border border-y border-border">
-        {items.filter(Boolean).length ? children : (
-          <p className="py-4 text-[14px] text-secondary">{empty}</p>
+      <h2 className="label mb-3">{title}</h2>
+      <div className="divide-y divide-border rounded-[var(--radius-lg)] border border-border bg-surface px-4">
+        {items.length ? (
+          children
+        ) : (
+          <p className="py-4 text-[13.5px] text-secondary">{empty}</p>
         )}
       </div>
     </div>
@@ -86,9 +90,9 @@ function Block({
 
 function Evidence({ k, v }: { k: string; v: string }) {
   return (
-    <div className="grid gap-1 py-4 sm:grid-cols-12 sm:gap-4">
-      <div className="font-serif text-[20px] sm:col-span-5">{k}</div>
-      <p className="text-[14px] leading-6 text-secondary sm:col-span-7">{v}</p>
+    <div className="grid gap-1 py-3.5 sm:grid-cols-12 sm:items-baseline sm:gap-4">
+      <div className="text-[14px] font-medium sm:col-span-5">{k}</div>
+      <p className="text-[13.5px] leading-6 text-secondary sm:col-span-7">{v}</p>
     </div>
   );
 }
