@@ -168,7 +168,7 @@ export function AppShell({
           </div>
         ) : null}
         {(eyebrow || title) && (
-          <header className="mb-8 enter sm:mb-10">
+          <header className="mb-6 enter sm:mb-8">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
               <div className="max-w-2xl">
                 {eyebrow ? <p className="label mb-2">{eyebrow}</p> : null}

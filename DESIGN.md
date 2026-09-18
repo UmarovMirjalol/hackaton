@@ -6,11 +6,11 @@ Original visual language. Principles inspired by Linear / Stripe / Notion restra
 
 | Token | Value | Role |
 | --- | --- | --- |
-| Background | `#F5F5F2` | Cool paper canvas |
+| Background | `#F6F7F8` | Cool stone canvas (not warm cream) |
 | Surface | `#FFFFFF` | Work surfaces |
 | Surface muted | `#ECECE7` | Nested chrome |
 | Text | `#111110` / `#5C5C57` / `#8B8B84` | Hierarchy from tone |
-| Accent | `#C23B22` vermillion | Single signal for CTAs, progress, active marks |
+| Accent | `#0C2D48` deep navy | Single signal for CTAs; cool, trustworthy, not terracotta/purple |
 | Borders | `#E0E0DA` | Structure from lines, not elevation |
 | Radius | 2 / 4 / 6px | Tight product controls |
 | Type | IBM Plex Sans + IBM Plex Mono | Distinctive professional sans |

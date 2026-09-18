@@ -86,8 +86,9 @@ export function UniversityCard({
         <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 border-t border-border pt-3 text-[12px]">
           {row.factors.slice(0, 3).map((f) => (
             <li key={f.key} className="text-tertiary">
+              <span className="text-primary">{f.label}</span>
+              <span className="mx-1.5 text-border-strong">·</span>
               <span className="font-medium text-primary">{f.value}</span>
-              <span className="ml-1.5">{f.label}</span>
             </li>
           ))}
         </ul>

@@ -8,11 +8,10 @@ import { MatchDetail } from "@/components/MatchDetail";
 import { NextUp } from "@/components/NextUp";
 import { UniversityCard } from "@/components/UniversityCard";
 import { Button } from "@/components/ui/Button";
-import { Segmented } from "@/components/ui/Choices";
 import { cn } from "@/lib/cn";
 import { IMAGE_DISCLAIMER } from "@/lib/media";
 import { useDerived, useRoute } from "@/lib/store";
-import type { AidNeed, CountryId, Field, RankedUniversity } from "@/lib/types";
+import type { CountryId, RankedUniversity } from "@/lib/types";
 import { FIT_METHODOLOGY, countryLabels, fieldLabels } from "@/lib/universities";
 
 export default function UniversitiesPage() {
@@ -71,30 +70,58 @@ export default function UniversitiesPage() {
           <div className="space-y-6">
             <div>
               <p className="small mb-2 font-medium text-secondary">Field</p>
-              <Segmented<Field>
-                value={profile.field}
-                onChange={(v) => setProfile({ field: v })}
-                options={[
-                  { value: "cs", label: "CS" },
-                  { value: "engineering", label: "Eng" },
-                  { value: "economics", label: "Econ" },
-                  { value: "biology", label: "Bio" },
-                  { value: "undecided", label: "Open" },
-                ]}
-              />
+              <div className="flex flex-wrap gap-1">
+                {(
+                  [
+                    ["cs", "CS"],
+                    ["engineering", "Eng"],
+                    ["economics", "Econ"],
+                    ["biology", "Bio"],
+                    ["undecided", "Open"],
+                  ] as const
+                ).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setProfile({ field: value })}
+                    className={cn(
+                      "h-8 border px-2.5 text-[12px] font-medium transition-colors rounded-[var(--radius-sm)]",
+                      profile.field === value
+                        ? "border-accent bg-accent text-white"
+                        : "border-border bg-surface text-secondary hover:border-border-strong hover:text-primary",
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
             <div>
               <p className="small mb-2 font-medium text-secondary">Aid</p>
-              <Segmented<AidNeed>
-                value={profile.aidNeed}
-                onChange={(v) => setProfile({ aidNeed: v })}
-                options={[
-                  { value: "full", label: "Full" },
-                  { value: "substantial", label: "Sub." },
-                  { value: "some", label: "Some" },
-                  { value: "none", label: "Pay" },
-                ]}
-              />
+              <div className="flex flex-wrap gap-1">
+                {(
+                  [
+                    ["full", "Full"],
+                    ["substantial", "Substantial"],
+                    ["some", "Some"],
+                    ["none", "Can pay"],
+                  ] as const
+                ).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setProfile({ aidNeed: value })}
+                    className={cn(
+                      "h-8 border px-2.5 text-[12px] font-medium transition-colors rounded-[var(--radius-sm)]",
+                      profile.aidNeed === value
+                        ? "border-accent bg-accent text-white"
+                        : "border-border bg-surface text-secondary hover:border-border-strong hover:text-primary",
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
             <div>
               <p className="small mb-2 font-medium text-secondary">Countries</p>
