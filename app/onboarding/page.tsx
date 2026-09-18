@@ -29,9 +29,37 @@ import {
   type Field as StudyField,
   type GradYear,
   type Interest,
+  type Profile,
 } from "@/lib/types";
 import { countryLabels, fieldLabels } from "@/lib/universities";
 import "./onboarding.css";
+
+/** Real profile completeness from answered fields — not step index. */
+function profileCompletionPercent(p: Profile): number {
+  const checks: boolean[] = [
+    Boolean(p.firstName.trim()),
+    Boolean(p.lastName.trim()),
+    Boolean(p.homeCountry.trim()),
+    Boolean(p.curriculum),
+    Boolean(p.gpa.trim()),
+    p.satStatus === "done" ? Boolean(p.satMath.trim()) : p.satStatus === "skip" || p.satStatus === "planned",
+    p.englishExam === "none" ? true : Boolean(p.englishScore.trim()),
+    Boolean(p.activities.trim()) || Boolean(p.achievements.trim()) || p.researchExperience,
+    Boolean(p.field),
+    p.interests.length > 0,
+    p.countries.length > 0,
+    Boolean(p.aidNeed),
+    Number(p.annualBudget || 0) > 0 || p.aidNeed === "full" || p.aidNeed === "none",
+    p.recLettersStarted,
+  ];
+  const filled = checks.filter(Boolean).length;
+  return Math.round((filled / checks.length) * 100);
+}
+
+function fact(value: string | null | undefined) {
+  const v = (value ?? "").trim();
+  return v || null;
+}
 
 export default function OnboardingPage() {
   const { profile, setProfile, loadDemo, hydrated, onboardingStep, setOnboardingStep } = useRoute();
@@ -39,7 +67,8 @@ export default function OnboardingPage() {
   const router = useRouter();
   const stepIndex = clampOnboardingStep(onboardingStep);
   const step = ONBOARDING_STEPS[stepIndex];
-  const progress = ((stepIndex + 1) / ONBOARDING_STEPS.length) * 100;
+  const nextStep = ONBOARDING_STEPS[stepIndex + 1];
+  const completion = profileCompletionPercent(profile);
 
   const setStep = (i: number) => setOnboardingStep(clampOnboardingStep(i));
 
@@ -66,15 +95,63 @@ export default function OnboardingPage() {
     setStep(stepIndex - 1);
   };
 
-  const summary = useMemo(
-    () =>
-      [
-        profile.firstName && `${profile.firstName} ${profile.lastName}`.trim(),
-        profile.homeCountry,
-        profile.field ? fieldLabels[profile.field] : null,
-      ]
-        .filter(Boolean)
-        .join(" · "),
+  const displayName = useMemo(() => {
+    const name = `${profile.firstName} ${profile.lastName}`.trim();
+    return name || null;
+  }, [profile.firstName, profile.lastName]);
+
+  const dossierFacts = useMemo(
+    () => [
+      {
+        label: "Home",
+        value: fact(profile.homeCountry)
+          ? `${profile.homeCountry}${profile.gradYear ? ` · Class of ${profile.gradYear}` : ""}`
+          : null,
+      },
+      {
+        label: "Academics",
+        value: fact(profile.gpa)
+          ? `${profile.gpa}${profile.gpaScale === "ib" ? " IB" : profile.gpaScale === "100" ? "/100" : " GPA"} · ${profile.curriculum.toUpperCase()}`
+          : profile.curriculum
+            ? `${profile.curriculum.toUpperCase()} curriculum`
+            : null,
+      },
+      {
+        label: "Testing",
+        value:
+          profile.satStatus === "done" && profile.satMath
+            ? `SAT ${profile.satMath}${profile.satEbrw ? ` / ${profile.satEbrw}` : ""}`
+            : profile.satStatus === "skip"
+              ? "No SAT"
+              : profile.satStatus === "planned"
+                ? "SAT planned"
+                : null,
+      },
+      {
+        label: "Field",
+        value: profile.field ? fieldLabels[profile.field] : null,
+      },
+      {
+        label: "Campus fit",
+        value: profile.interests.length
+          ? profile.interests
+              .map((i) => i.charAt(0).toUpperCase() + i.slice(1))
+              .join(", ")
+          : null,
+      },
+      {
+        label: "Places",
+        value: profile.countries.length
+          ? profile.countries.map((c) => countryLabels[c]).join(", ")
+          : null,
+      },
+      {
+        label: "Aid",
+        value: profile.aidNeed
+          ? `${profile.aidNeed}${Number(profile.annualBudget || 0) > 0 ? ` · $${Number(profile.annualBudget).toLocaleString()}/yr` : ""}`
+          : null,
+      },
+    ],
     [profile],
   );
 
@@ -82,32 +159,34 @@ export default function OnboardingPage() {
     return (
       <div className="ob-shell flex min-h-dvh items-center justify-center">
         <p className="font-mono text-[12px] tracking-[0.08em] text-[var(--text-tertiary)] uppercase">
-          Loading profile
+          Opening profile builder
         </p>
       </div>
     );
   }
 
+  const isLast = stepIndex >= ONBOARDING_STEPS.length - 1;
+
   return (
     <div className="ob-shell">
-      <header className="sticky top-0 z-20 border-b border-[var(--border)] backdrop-blur-md">
+      <header className="ob-top">
         <div className="ob-frame flex items-center justify-between gap-4 py-3.5">
-          <div className="flex items-baseline gap-3">
-            <Link
-              href="/"
-              className="text-[15px] font-semibold tracking-tight text-[var(--text-primary)] transition-opacity hover:opacity-70"
-            >
-              Route
+          <div className="flex min-w-0 items-baseline gap-4">
+            <Link href="/" className="ob-brand">
+              <span className="ob-brand-mark">Route</span>
             </Link>
-            <span className="hidden text-[12px] text-[var(--text-tertiary)] sm:inline">
-              Admissions profile
-            </span>
+            <p className="hidden truncate text-[13px] text-[var(--text-secondary)] sm:block">
+              Build your admissions profile
+            </p>
           </div>
 
-          <div className="flex items-center gap-4 sm:gap-6">
-            <p className="font-mono text-[11px] tracking-[0.04em] text-[var(--text-tertiary)] tabular-nums">
-              Step {step.number} of {ONBOARDING_STEPS.length}
-            </p>
+          <div className="flex items-center gap-4 sm:gap-5">
+            <div className="ob-complete" aria-label={`Profile ${completion}% complete`}>
+              <div className="ob-complete-meter" aria-hidden>
+                <span style={{ width: `${completion}%` }} />
+              </div>
+              <span className="ob-complete-label">Profile {completion}%</span>
+            </div>
             <ObButton
               variant="text"
               onClick={() => {
@@ -119,64 +198,50 @@ export default function OnboardingPage() {
             </ObButton>
           </div>
         </div>
-        <div className="ob-progress" aria-hidden>
-          <span style={{ width: `${progress}%` }} />
-        </div>
       </header>
 
-      <div className="ob-frame grid gap-10 py-8 lg:grid-cols-[var(--ob-rail)_minmax(0,1fr)] lg:gap-16 lg:py-12 xl:gap-20">
-        <aside className="ob-rail hidden lg:block">
-          <p className="mb-5 font-mono text-[10px] tracking-[0.12em] text-[var(--text-tertiary)] uppercase">
-            Profile build
-          </p>
-          <ol>
+      <div className="ob-frame ob-workspace">
+        <nav className="ob-journey" aria-label="Profile journey">
+          <p className="ob-journey-kicker">Your route</p>
+          <div className="ob-journey-list">
             {ONBOARDING_STEPS.map((s, i) => {
-              const done = i < stepIndex;
-              const active = i === stepIndex;
+              const state = i < stepIndex ? "done" : i === stepIndex ? "current" : "upcoming";
               return (
-                <li key={s.id}>
-                  <button
-                    type="button"
-                    data-active={active}
-                    data-done={done}
-                    className="ob-step-btn"
-                    onClick={() => {
-                      setError(null);
-                      setStep(i);
-                    }}
-                  >
-                    <span className="font-mono text-[11px] tabular-nums opacity-70">
-                      {String(s.number).padStart(2, "0")}
-                    </span>
-                    <span>
-                      <span className="block text-[13px] font-medium leading-5">{s.label}</span>
-                      {active ? (
-                        <span className="mt-1 block text-[12px] leading-5 text-[var(--text-tertiary)]">
-                          {s.purpose}
-                        </span>
-                      ) : null}
-                    </span>
-                  </button>
-                </li>
+                <button
+                  key={s.id}
+                  type="button"
+                  data-state={state}
+                  className="ob-journey-item"
+                  onClick={() => {
+                    setError(null);
+                    setStep(i);
+                  }}
+                >
+                  <span className="ob-journey-dot" aria-hidden />
+                  <span className="ob-journey-name">{s.label}</span>
+                </button>
               );
             })}
-          </ol>
-          {summary ? (
-            <p className="mt-8 border-t border-[var(--border)] pt-5 text-[12px] leading-5 text-[var(--text-tertiary)]">
-              {summary}
-            </p>
-          ) : null}
-        </aside>
-
-        <section key={step.id} className="ob-main min-w-0">
-          <p className="mb-3 font-mono text-[11px] tracking-[0.08em] text-[var(--text-tertiary)] uppercase lg:hidden">
-            {step.label} · {step.number}/{ONBOARDING_STEPS.length}
+          </div>
+          <p className="ob-journey-foot">
+            Each answer strengthens the profile Route will map into universities.
           </p>
+        </nav>
+
+        <section className="ob-stage">
+          <div className="ob-stage-meta">
+            <p className="ob-stage-step">
+              {step.label} · {step.number} of {ONBOARDING_STEPS.length}
+            </p>
+            <p className="ob-stage-next">
+              {nextStep ? `Next: ${nextStep.label}` : "Ready to analyze"}
+            </p>
+          </div>
 
           <h1 className="ob-question">{step.title}</h1>
           <p className="ob-purpose">{step.purpose}</p>
 
-          <div className="ob-body mt-9 max-w-xl xl:max-w-2xl">
+          <div key={step.id} className="ob-body">
             {renderStep(step.id, profile, setProfile)}
           </div>
 
@@ -186,17 +251,56 @@ export default function OnboardingPage() {
             </p>
           ) : null}
 
-          <div className="ob-footer">
-            <div className="flex items-center justify-between gap-3">
-              <ObButton variant="ghost" onClick={goBack}>
-                {stepIndex === 0 ? "Home" : "Back"}
-              </ObButton>
-              <ObButton variant="primary" onClick={goNext}>
-                {stepIndex >= ONBOARDING_STEPS.length - 1 ? "Analyze profile" : "Continue"}
-              </ObButton>
-            </div>
+          <div className="ob-actions">
+            <ObButton variant="ghost" onClick={goBack}>
+              {stepIndex === 0 ? "Leave" : "Back"}
+            </ObButton>
+            <ObButton variant="primary" onClick={goNext}>
+              {isLast ? "Analyze my profile" : "Continue building"}
+            </ObButton>
           </div>
         </section>
+
+        <aside className="ob-dossier" aria-label="Live profile">
+          <p className="ob-dossier-kicker">Live profile</p>
+          <p className="ob-dossier-name" data-empty={!displayName}>
+            {displayName ?? "Student profile"}
+          </p>
+          <p className="ob-dossier-sub">
+            {completion === 0
+              ? "Answers appear here as you build."
+              : completion < 50
+                ? "Profile taking shape."
+                : completion < 85
+                  ? "Strong enough to start mapping."
+                  : "Ready for analysis."}
+          </p>
+
+          <div className="ob-dossier-progress">
+            <div className="ob-dossier-progress-row">
+              <span>Completeness</span>
+              <span>{completion}%</span>
+            </div>
+            <div className="ob-dossier-bar" aria-hidden>
+              <span style={{ width: `${completion}%` }} />
+            </div>
+          </div>
+
+          <dl className="ob-dossier-facts">
+            {dossierFacts.map((f) => (
+              <div key={f.label} className="ob-fact">
+                <dt>{f.label}</dt>
+                <dd data-empty={!f.value}>{f.value ?? "Not set yet"}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <p className="ob-dossier-hint">
+            {nextStep
+              ? `After ${step.label.toLowerCase()}, you’ll add ${nextStep.label.toLowerCase()} — then Route can shortlist with reasons.`
+              : "Analyze to turn this profile into a university route with explanations."}
+          </p>
+        </aside>
       </div>
     </div>
   );
@@ -210,8 +314,8 @@ function renderStep(
   switch (id) {
     case "academic":
       return (
-        <div className="space-y-8">
-          <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+        <div className="space-y-7">
+          <div className="grid gap-x-5 gap-y-5 sm:grid-cols-2">
             <ObField label="First name">
               <ObInput
                 autoFocus
@@ -262,7 +366,7 @@ function renderStep(
             />
           </ObField>
 
-          <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+          <div className="grid gap-x-5 gap-y-5 sm:grid-cols-2">
             <ObField
               label={profile.gpaScale === "ib" ? "IB points" : "GPA"}
               hint="Optional if you do not have a number yet."
@@ -291,20 +395,20 @@ function renderStep(
 
     case "testing":
       return (
-        <div className="space-y-9">
+        <div className="space-y-8">
           <div>
             <p className="ob-section-label">SAT</p>
             <ObOptionRows
               value={profile.satStatus}
               onChange={(v) => setProfile({ satStatus: v })}
               options={[
-                { value: "done", label: "Score in hand", hint: "We’ll use Math and ERW in the match." },
-                { value: "planned", label: "Planning to sit", hint: "Becomes a dated task on your roadmap." },
-                { value: "skip", label: "Not using SAT", hint: "Test-optional and non-SAT paths stay open." },
+                { value: "done", label: "Score in hand", hint: "Math and ERW feed the match." },
+                { value: "planned", label: "Planning to sit", hint: "Becomes a dated roadmap task." },
+                { value: "skip", label: "Not using SAT", hint: "Test-optional paths stay open." },
               ]}
             />
             {profile.satStatus === "done" ? (
-              <div className="mt-6 grid gap-6 sm:grid-cols-2">
+              <div className="mt-5 grid gap-5 sm:grid-cols-2">
                 <ObField label="SAT Math">
                   <ObInput
                     autoFocus
@@ -339,7 +443,7 @@ function renderStep(
               ]}
             />
             {profile.englishExam !== "none" ? (
-              <div className="mt-6 max-w-xs">
+              <div className="mt-5 max-w-xs">
                 <ObField label="Score">
                   <ObInput
                     value={profile.englishScore}
@@ -361,7 +465,7 @@ function renderStep(
 
     case "activities":
       return (
-        <div className="space-y-10">
+        <div className="space-y-7">
           <ObField
             label="What you spend time on"
             hint="Clubs, projects, work, volunteering — short phrases are enough."
@@ -396,7 +500,7 @@ function renderStep(
 
     case "interests":
       return (
-        <div className="space-y-10">
+        <div className="space-y-8">
           <div>
             <p className="ob-section-label">Intended field</p>
             <ObSelectList<StudyField>
@@ -441,9 +545,9 @@ function renderStep(
               label: countryLabels[cid],
             }))}
           />
-          <p className="mt-5 text-[12.5px] leading-5 text-[var(--text-tertiary)]">
+          <p className="mt-4 text-[12.5px] leading-5 text-[var(--text-tertiary)]">
             {profile.countries.length
-              ? `${profile.countries.length} selected — unchecked countries leave the shortlist.`
+              ? `${profile.countries.length} in profile — unchecked countries leave the shortlist.`
               : "Select every region you are willing to apply to."}
           </p>
         </div>
@@ -451,7 +555,7 @@ function renderStep(
 
     case "aid":
       return (
-        <div className="space-y-10">
+        <div className="space-y-8">
           <div>
             <p className="ob-section-label">Aid need</p>
             <ObOptionRows<AidNeed>
@@ -495,7 +599,7 @@ function renderStep(
 
     case "goals":
       return (
-        <div className="space-y-10">
+        <div className="space-y-7">
           <div>
             <p className="ob-section-label">Recommendation letters</p>
             <ObSegmented
@@ -508,39 +612,35 @@ function renderStep(
             />
           </div>
 
-          <div className="ob-dossier-wrap">
+          <div className="ob-goals-sheet">
             <p className="ob-section-label">Profile ready for analysis</p>
             <p className="mt-1 text-[22px] font-medium tracking-tight">
               {profile.firstName || "—"} {profile.lastName}
             </p>
-            <dl className="ob-dossier mt-6 sm:grid-cols-2">
-              <div>
+            <dl className="ob-goals-grid">
+              <div className="ob-fact">
                 <dt>Field</dt>
-                <dd>{profile.field ? fieldLabels[profile.field] : "—"}</dd>
+                <dd data-empty={!profile.field}>
+                  {profile.field ? fieldLabels[profile.field] : "—"}
+                </dd>
               </div>
-              <div>
+              <div className="ob-fact">
                 <dt>Aid</dt>
-                <dd className="capitalize">{profile.aidNeed || "—"}</dd>
+                <dd className="capitalize" data-empty={!profile.aidNeed}>
+                  {profile.aidNeed || "—"}
+                </dd>
               </div>
-              <div>
+              <div className="ob-fact">
                 <dt>Countries</dt>
-                <dd>
+                <dd data-empty={!profile.countries.length}>
                   {profile.countries.length
                     ? profile.countries.map((c) => countryLabels[c]).join(", ")
                     : "—"}
                 </dd>
               </div>
-              <div>
+              <div className="ob-fact">
                 <dt>Budget</dt>
                 <dd>${Number(profile.annualBudget || 0).toLocaleString()}/yr</dd>
-              </div>
-              <div>
-                <dt>Home</dt>
-                <dd>{profile.homeCountry || "—"}</dd>
-              </div>
-              <div>
-                <dt>Grad year</dt>
-                <dd>{profile.gradYear}</dd>
               </div>
             </dl>
           </div>
