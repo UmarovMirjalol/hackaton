@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -17,7 +18,8 @@ import {
   type TaskStatus,
 } from "./types";
 
-const STORAGE_KEY = "route.admissions.v1";
+/** Bump when persisted shape changes so stale demos cannot resurrect old exam flags. */
+const STORAGE_KEY = "route.admissions.v2";
 
 type Store = {
   profile: Profile;
@@ -44,21 +46,28 @@ export function RouteProvider({ children }: { children: ReactNode }) {
     taskStatus: {},
     hydrated: false,
   });
+  /** Prevents localStorage hydrate from clobbering an early demo/profile write. */
+  const userWrote = useRef(false);
 
   useEffect(() => {
+    if (userWrote.current) {
+      setStore((s) => (s.hydrated ? s : { ...s, hydrated: true }));
+      return;
+    }
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<Store>;
-        // Hydrate from localStorage after mount to avoid a server/client mismatch.
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional persist restore
-        setStore((s) => ({
-          ...s,
-          profile: { ...defaultProfile, ...parsed.profile },
-          compareIds: parsed.compareIds ?? [],
-          taskStatus: parsed.taskStatus ?? {},
-          hydrated: true,
-        }));
+        setStore((s) => {
+          if (userWrote.current) return { ...s, hydrated: true };
+          return {
+            ...s,
+            profile: { ...defaultProfile, ...parsed.profile },
+            compareIds: parsed.compareIds ?? [],
+            taskStatus: parsed.taskStatus ?? {},
+            hydrated: true,
+          };
+        });
         return;
       }
     } catch {
@@ -82,26 +91,46 @@ export function RouteProvider({ children }: { children: ReactNode }) {
   const value = useMemo<Ctx>(
     () => ({
       ...store,
-      setProfile: (patch) =>
-        setStore((s) => ({ ...s, profile: { ...s.profile, ...patch } })),
-      replaceProfile: (profile) => setStore((s) => ({ ...s, profile })),
-      toggleCompare: (id) =>
+      setProfile: (patch) => {
+        userWrote.current = true;
+        setStore((s) => ({ ...s, profile: { ...s.profile, ...patch } }));
+      },
+      replaceProfile: (profile) => {
+        userWrote.current = true;
+        setStore((s) => ({
+          ...s,
+          profile,
+          compareIds: [],
+          taskStatus: {},
+          hydrated: true,
+        }));
+      },
+      toggleCompare: (id) => {
+        userWrote.current = true;
         setStore((s) => {
           const has = s.compareIds.includes(id);
           if (has) return { ...s, compareIds: s.compareIds.filter((x) => x !== id) };
           if (s.compareIds.length >= 3) return s;
           return { ...s, compareIds: [...s.compareIds, id] };
-        }),
-      setCompareIds: (ids) => setStore((s) => ({ ...s, compareIds: ids.slice(0, 3) })),
-      setTaskStatus: (id, status) =>
-        setStore((s) => ({ ...s, taskStatus: { ...s.taskStatus, [id]: status } })),
-      reset: () =>
+        });
+      },
+      setCompareIds: (ids) => {
+        userWrote.current = true;
+        setStore((s) => ({ ...s, compareIds: ids.slice(0, 3) }));
+      },
+      setTaskStatus: (id, status) => {
+        userWrote.current = true;
+        setStore((s) => ({ ...s, taskStatus: { ...s.taskStatus, [id]: status } }));
+      },
+      reset: () => {
+        userWrote.current = true;
         setStore({
           profile: defaultProfile,
           compareIds: [],
           taskStatus: {},
           hydrated: true,
-        }),
+        });
+      },
     }),
     [store],
   );

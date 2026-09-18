@@ -19,7 +19,7 @@ export default function RoadmapPage() {
       title="What to do with the shortlist."
       lede={
         profile.englishExam !== "none"
-          ? "IELTS/TOEFL is already on file, so it is not a mandatory task. The SAT appears only if you still need it for a U.S. campus."
+          ? `IELTS/TOEFL is already on file (${profile.englishExam.toUpperCase()}${profile.englishScore ? ` ${profile.englishScore}` : ""}), so it is not a mandatory task.${profile.satStatus === "done" ? " SAT is already scored — it is not on this plan." : profile.satStatus === "planned" ? " SAT is still planned for U.S. campuses." : ""}`
           : "Tasks are generated from the current shortlist and exam status — not a generic senior-year calendar."
       }
     >
