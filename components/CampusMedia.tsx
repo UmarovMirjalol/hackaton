@@ -37,9 +37,17 @@ export function CampusMedia({
 }) {
   const img = campusImage(universityId);
   const tone = PLACE_TONES[countryId ?? ""] ?? ["#1c2430", "#0d6e6a"];
+  // `cn` does not twMerge — never ship both relative and absolute or Image fill collapses to 0 height.
+  const fillFrame = /\babsolute\b/.test(className ?? "");
 
   return (
-    <div className={cn("campus-media relative overflow-hidden bg-surface-muted", className)}>
+    <div
+      className={cn(
+        "campus-media overflow-hidden bg-surface-muted",
+        fillFrame ? "h-full w-full" : "relative",
+        className,
+      )}
+    >
       {img ? (
         <Image
           src={img.src}

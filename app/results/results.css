@@ -101,6 +101,15 @@
   will-change: opacity, transform;
 }
 
+/* Ensure fill images always paint the stage (absolute + sized parent). */
+.campus-scroll-layer > .campus-media,
+.campus-scroll-strip-media > .campus-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .campus-scroll-layer.is-current {
   opacity: 1;
   transform: scale(1);
