@@ -142,5 +142,46 @@ export function buildRoadmap(
 }
 
 export function nextTask(tasks: RoadmapTask[], status: Record<string, string>) {
+  const started = tasks.find((t) => status[t.id] === "started");
+  if (started) return started;
   return tasks.find((t) => status[t.id] !== "done") ?? null;
+}
+
+/** Restrained “what this unlocks” line from existing task + shortlist data only. */
+export function taskConsequence(
+  task: RoadmapTask,
+  picks: RankedUniversity[],
+): string | null {
+  const names = (task.universityIds ?? [])
+    .map((id) => picks.find((p) => p.university.id === id)?.university.shortName)
+    .filter((n): n is string => Boolean(n));
+
+  switch (task.id) {
+    case "sat":
+      return "Unlocks a usable U.S. testing file for campuses still treating a score as useful.";
+    case "english":
+      return "Clears a hard filter for UK, Canadian, and other English-requirement campuses on this route.";
+    case "shortlist":
+      return names.length
+        ? `Turns ${names.join(", ")} into a working list you can write and fund against.`
+        : "Gives the rest of the timeline a concrete campus list to write and fund against.";
+    case "recs":
+      return "Starts the longest lead-time item on U.S. (and many UK/Canadian) files.";
+    case "css":
+      return "Keeps full-need and substantial-aid U.S. campuses readable once applications open.";
+    case "ucas":
+      return "Produces the single subject statement shared across UK campuses on this route.";
+    case "essays":
+      return "Removes the bottleneck that blocks early and regular submissions.";
+    case "early":
+      return names[0]
+        ? `Forces a real first-choice call on ${names[0]} before the early deadline.`
+        : "Forces a real first-choice call before an early deadline.";
+    case "ouac":
+      return "Keeps Canadian applications on their own calendar, not as a Common App afterthought.";
+    case "regular":
+      return "Closes the remaining files while essays and testing are already settled.";
+    default:
+      return null;
+  }
 }
