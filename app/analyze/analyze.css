@@ -189,6 +189,43 @@
   color: var(--text-secondary);
 }
 
+.az-evaluation {
+  padding-top: var(--space-4);
+}
+
+.az-eval-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.az-eval-badge {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.az-eval-badge.is-strong {
+  color: var(--signal);
+}
+
+.az-eval-badge.is-usable {
+  color: var(--text-secondary);
+}
+
+.az-eval-badge.is-thin {
+  color: var(--text-tertiary);
+}
+
+.az-eval-col {
+  margin-top: var(--space-4);
+}
+
 .az-aside {
   min-width: 0;
 }

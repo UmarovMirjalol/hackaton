@@ -11,6 +11,12 @@ import {
   fallbackDiagnosisExplanation,
   type DiagnosisExplanation,
 } from "@/lib/ai/diagnosis-explanation-shared";
+import {
+  buildProfileEvaluationContext,
+  fallbackProfileEvaluation,
+  profileEvaluationCacheKey,
+  type ProfileEvaluation,
+} from "@/lib/ai/profile-evaluation-shared";
 import { cn } from "@/lib/cn";
 import { synthesize } from "@/lib/diagnosis";
 import { profileCompleteness } from "@/lib/journey";
@@ -109,9 +115,12 @@ export default function AnalyzePage() {
   const [stage, setStage] = useState(0);
   const [phase, setPhase] = useState<"loading" | "ready">("loading");
   const [explanation, setExplanation] = useState<DiagnosisExplanation | null>(null);
+  const [evaluation, setEvaluation] = useState<ProfileEvaluation | null>(null);
+  const [evaluationPending, setEvaluationPending] = useState(false);
   const timersRef = useRef<number[]>([]);
   const cancelledRef = useRef(false);
   const explanationGenerationRef = useRef(0);
+  const evaluationGenerationRef = useRef(0);
   const profileRouteKey = useMemo(() => routeInputFingerprint(profile), [profile]);
 
   const diagnosis = useMemo(() => synthesize(profile), [profile]);
@@ -129,6 +138,10 @@ export default function AnalyzePage() {
   const explanationContext = useMemo(
     () => buildDiagnosisExplanationContext(profile, diagnosis, priorities),
     [profile, diagnosis, priorities],
+  );
+  const evaluationContext = useMemo(
+    () => buildProfileEvaluationContext(profile),
+    [profile],
   );
   const pct = profileCompleteness(profile);
   const ready = profileReady(profile);
@@ -218,6 +231,49 @@ export default function AnalyzePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, ready, diagnosisExplanationCacheKey(explanationContext)]);
 
+  // AI profile evaluation — quality/readiness only; never changes matching.
+  useEffect(() => {
+    if (!hydrated || !ready) return;
+
+    const generation = ++evaluationGenerationRef.current;
+    const expectedKey = profileEvaluationCacheKey(evaluationContext);
+    setEvaluation(fallbackProfileEvaluation(evaluationContext));
+    setEvaluationPending(true);
+
+    const ac = new AbortController();
+    fetch("/api/ai/profile-evaluation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ context: evaluationContext }),
+      signal: ac.signal,
+    })
+      .then(async (res) => {
+        const data = (await res.json()) as {
+          evaluation?: ProfileEvaluation;
+        };
+        if (ac.signal.aborted) return;
+        if (evaluationGenerationRef.current !== generation) return;
+        if (profileEvaluationCacheKey(evaluationContext) !== expectedKey) return;
+        if (
+          data.evaluation &&
+          typeof data.evaluation.headline === "string" &&
+          typeof data.evaluation.summary === "string" &&
+          Array.isArray(data.evaluation.nextImprovements)
+        ) {
+          setEvaluation(data.evaluation);
+        }
+        setEvaluationPending(false);
+      })
+      .catch(() => {
+        if (ac.signal.aborted) return;
+        if (evaluationGenerationRef.current !== generation) return;
+        setEvaluationPending(false);
+      });
+
+    return () => ac.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated, ready, profileEvaluationCacheKey(evaluationContext)]);
+
   if (!hydrated) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-background">
@@ -295,6 +351,63 @@ export default function AnalyzePage() {
                 <p className="label">Understand</p>
                 <h1 className="text-h1 mt-2">{diagnosis.title}</h1>
                 <p className="body mt-3 max-w-2xl text-secondary">{diagnosis.summary}</p>
+
+                {evaluation ? (
+                  <section className="az-block az-evaluation" aria-label="AI profile evaluation">
+                    <div className="az-eval-head">
+                      <h2 className="label">AI profile evaluation</h2>
+                      <p
+                        className={cn(
+                          "az-eval-badge",
+                          evaluation.readiness === "strong" && "is-strong",
+                          evaluation.readiness === "usable" && "is-usable",
+                          evaluation.readiness === "thin" && "is-thin",
+                        )}
+                      >
+                        {evaluation.readiness}
+                        {evaluationPending ? " · updating" : ""}
+                      </p>
+                    </div>
+                    <p className="az-signal-title mt-3">{evaluation.headline}</p>
+                    <p className="body mt-2 max-w-2xl text-secondary">{evaluation.summary}</p>
+                    <p className="caption mt-2">
+                      Judges profile quality only — not admission odds, and it does not change campus ranking.
+                    </p>
+
+                    {evaluation.credibleSignals.length > 0 ? (
+                      <div className="az-eval-col">
+                        <h3 className="label">Credible signals</h3>
+                        <ul className="az-what-matters">
+                          {evaluation.credibleSignals.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+
+                    {evaluation.weakOrMissing.length > 0 ? (
+                      <div className="az-eval-col">
+                        <h3 className="label">Weak or missing</h3>
+                        <ul className="az-what-matters">
+                          {evaluation.weakOrMissing.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+
+                    {evaluation.nextImprovements.length > 0 ? (
+                      <div className="az-eval-col">
+                        <h3 className="label">Improve next</h3>
+                        <ul className="az-what-matters">
+                          {evaluation.nextImprovements.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                  </section>
+                ) : null}
 
                 <section className="az-block">
                   <h2 className="label">Strong signals</h2>
