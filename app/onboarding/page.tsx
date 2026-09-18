@@ -3,17 +3,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import {
-  ObButton,
-  ObCountryGrid,
-  ObField,
-  ObInput,
-  ObOptionRows,
-  ObRange,
-  ObSegmented,
-  ObSelectList,
-  ObTextArea,
-} from "@/components/onboarding/Controls";
+import { ProfileRange } from "@/components/onboarding/Controls";
+import { Button } from "@/components/ui/Button";
+import { ChoiceGrid, OptionRows, Segmented } from "@/components/ui/Choices";
+import { Field, Input, TextArea } from "@/components/ui/Field";
+import { Alert, LoadingBlock } from "@/components/ui/States";
+import { JOURNEY, profileCompleteness } from "@/lib/journey";
 import {
   ONBOARDING_STEPS,
   clampOnboardingStep,
@@ -34,41 +29,89 @@ import {
 import { countryLabels, fieldLabels } from "@/lib/universities";
 import "./onboarding.css";
 
-/** Real profile completeness from answered fields — not step index. */
-function profileCompletionPercent(p: Profile): number {
-  const checks: boolean[] = [
-    Boolean(p.firstName.trim()),
-    Boolean(p.lastName.trim()),
-    Boolean(p.homeCountry.trim()),
-    Boolean(p.curriculum),
-    Boolean(p.gpa.trim()),
-    p.satStatus === "done" ? Boolean(p.satMath.trim()) : p.satStatus === "skip" || p.satStatus === "planned",
-    p.englishExam === "none" ? true : Boolean(p.englishScore.trim()),
-    Boolean(p.activities.trim()) || Boolean(p.achievements.trim()) || p.researchExperience,
-    Boolean(p.field),
-    p.interests.length > 0,
-    p.countries.length > 0,
-    Boolean(p.aidNeed),
-    Number(p.annualBudget || 0) > 0 || p.aidNeed === "full" || p.aidNeed === "none",
-    p.recLettersStarted,
-  ];
-  const filled = checks.filter(Boolean).length;
-  return Math.round((filled / checks.length) * 100);
-}
+type Signal = { id: string; text: string };
 
-function fact(value: string | null | undefined) {
-  const v = (value ?? "").trim();
-  return v || null;
+function profileSignals(p: Profile): Signal[] {
+  const out: Signal[] = [];
+  const name = `${p.firstName} ${p.lastName}`.trim();
+  if (name) out.push({ id: "name", text: name });
+  if (p.homeCountry.trim()) {
+    out.push({
+      id: "home",
+      text: `Home · ${p.homeCountry}${p.gradYear ? ` · ${p.gradYear}` : ""}`,
+    });
+  }
+  if (p.gpa.trim()) {
+    out.push({
+      id: "gpa",
+      text:
+        p.gpaScale === "ib"
+          ? `IB ${p.gpa}`
+          : p.gpaScale === "100"
+            ? `${p.gpa}/100`
+            : `GPA ${p.gpa}`,
+    });
+  } else if (p.curriculum) {
+    out.push({ id: "curr", text: `${p.curriculum.toUpperCase()} curriculum` });
+  }
+  if (p.satStatus === "done" && p.satMath.trim()) {
+    out.push({
+      id: "sat",
+      text: `SAT ${p.satMath}${p.satEbrw.trim() ? ` / ${p.satEbrw}` : ""}`,
+    });
+  } else if (p.satStatus === "planned") {
+    out.push({ id: "sat", text: "SAT planned" });
+  } else if (p.satStatus === "skip") {
+    out.push({ id: "sat", text: "No SAT" });
+  }
+  if (p.englishExam !== "none" && p.englishScore.trim()) {
+    out.push({
+      id: "eng",
+      text: `${p.englishExam.toUpperCase()} ${p.englishScore}`,
+    });
+  }
+  if (p.field) out.push({ id: "field", text: fieldLabels[p.field] });
+  if (p.interests.length) {
+    out.push({
+      id: "int",
+      text: p.interests.map((i) => i.charAt(0).toUpperCase() + i.slice(1)).join(" · "),
+    });
+  }
+  if (p.countries.length) {
+    out.push({
+      id: "place",
+      text: p.countries.map((c) => countryLabels[c]).join(", "),
+    });
+  }
+  if (p.aidNeed) {
+    out.push({
+      id: "aid",
+      text:
+        Number(p.annualBudget || 0) > 0
+          ? `Aid ${p.aidNeed} · $${Number(p.annualBudget).toLocaleString()}/yr`
+          : `Aid · ${p.aidNeed}`,
+    });
+  }
+  if (p.activities.trim() || p.researchExperience) {
+    out.push({
+      id: "act",
+      text: p.researchExperience ? "Research experience" : "Activities on file",
+    });
+  }
+  return out;
 }
 
 export default function OnboardingPage() {
   const { profile, setProfile, loadDemo, hydrated, onboardingStep, setOnboardingStep } = useRoute();
   const [error, setError] = useState<string | null>(null);
+  const [signalsOpen, setSignalsOpen] = useState(false);
   const router = useRouter();
   const stepIndex = clampOnboardingStep(onboardingStep);
   const step = ONBOARDING_STEPS[stepIndex];
-  const nextStep = ONBOARDING_STEPS[stepIndex + 1];
-  const completion = profileCompletionPercent(profile);
+  const nextChapter = ONBOARDING_STEPS[stepIndex + 1];
+  const completion = profileCompleteness(profile);
+  const signals = useMemo(() => profileSignals(profile), [profile]);
+  const isLast = stepIndex >= ONBOARDING_STEPS.length - 1;
 
   const setStep = (i: number) => setOnboardingStep(clampOnboardingStep(i));
 
@@ -79,7 +122,7 @@ export default function OnboardingPage() {
       return;
     }
     setError(null);
-    if (stepIndex >= ONBOARDING_STEPS.length - 1) {
+    if (isLast) {
       router.push("/analyze");
       return;
     }
@@ -95,212 +138,203 @@ export default function OnboardingPage() {
     setStep(stepIndex - 1);
   };
 
-  const displayName = useMemo(() => {
-    const name = `${profile.firstName} ${profile.lastName}`.trim();
-    return name || null;
-  }, [profile.firstName, profile.lastName]);
-
-  const dossierFacts = useMemo(
-    () => [
-      {
-        label: "Home",
-        value: fact(profile.homeCountry)
-          ? `${profile.homeCountry}${profile.gradYear ? ` · Class of ${profile.gradYear}` : ""}`
-          : null,
-      },
-      {
-        label: "Academics",
-        value: fact(profile.gpa)
-          ? `${profile.gpa}${profile.gpaScale === "ib" ? " IB" : profile.gpaScale === "100" ? "/100" : " GPA"} · ${profile.curriculum.toUpperCase()}`
-          : profile.curriculum
-            ? `${profile.curriculum.toUpperCase()} curriculum`
-            : null,
-      },
-      {
-        label: "Testing",
-        value:
-          profile.satStatus === "done" && profile.satMath
-            ? `SAT ${profile.satMath}${profile.satEbrw ? ` / ${profile.satEbrw}` : ""}`
-            : profile.satStatus === "skip"
-              ? "No SAT"
-              : profile.satStatus === "planned"
-                ? "SAT planned"
-                : null,
-      },
-      {
-        label: "Field",
-        value: profile.field ? fieldLabels[profile.field] : null,
-      },
-      {
-        label: "Campus fit",
-        value: profile.interests.length
-          ? profile.interests
-              .map((i) => i.charAt(0).toUpperCase() + i.slice(1))
-              .join(", ")
-          : null,
-      },
-      {
-        label: "Places",
-        value: profile.countries.length
-          ? profile.countries.map((c) => countryLabels[c]).join(", ")
-          : null,
-      },
-      {
-        label: "Aid",
-        value: profile.aidNeed
-          ? `${profile.aidNeed}${Number(profile.annualBudget || 0) > 0 ? ` · $${Number(profile.annualBudget).toLocaleString()}/yr` : ""}`
-          : null,
-      },
-    ],
-    [profile],
-  );
-
   if (!hydrated) {
     return (
       <div className="ob-shell flex min-h-dvh items-center justify-center">
-        <p className="font-mono text-[12px] tracking-[0.08em] text-[var(--text-tertiary)] uppercase">
-          Opening profile builder
-        </p>
+        <LoadingBlock label="Opening profile…" />
       </div>
     );
   }
 
-  const isLast = stepIndex >= ONBOARDING_STEPS.length - 1;
-
   return (
     <div className="ob-shell">
       <header className="ob-top">
-        <div className="ob-frame flex items-center justify-between gap-4 py-3.5">
-          <div className="flex min-w-0 items-baseline gap-4">
-            <Link href="/" className="ob-brand">
-              <span className="ob-brand-mark">Route</span>
-              <span className="ob-brand-dot" aria-hidden />
+        <div className="route-frame flex items-center justify-between gap-3 py-3">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-[15px] font-semibold tracking-tight text-primary"
+            >
+              Route
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)]" aria-hidden />
             </Link>
-            <p className="hidden truncate text-[13px] text-[var(--text-secondary)] sm:block">
-              Build your admissions profile
-            </p>
+            <span className="hidden text-[13px] text-secondary sm:inline">
+              Building your admissions profile
+            </span>
           </div>
-
-          <div className="flex items-center gap-4 sm:gap-5">
-            <div className="ob-complete" aria-label={`Profile ${completion}% complete`}>
-              <div className="ob-complete-meter" aria-hidden>
-                <span style={{ width: `${completion}%` }} />
-              </div>
-              <span className="ob-complete-label">Profile {completion}%</span>
-            </div>
-            <ObButton
-              variant="text"
+          <div className="flex items-center gap-3 sm:gap-4">
+            <p className="meta hidden tabular-nums sm:block">{completion}% on file</p>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => {
                 loadDemo();
                 router.push("/analyze");
               }}
             >
               Try demo
-            </ObButton>
+            </Button>
           </div>
         </div>
       </header>
 
-      <div className="ob-frame ob-workspace">
-        <nav className="ob-journey" aria-label="Profile journey">
-          <p className="ob-journey-kicker">Your route</p>
-          <div className="ob-journey-list">
-            {ONBOARDING_STEPS.map((s, i) => {
-              const state = i < stepIndex ? "done" : i === stepIndex ? "current" : "upcoming";
+      <div className="route-frame ob-layout">
+        {/* Mobile chapter progress */}
+        <div className="ob-mobile-chapters lg:hidden" aria-label="Profile chapters">
+          {ONBOARDING_STEPS.map((s, i) => {
+            const state =
+              i < stepIndex ? "done" : i === stepIndex ? "current" : "upcoming";
+            return (
+              <button
+                key={s.id}
+                type="button"
+                data-state={state}
+                className="ob-mobile-chip"
+                onClick={() => {
+                  setError(null);
+                  setStep(i);
+                }}
+              >
+                {state === "done" ? "✓" : null}
+                {s.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* LEFT — product journey + profile chapters */}
+        <aside className="ob-rail" aria-label="Admissions route progress">
+          <p className="label mb-3">Your route</p>
+          <ol className="ob-route-stages">
+            {JOURNEY.map((j) => {
+              const isProfile = j.id === "profile";
               return (
-                <button
-                  key={s.id}
-                  type="button"
-                  data-state={state}
-                  className="ob-journey-item"
-                  onClick={() => {
-                    setError(null);
-                    setStep(i);
-                  }}
+                <li
+                  key={j.id}
+                  className={
+                    isProfile
+                      ? "ob-route-stage is-active"
+                      : "ob-route-stage is-upcoming"
+                  }
                 >
-                  <span className="ob-journey-dot" aria-hidden />
-                  <span className="ob-journey-name">{s.label}</span>
-                </button>
+                  <span className="ob-route-dot" aria-hidden />
+                  <span>
+                    <span className="ob-route-label">{j.label}</span>
+                    {isProfile ? (
+                      <span className="ob-route-meta">
+                        {String(step.number).padStart(2, "0")} /{" "}
+                        {String(ONBOARDING_STEPS.length).padStart(2, "0")} · {step.label}
+                      </span>
+                    ) : null}
+                  </span>
+                </li>
               );
             })}
-          </div>
-          <p className="ob-journey-foot">
-            Answers feed a live profile — then a mapped university route.
-          </p>
-        </nav>
+          </ol>
 
+          <div className="ob-chapters">
+            <p className="label mb-2">Profile chapters</p>
+            <div className="ob-chapter-list">
+              {ONBOARDING_STEPS.map((s, i) => {
+                const state =
+                  i < stepIndex ? "done" : i === stepIndex ? "current" : "upcoming";
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    data-state={state}
+                    className="ob-chapter"
+                    onClick={() => {
+                      setError(null);
+                      setStep(i);
+                    }}
+                  >
+                    <span className="ob-chapter-mark" aria-hidden>
+                      {state === "done" ? "✓" : String(s.number).padStart(2, "0")}
+                    </span>
+                    <span>{s.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </aside>
+
+        {/* CENTER — current chapter */}
         <section className="ob-stage">
-          <div className="ob-stage-meta">
-            <p className="ob-stage-step">
-              {step.label} · {step.number} of {ONBOARDING_STEPS.length}
+          <div className="ob-stage-head">
+            <p className="label">
+              Profile · {String(step.number).padStart(2, "0")} /{" "}
+              {String(ONBOARDING_STEPS.length).padStart(2, "0")}
             </p>
-            <p className="ob-stage-next">
-              {nextStep ? `Next: ${nextStep.label}` : "Ready to analyze"}
-            </p>
+            {!isLast && nextChapter ? (
+              <p className="caption hidden sm:block">Next · {nextChapter.label}</p>
+            ) : (
+              <p className="caption hidden text-[var(--signal)] sm:block">Then · Understand</p>
+            )}
           </div>
 
-          <h1 className="ob-question">{step.title}</h1>
-          <p className="ob-purpose">{step.purpose}</p>
+          <h1 className="ob-question text-h1">{step.title}</h1>
+          <p className="ob-lede body text-secondary">{step.purpose}</p>
 
-          <div key={step.id} className="ob-body">
-            {renderStep(step.id, profile, setProfile)}
+          <div key={step.id} className="ob-body enter">
+            {renderStep(step.id, profile, setProfile, isLast)}
           </div>
 
           {error ? (
-            <p role="alert" className="ob-error">
+            <Alert tone="error" className="mt-5">
               {error}
-            </p>
+            </Alert>
           ) : null}
 
           <div className="ob-actions">
-            <ObButton variant="ghost" onClick={goBack}>
+            <Button variant="secondary" onClick={goBack}>
               {stepIndex === 0 ? "Leave" : "Back"}
-            </ObButton>
-            <ObButton variant="primary" onClick={goNext}>
-              {isLast ? "Analyze my profile" : "Continue building"}
-            </ObButton>
+            </Button>
+            <Button variant="signal" size="lg" onClick={goNext}>
+              {isLast ? "Build my route" : "Continue"}
+            </Button>
           </div>
         </section>
 
-        <aside className="ob-dossier" aria-label="Live profile">
-          <p className="ob-dossier-kicker">Live profile</p>
-          <p className="ob-dossier-name" data-empty={!displayName}>
-            {displayName ?? "Student profile"}
-          </p>
-          <p className="ob-dossier-sub">
-            {completion === 0
-              ? "Answers appear here as you build."
-              : completion < 50
-                ? "Profile taking shape."
-                : completion < 85
-                  ? "Strong enough to start mapping."
-                  : "Ready for analysis."}
-          </p>
+        {/* RIGHT — profile signals */}
+        <aside className="ob-signals" aria-label="Profile signals">
+          <button
+            type="button"
+            className="ob-signals-toggle md:hidden"
+            aria-expanded={signalsOpen}
+            onClick={() => setSignalsOpen((v) => !v)}
+          >
+            <span className="label">Profile signals</span>
+            <span className="meta">
+              {signals.length ? `${signals.length} on file` : "Empty"} · {signalsOpen ? "Hide" : "Show"}
+            </span>
+          </button>
 
-          <div className="ob-dossier-progress">
-            <div className="ob-dossier-progress-row">
-              <span>Completeness</span>
-              <span>{completion}%</span>
-            </div>
-            <div className="ob-dossier-bar" aria-hidden>
-              <span style={{ width: `${completion}%` }} />
-            </div>
+          <div className={signalsOpen ? "ob-signals-panel is-open" : "ob-signals-panel"}>
+            <p className="label mb-3 hidden md:block">Profile signals</p>
+            {signals.length === 0 ? (
+              <p className="text-[13px] leading-5 text-tertiary">
+                Answers appear here as you build — so you can see the profile taking shape.
+              </p>
+            ) : (
+              <ul className="ob-signal-list">
+                {signals.map((s) => (
+                  <li key={s.id} className="ob-signal enter">
+                    <span className="ob-signal-check" aria-hidden>
+                      ✓
+                    </span>
+                    <span>{s.text}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="ob-signals-note">
+              {isLast
+                ? "Next we turn this profile into a diagnosis — then campus options with reasons."
+                : "You give the important pieces. Route turns them into a mapped admissions path."}
+            </p>
           </div>
-
-          <dl className="ob-dossier-facts">
-            {dossierFacts.map((f) => (
-              <div key={f.label} className="ob-fact" data-filled={Boolean(f.value)}>
-                <dt>{f.label}</dt>
-                <dd data-empty={!f.value}>{f.value ?? "Not set yet"}</dd>
-              </div>
-            ))}
-          </dl>
-
-          <p className="ob-dossier-hint">
-            {nextStep
-              ? `After ${step.label.toLowerCase()}, you’ll add ${nextStep.label.toLowerCase()} — then Route can shortlist with reasons.`
-              : "Analyze to turn this profile into a university route with explanations."}
-          </p>
         </aside>
       </div>
     </div>
@@ -311,36 +345,37 @@ function renderStep(
   id: OnboardingStepId,
   profile: ReturnType<typeof useRoute>["profile"],
   setProfile: ReturnType<typeof useRoute>["setProfile"],
+  isLast: boolean,
 ) {
   switch (id) {
     case "academic":
       return (
-        <div className="space-y-7">
-          <div className="grid gap-x-5 gap-y-5 sm:grid-cols-2">
-            <ObField label="First name">
-              <ObInput
+        <div className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="First name">
+              <Input
                 autoFocus
                 value={profile.firstName}
                 onChange={(e) => setProfile({ firstName: e.target.value })}
                 placeholder="Amira"
               />
-            </ObField>
-            <ObField label="Last name">
-              <ObInput
+            </Field>
+            <Field label="Last name">
+              <Input
                 value={profile.lastName}
                 onChange={(e) => setProfile({ lastName: e.target.value })}
                 placeholder="Hassan"
               />
-            </ObField>
-            <ObField label="Home country">
-              <ObInput
+            </Field>
+            <Field label="Home country">
+              <Input
                 value={profile.homeCountry}
                 onChange={(e) => setProfile({ homeCountry: e.target.value })}
                 placeholder="Kenya"
               />
-            </ObField>
-            <ObField label="Graduation year">
-              <ObSegmented<`${GradYear}`>
+            </Field>
+            <Field label="Graduation year">
+              <Segmented<`${GradYear}`>
                 value={`${profile.gradYear}`}
                 onChange={(v) => setProfile({ gradYear: Number(v) as GradYear })}
                 options={[
@@ -349,13 +384,13 @@ function renderStep(
                   { value: "2028", label: "2028" },
                 ]}
               />
-            </ObField>
+            </Field>
           </div>
 
-          <div className="ob-divider" />
+          <div className="hairline" />
 
-          <ObField label="Curriculum">
-            <ObSegmented<Curriculum>
+          <Field label="Curriculum">
+            <Segmented<Curriculum>
               value={profile.curriculum}
               onChange={(v) => setProfile({ curriculum: v })}
               options={[
@@ -365,22 +400,22 @@ function renderStep(
                 { value: "national", label: "National" },
               ]}
             />
-          </ObField>
+          </Field>
 
-          <div className="grid gap-x-5 gap-y-5 sm:grid-cols-2">
-            <ObField
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field
               label={profile.gpaScale === "ib" ? "IB points" : "GPA"}
               hint="Optional if you do not have a number yet."
             >
-              <ObInput
+              <Input
                 inputMode="decimal"
                 value={profile.gpa}
                 onChange={(e) => setProfile({ gpa: e.target.value })}
                 placeholder={profile.gpaScale === "ib" ? "38" : "3.8"}
               />
-            </ObField>
-            <ObField label="Scale">
-              <ObSegmented
+            </Field>
+            <Field label="Scale">
+              <Segmented
                 value={profile.gpaScale}
                 onChange={(v) => setProfile({ gpaScale: v })}
                 options={[
@@ -389,7 +424,7 @@ function renderStep(
                   { value: "ib", label: "IB 45" },
                 ]}
               />
-            </ObField>
+            </Field>
           </div>
         </div>
       );
@@ -398,8 +433,8 @@ function renderStep(
       return (
         <div className="space-y-8">
           <div>
-            <p className="ob-section-label">SAT</p>
-            <ObOptionRows
+            <p className="label mb-3">SAT</p>
+            <OptionRows
               value={profile.satStatus}
               onChange={(v) => setProfile({ satStatus: v })}
               options={[
@@ -409,31 +444,30 @@ function renderStep(
               ]}
             />
             {profile.satStatus === "done" ? (
-              <div className="mt-5 grid gap-5 sm:grid-cols-2">
-                <ObField label="SAT Math">
-                  <ObInput
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <Field label="SAT Math">
+                  <Input
                     autoFocus
                     inputMode="numeric"
                     value={profile.satMath}
                     onChange={(e) => setProfile({ satMath: e.target.value })}
                     placeholder="760"
                   />
-                </ObField>
-                <ObField label="SAT ERW">
-                  <ObInput
+                </Field>
+                <Field label="SAT ERW">
+                  <Input
                     inputMode="numeric"
                     value={profile.satEbrw}
                     onChange={(e) => setProfile({ satEbrw: e.target.value })}
                     placeholder="710"
                   />
-                </ObField>
+                </Field>
               </div>
             ) : null}
           </div>
-
           <div>
-            <p className="ob-section-label">English proficiency</p>
-            <ObSegmented<EnglishExam>
+            <p className="label mb-3">English proficiency</p>
+            <Segmented<EnglishExam>
               value={profile.englishExam}
               onChange={(v) => setProfile({ englishExam: v })}
               options={[
@@ -444,9 +478,9 @@ function renderStep(
               ]}
             />
             {profile.englishExam !== "none" ? (
-              <div className="mt-5 max-w-xs">
-                <ObField label="Score">
-                  <ObInput
+              <div className="mt-4 max-w-xs">
+                <Field label="Score">
+                  <Input
                     value={profile.englishScore}
                     onChange={(e) => setProfile({ englishScore: e.target.value })}
                     placeholder={
@@ -457,7 +491,7 @@ function renderStep(
                           : "130"
                     }
                   />
-                </ObField>
+                </Field>
               </div>
             ) : null}
           </div>
@@ -466,28 +500,28 @@ function renderStep(
 
     case "activities":
       return (
-        <div className="space-y-7">
-          <ObField
+        <div className="space-y-6">
+          <Field
             label="What you spend time on"
             hint="Clubs, projects, work, volunteering — short phrases are enough."
           >
-            <ObTextArea
+            <TextArea
               autoFocus
               value={profile.activities}
               onChange={(e) => setProfile({ activities: e.target.value })}
               placeholder="Robotics captain · coding club · family business weekends"
             />
-          </ObField>
-          <ObField label="Achievements" hint="Optional awards, olympiads, publications.">
-            <ObTextArea
+          </Field>
+          <Field label="Achievements" hint="Optional awards, olympiads, publications.">
+            <TextArea
               value={profile.achievements}
               onChange={(e) => setProfile({ achievements: e.target.value })}
               placeholder="National olympiad shortlist · research fair winner"
             />
-          </ObField>
+          </Field>
           <div>
-            <p className="ob-section-label">Research experience</p>
-            <ObSegmented
+            <p className="label mb-3">Research experience</p>
+            <Segmented
               value={profile.researchExperience ? "yes" : "no"}
               onChange={(v) => setProfile({ researchExperience: v === "yes" })}
               options={[
@@ -503,8 +537,11 @@ function renderStep(
       return (
         <div className="space-y-8">
           <div>
-            <p className="ob-section-label">Intended field</p>
-            <ObSelectList<StudyField>
+            <div className="mb-3 flex items-baseline justify-between gap-3">
+              <p className="label">Intended field</p>
+              <p className="caption">Choose one</p>
+            </div>
+            <ChoiceGrid<StudyField>
               value={profile.field}
               onChange={(v) => setProfile({ field: v as StudyField })}
               options={[
@@ -517,8 +554,15 @@ function renderStep(
             />
           </div>
           <div>
-            <p className="ob-section-label">Campus strengths that matter</p>
-            <ObSelectList<Interest>
+            <div className="mb-3 flex items-baseline justify-between gap-3">
+              <p className="label">Campus strengths that matter</p>
+              <p className="caption">
+                {profile.interests.length
+                  ? `${profile.interests.length} selected`
+                  : "Select at least one"}
+              </p>
+            </div>
+            <ChoiceGrid<Interest>
               multiple
               value={profile.interests}
               onChange={(v) => setProfile({ interests: v as Interest[] })}
@@ -537,29 +581,32 @@ function renderStep(
     case "place":
       return (
         <div>
-          <p className="ob-section-label">Where you will apply</p>
-          <ObCountryGrid<CountryId>
+          <div className="mb-3 flex items-baseline justify-between gap-3">
+            <p className="label">Countries</p>
+            <p className="caption">
+              {profile.countries.length
+                ? `${profile.countries.length} selected`
+                : "Select at least one"}
+            </p>
+          </div>
+          <ChoiceGrid<CountryId>
+            multiple
             value={profile.countries}
-            onChange={(v) => setProfile({ countries: v })}
+            onChange={(v) => setProfile({ countries: v as CountryId[] })}
             options={(Object.keys(countryLabels) as CountryId[]).map((cid) => ({
               value: cid,
               label: countryLabels[cid],
             }))}
           />
-          <p className="mt-4 text-[12.5px] leading-5 text-[var(--text-tertiary)]">
-            {profile.countries.length
-              ? `${profile.countries.length} in profile — unchecked countries leave the shortlist.`
-              : "Select every region you are willing to apply to."}
-          </p>
         </div>
       );
 
     case "aid":
       return (
-        <div className="space-y-8">
+        <div className="space-y-7">
           <div>
-            <p className="ob-section-label">Aid need</p>
-            <ObOptionRows<AidNeed>
+            <p className="label mb-3">Aid need</p>
+            <OptionRows<AidNeed>
               value={profile.aidNeed}
               onChange={(v) => setProfile({ aidNeed: v })}
               options={[
@@ -586,7 +633,7 @@ function renderStep(
               ]}
             />
           </div>
-          <ObRange
+          <ProfileRange
             label="Annual family contribution"
             value={Number(profile.annualBudget || 0)}
             onChange={(n) => setProfile({ annualBudget: String(n) })}
@@ -602,8 +649,8 @@ function renderStep(
       return (
         <div className="space-y-7">
           <div>
-            <p className="ob-section-label">Recommendation letters</p>
-            <ObSegmented
+            <p className="label mb-3">Recommendation letters</p>
+            <Segmented
               value={profile.recLettersStarted ? "yes" : "no"}
               onChange={(v) => setProfile({ recLettersStarted: v === "yes" })}
               options={[
@@ -613,35 +660,40 @@ function renderStep(
             />
           </div>
 
-          <div className="ob-goals-sheet">
-            <p className="ob-section-label">Profile ready for analysis</p>
-            <p className="mt-1 text-[22px] font-medium tracking-tight">
+          <div className="ob-complete-panel">
+            <p className="label">Profile complete</p>
+            <p className="mt-2 text-[22px] font-medium tracking-tight">
               {profile.firstName || "—"} {profile.lastName}
             </p>
-            <dl className="ob-goals-grid">
-              <div className="ob-fact">
-                <dt>Field</dt>
-                <dd data-empty={!profile.field}>
+            <p className="body mt-2 text-secondary">
+              {isLast
+                ? "Your profile is ready. Next, we’ll turn it into a concise admissions diagnosis."
+                : "Finish earlier chapters before analyzing."}
+            </p>
+            <dl className="ob-complete-grid mt-5">
+              <div>
+                <dt className="caption">Field</dt>
+                <dd className="text-[14px] font-medium">
                   {profile.field ? fieldLabels[profile.field] : "—"}
                 </dd>
               </div>
-              <div className="ob-fact">
-                <dt>Aid</dt>
-                <dd className="capitalize" data-empty={!profile.aidNeed}>
-                  {profile.aidNeed || "—"}
-                </dd>
+              <div>
+                <dt className="caption">Aid</dt>
+                <dd className="text-[14px] font-medium capitalize">{profile.aidNeed || "—"}</dd>
               </div>
-              <div className="ob-fact">
-                <dt>Countries</dt>
-                <dd data-empty={!profile.countries.length}>
+              <div>
+                <dt className="caption">Countries</dt>
+                <dd className="text-[14px] font-medium">
                   {profile.countries.length
                     ? profile.countries.map((c) => countryLabels[c]).join(", ")
                     : "—"}
                 </dd>
               </div>
-              <div className="ob-fact">
-                <dt>Budget</dt>
-                <dd>${Number(profile.annualBudget || 0).toLocaleString()}/yr</dd>
+              <div>
+                <dt className="caption">Budget</dt>
+                <dd className="text-[14px] font-medium">
+                  ${Number(profile.annualBudget || 0).toLocaleString()}/yr
+                </dd>
               </div>
             </dl>
           </div>

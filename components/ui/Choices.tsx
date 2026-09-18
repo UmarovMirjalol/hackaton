@@ -25,9 +25,9 @@ export function Segmented<T extends string>({
             aria-pressed={active}
             onClick={() => onChange(opt.value)}
             className={cn(
-              "min-h-9 flex-1 rounded-[calc(var(--radius-md)-1px)] px-2.5 text-[12.5px] font-medium transition-colors duration-150",
+              "min-h-10 flex-1 rounded-[calc(var(--radius-md)-1px)] px-3 text-[13px] font-medium transition-[background-color,color,transform] duration-[var(--duration)] active:scale-[0.99]",
               active
-                ? "bg-surface text-primary"
+                ? "bg-surface text-primary shadow-[inset_0_0_0_1px_var(--border-strong)]"
                 : "bg-surface-muted/80 text-secondary hover:bg-surface hover:text-primary",
             )}
           >
@@ -71,14 +71,78 @@ export function ChoiceGrid<T extends string>({
               onChange(next as T[]);
             }}
             className={cn(
-              "border px-3.5 py-3 text-left transition-[background-color,border-color] duration-150 rounded-[var(--radius-md)]",
+              "flex items-start gap-3 border px-3.5 py-3 text-left transition-[background-color,border-color,transform] duration-[var(--duration)] rounded-[var(--radius-md)] active:scale-[0.995]",
               on
-                ? "border-primary bg-surface shadow-[inset_3px_0_0_0_var(--signal)]"
+                ? "border-[var(--signal)] bg-[var(--signal-subtle)]"
                 : "border-border bg-surface hover:border-border-strong",
             )}
           >
-            <div className="text-[13.5px] font-medium text-primary">{opt.label}</div>
-            {opt.hint ? <div className="mt-0.5 text-[12px] text-tertiary">{opt.hint}</div> : null}
+            <span
+              className={cn(
+                "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center border text-[10px] transition-colors",
+                multiple ? "rounded-[3px]" : "rounded-full",
+                on
+                  ? "border-[var(--signal)] bg-[var(--signal)] text-white"
+                  : "border-border-strong bg-surface text-transparent",
+              )}
+              aria-hidden
+            >
+              ✓
+            </span>
+            <span className="min-w-0">
+              <span className={cn("block text-[14px]", on ? "font-medium text-primary" : "text-secondary")}>
+                {opt.label}
+              </span>
+              {opt.hint ? <span className="mt-0.5 block text-[12px] text-tertiary">{opt.hint}</span> : null}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Full-width decision rows — aid, SAT status */
+export function OptionRows<T extends string>({
+  value,
+  onChange,
+  options,
+}: {
+  value: T | "";
+  onChange: (v: T) => void;
+  options: { value: T; label: string; hint?: string }[];
+}) {
+  return (
+    <div role="radiogroup" className="grid gap-2">
+      {options.map((opt) => {
+        const on = value === opt.value;
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            role="radio"
+            aria-checked={on}
+            onClick={() => onChange(opt.value)}
+            className={cn(
+              "grid w-full grid-cols-[1rem_1fr] gap-3 border px-3.5 py-3.5 text-left transition-[background-color,border-color,transform] duration-[var(--duration)] rounded-[var(--radius-md)] active:scale-[0.995]",
+              on
+                ? "border-[var(--signal)] bg-[var(--signal-subtle)]"
+                : "border-border bg-surface hover:border-border-strong",
+            )}
+          >
+            <span
+              className={cn(
+                "mt-1 h-3.5 w-3.5 rounded-full border-2 transition-colors",
+                on ? "border-[var(--signal)] bg-[var(--signal)]" : "border-border-strong",
+              )}
+              aria-hidden
+            />
+            <span>
+              <span className="block text-[14.5px] font-medium text-primary">{opt.label}</span>
+              {opt.hint ? (
+                <span className="mt-0.5 block text-[12.5px] leading-5 text-tertiary">{opt.hint}</span>
+              ) : null}
+            </span>
           </button>
         );
       })}
