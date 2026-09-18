@@ -56,6 +56,33 @@ export default function ProfilePage() {
         ) : undefined
       }
     >
+      {complete >= 65 ? (
+        <div className="mb-8 border-b border-border pb-6">
+          <p className="label">Candidate dossier</p>
+          <p className="mt-2 text-[22px] font-medium tracking-tight">
+            {profile.firstName || "Your"} {profile.lastName}
+          </p>
+          <dl className="mt-4 grid gap-x-8 gap-y-2 text-[13px] sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <dt className="text-tertiary">Field</dt>
+              <dd className="font-medium">{fieldLabels[profile.field]}</dd>
+            </div>
+            <div>
+              <dt className="text-tertiary">Aid</dt>
+              <dd className="font-medium capitalize">{profile.aidNeed}</dd>
+            </div>
+            <div>
+              <dt className="text-tertiary">Countries</dt>
+              <dd className="font-medium">{profile.countries.map((c) => countryLabels[c]).join(", ")}</dd>
+            </div>
+            <div>
+              <dt className="text-tertiary">Budget</dt>
+              <dd className="font-medium">${Number(profile.annualBudget || 0).toLocaleString()}/yr</dd>
+            </div>
+          </dl>
+        </div>
+      ) : null}
+
       <div className="mb-4 lg:mb-6">
         <div className="mb-2 flex items-center justify-between gap-2 lg:hidden">
           <p className="label">
