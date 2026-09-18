@@ -5,6 +5,10 @@ import { flushSync } from "react-dom";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { CampusMedia } from "@/components/CampusMedia";
+import {
+  CampusScrollPreview,
+  useActiveCampus,
+} from "@/components/CampusScrollPreview";
 import { MatchDetail } from "@/components/MatchDetail";
 import { NextUp } from "@/components/NextUp";
 import { StatusBadge } from "@/components/ui/Badges";
@@ -51,6 +55,12 @@ export default function ResultsPage() {
   };
 
   const canCompare = compareIds.length >= 2;
+
+  const campusIds = useMemo(() => visible.map((r) => r.university.id), [visible]);
+  const [activeCampusId] = useActiveCampus(
+    campusIds,
+    hydrated && profileReady(profile) && visible.length > 0,
+  );
 
   return (
     <AppShell
@@ -211,35 +221,46 @@ export default function ResultsPage() {
         </label>
       </div>
 
-      <ul className="results-list space-y-0">
-        {visible.map((row, i) => {
-          const context = explanationContexts[i];
-          const resolved = context
-            ? getExplanation(row.university.id, context)
-            : {
-                explanation: explanations[row.university.id]?.explanation ?? null,
-                pending: explanations[row.university.id]?.pending ?? false,
-              };
-          return (
-            <li
-              key={`${row.university.id}-${row.fitIndex}-${row.why.slice(0, 24)}`}
-              className="results-item"
-              style={{ animationDelay: `${Math.min(i, 6) * 55}ms` }}
-            >
-              <ResultCard
-                row={row}
-                rank={i + 1}
-                featured={i === 0}
-                selected={compareIds.includes(row.university.id)}
-                onToggle={() => toggleCompare(row.university.id)}
-                onOpen={() => setDetail(row)}
-                explanation={resolved.explanation}
-                explanationPending={resolved.pending}
-              />
-            </li>
-          );
-        })}
-      </ul>
+      <div className="results-stage">
+        <CampusScrollPreview
+          rows={visible}
+          activeId={activeCampusId}
+          onSelect={(row) => setDetail(row)}
+        />
+
+        <ul className="results-list space-y-0">
+          {visible.map((row, i) => {
+            const context = explanationContexts[i];
+            const resolved = context
+              ? getExplanation(row.university.id, context)
+              : {
+                  explanation: explanations[row.university.id]?.explanation ?? null,
+                  pending: explanations[row.university.id]?.pending ?? false,
+                };
+            const isActive = activeCampusId === row.university.id;
+            return (
+              <li
+                key={`${row.university.id}-${row.fitIndex}-${row.why.slice(0, 24)}`}
+                className={cn("results-item", isActive && "is-active-campus")}
+                data-campus-id={row.university.id}
+                style={{ animationDelay: `${Math.min(i, 6) * 55}ms` }}
+              >
+                <ResultCard
+                  row={row}
+                  rank={i + 1}
+                  featured={i === 0}
+                  active={isActive}
+                  selected={compareIds.includes(row.university.id)}
+                  onToggle={() => toggleCompare(row.university.id)}
+                  onOpen={() => setDetail(row)}
+                  explanation={resolved.explanation}
+                  explanationPending={resolved.pending}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      </div>
 
       {!visible.length ? (
         <EmptyState
@@ -277,6 +298,7 @@ function ResultCard({
   row,
   rank,
   featured,
+  active,
   selected,
   onToggle,
   onOpen,
@@ -286,6 +308,7 @@ function ResultCard({
   row: RankedUniversity;
   rank: number;
   featured?: boolean;
+  active?: boolean;
   selected: boolean;
   onToggle: () => void;
   onOpen: () => void;
@@ -298,18 +321,17 @@ function ResultCard({
   return (
     <article
       className={cn(
-        featured
-          ? "result-card featured-card group grid gap-5 border-b-0 py-6 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:gap-8 sm:py-7"
-          : "result-card group grid gap-5 border-b border-border py-8 sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-8",
+        "result-card group grid gap-5 py-8",
+        featured && "featured-card border-b-0 py-6 sm:py-7",
+        !featured && "border-b border-border",
+        active && "is-active",
+        "result-card-split sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-7",
       )}
     >
       <button
         type="button"
         onClick={onOpen}
-        className={cn(
-          "relative overflow-hidden text-left outline-none focus-visible:shadow-[var(--shadow-focus)]",
-          featured ? "aspect-[16/11] sm:min-h-[280px] sm:aspect-auto" : "aspect-[4/5]",
-        )}
+        className="result-card-thumb relative aspect-[4/5] overflow-hidden text-left outline-none focus-visible:shadow-[var(--shadow-focus)]"
       >
         <CampusMedia
           universityId={u.id}
@@ -318,17 +340,12 @@ function ResultCard({
           alt={`${u.name} campus`}
           className="absolute inset-0"
           priority={rank < 2}
-          sizes={featured ? "(max-width: 640px) 100vw, 480px" : "180px"}
+          sizes="140px"
           overlay
         />
         <span className="absolute left-2.5 top-2.5 z-[1] font-mono text-[10px] tracking-[0.14em] text-white">
           {String(rank).padStart(2, "0")}
         </span>
-        {featured ? (
-          <span className="absolute bottom-3 left-3 z-[1] text-[11px] font-medium tracking-wide text-white/90">
-            Strongest fit on this route
-          </span>
-        ) : null}
       </button>
 
       <div className="min-w-0">

@@ -1,4 +1,171 @@
-/* Results — list entrance + filter chip flow */
+/* Results — scroll-synced campus stage + list entrance */
+
+.results-stage {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .results-stage {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: 2.25rem;
+  }
+
+  /* Large sticky preview carries the photography; keep list thumbs compact. */
+  .results-stage .result-card-thumb {
+    display: none;
+  }
+
+  .results-stage .result-card-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ——— Sticky campus preview ——— */
+
+.campus-scroll-preview {
+  display: none;
+}
+
+@media (min-width: 1100px) {
+  .campus-scroll-preview {
+    display: block;
+    position: sticky;
+    top: 6.5rem;
+    align-self: start;
+  }
+}
+
+.campus-scroll-stage {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  max-height: min(72vh, 640px);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--signal) 14%, var(--border));
+  border-radius: var(--radius-xl);
+  background: #102026;
+  box-shadow: var(--shadow-soft);
+}
+
+.campus-scroll-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.06);
+  filter: saturate(0.85) brightness(0.92);
+  transition:
+    opacity 720ms var(--ease-out),
+    transform 900ms var(--ease-out),
+    filter 900ms var(--ease-out);
+  will-change: opacity, transform;
+}
+
+.campus-scroll-layer.is-current {
+  opacity: 1;
+  transform: scale(1);
+  filter: saturate(1.05) brightness(1);
+  z-index: 2;
+}
+
+.campus-scroll-layer.is-leaving {
+  opacity: 0;
+  transform: scale(1.03);
+  filter: saturate(0.9) brightness(0.88);
+  z-index: 1;
+}
+
+.campus-scroll-layer .campus-media-img {
+  transform: scale(1.04);
+  transition: transform 1.4s var(--ease-out);
+}
+
+.campus-scroll-layer.is-current .campus-media-img {
+  transform: scale(1);
+}
+
+.campus-scroll-meta {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 3;
+  padding: 1.35rem 1.35rem 1.4rem;
+  color: #fff;
+  background: linear-gradient(180deg, transparent 0%, rgba(8, 16, 18, 0.78) 55%, rgba(8, 16, 18, 0.92) 100%);
+  transform: translateY(6px);
+  animation: campus-meta-in 520ms var(--ease-out) both;
+}
+
+@keyframes campus-meta-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.campus-scroll-rank {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.campus-scroll-name {
+  margin-top: 0.45rem;
+  font-family: var(--font-display), "Times New Roman", serif;
+  font-size: clamp(1.35rem, 2vw, 1.85rem);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.campus-scroll-place {
+  margin-top: 0.35rem;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.campus-scroll-fit {
+  margin-top: 0.55rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--signal-subtle) 80%, white);
+}
+
+.campus-scroll-open {
+  margin-top: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  height: 2rem;
+  padding: 0 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+  transition:
+    background-color var(--duration) var(--ease-out),
+    border-color var(--duration) var(--ease-out),
+    transform var(--duration) var(--ease-out);
+}
+
+.campus-scroll-open:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
+}
+
+.campus-scroll-hint {
+  margin-top: 0.75rem;
+  padding-inline: 0.15rem;
+}
+
+/* ——— List entrance + active card ——— */
 
 .results-item {
   opacity: 0;
@@ -13,16 +180,29 @@
   }
 }
 
+.results-item.is-active-campus .result-card {
+  background: color-mix(in srgb, var(--signal-subtle) 42%, var(--surface));
+  box-shadow: var(--shadow-soft);
+}
+
+.results-item.is-active-campus .result-card::before {
+  transform: scaleY(1);
+}
+
 .result-card {
-  padding-inline: 0.5rem;
-  margin-inline: -0.5rem;
+  padding-inline: 0.65rem;
+  margin-inline: -0.65rem;
   border-radius: var(--radius-xl);
+  transition:
+    background-color var(--duration-slow) var(--ease),
+    box-shadow var(--duration-slow) var(--ease),
+    border-color var(--duration) var(--ease);
 }
 
 .result-card.featured-card {
   padding: 0.85rem;
-  margin-inline: -0.5rem;
-  margin-bottom: 0.5rem;
+  margin-inline: -0.65rem;
+  margin-bottom: 0.35rem;
   background:
     linear-gradient(
       145deg,
@@ -68,6 +248,26 @@
     opacity: 1;
     transform: none;
     animation: none;
+  }
+
+  .campus-scroll-layer,
+  .campus-scroll-layer.is-current,
+  .campus-scroll-layer.is-leaving,
+  .campus-scroll-layer .campus-media-img,
+  .campus-scroll-meta,
+  .campus-scroll-open {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .campus-scroll-layer.is-current {
+    opacity: 1;
+  }
+
+  .campus-scroll-layer.is-leaving {
+    opacity: 0;
   }
 
   .results-filters button,
