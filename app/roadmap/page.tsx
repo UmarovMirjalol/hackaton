@@ -38,21 +38,30 @@ export default function RoadmapPage() {
         ) : undefined
       }
     >
-      <div className="mb-8 flex gap-2 overflow-x-auto">
-        {roadmapPicks.slice(0, 3).map((c) => (
-          <div key={c.university.id} className="flex min-w-[180px] items-center gap-2 py-1">
-            <CampusThumb
-              universityId={c.university.id}
-              alt={c.university.shortName}
-              className="h-10 w-14 rounded-[var(--radius-sm)]"
-            />
-            <div className="min-w-0">
-              <p className="small truncate font-medium">{c.university.shortName}</p>
-              <p className="caption truncate">{c.university.city}</p>
-            </div>
+      {roadmapPicks.length > 0 ? (
+        <section aria-label="Shortlist for this route" className="mb-8 border-b border-border pb-6">
+          <p className="label mb-3">This route is built for</p>
+          <div className="flex gap-4 overflow-x-auto pb-1">
+            {roadmapPicks.slice(0, 3).map((c) => (
+              <div
+                key={c.university.id}
+                className="flex min-w-[200px] shrink-0 items-center gap-3 rounded-[var(--radius-md)] border border-border bg-surface px-3 py-2"
+              >
+                <CampusThumb
+                  universityId={c.university.id}
+                  alt={c.university.shortName}
+                  className="h-12 w-[4.5rem] shrink-0 rounded-[var(--radius-sm)]"
+                />
+                <div className="min-w-0">
+                  <p className="text-[13px] font-medium truncate">{c.university.shortName}</p>
+                  <p className="caption truncate">{c.university.city}</p>
+                  <p className="meta mt-0.5">Fit {c.fitIndex}</p>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </section>
+      ) : null}
 
       <div className="grid gap-10 lg:grid-cols-12">
         <section className="lg:col-span-8">

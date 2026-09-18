@@ -26,7 +26,7 @@ export default function UniversitiesPage() {
     [recs, profile.countries],
   );
 
-  const filterSig = `${profile.field}|${profile.aidNeed}|${profile.countries.join(",")}`;
+  const filterSig = `${profile.field}|${profile.aidNeed}|${profile.annualBudget}|${profile.countries.join(",")}|${profile.satMath}-${profile.satEbrw}`;
 
   const goCompare = (extraId?: string) => {
     const ids = [...compareIds];
@@ -146,7 +146,7 @@ export default function UniversitiesPage() {
           ) : (
             <ul className="divide-y divide-border">
               {visible.map((row, i) => (
-                <li key={row.university.id} className="py-6 first:pt-0">
+                <li key={`${row.university.id}-${row.fitIndex}`} className="py-6 first:pt-0">
                   <UniversityCard
                     row={row}
                     rank={i + 1}

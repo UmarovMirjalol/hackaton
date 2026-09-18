@@ -47,7 +47,7 @@ export function UniversityCard({
             alt={img.caption}
             fill
             sizes="168px"
-            className="object-cover transition-opacity duration-200 group-hover:opacity-92"
+            className="object-cover transition-[transform,opacity] duration-300 ease-out group-hover:scale-[1.03] group-hover:opacity-95"
             priority={rank < 2}
           />
         ) : null}
