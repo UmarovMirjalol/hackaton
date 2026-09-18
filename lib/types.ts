@@ -10,6 +10,7 @@ export type CountryId =
   | "ca"
   | "uk"
   | "ae"
+  | "hk"
   | "nl"
   | "de"
   | "ch";

@@ -95,6 +95,16 @@ const profiles: { name: string; profile: Profile }[] = [
       researchExperience: true,
     }),
   },
+  {
+    name: "G — Hong Kong + can pay + CS",
+    profile: base({
+      countries: ["hk"],
+      aidNeed: "none",
+      annualBudget: "55000",
+      field: "cs",
+      interests: ["building", "research"],
+    }),
+  },
 ];
 
 function assertCatalog() {
