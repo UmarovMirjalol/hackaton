@@ -152,12 +152,13 @@ export function fallbackRecommendationExplanation(
 
   const clauses: string[] = [];
   if (academic?.value) {
-    const academicValue = academic.value.replace(/^Offers\s+/i, "offers ").toLowerCase();
-    clauses.push(
-      academic.tone === "good"
-        ? `${academicValue} aligns with your ${field} direction`
-        : `academic overlap is limited (${academic.value.toLowerCase()})`,
-    );
+    if (/^offers\s+/i.test(academic.value)) {
+      clauses.push(`${academic.value.toLowerCase()} for your ${field} direction`);
+    } else if (academic.tone === "good") {
+      clauses.push(`academic fit is “${academic.value.toLowerCase()}” for ${field}`);
+    } else {
+      clauses.push(`academic overlap is limited (${academic.value.toLowerCase()})`);
+    }
   }
   if (financial?.value) {
     clauses.push(
