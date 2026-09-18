@@ -203,6 +203,16 @@
   font-weight: 500;
 }
 
+/* Underline fields use border focus — avoid global boxed outline */
+.ob-shell input:not([type="range"]):focus-visible,
+.ob-shell textarea:focus-visible {
+  outline: none;
+}
+
+.ob-body {
+  padding-bottom: 0.5rem;
+}
+
 /* 1280 */
 @media (min-width: 1280px) {
   .ob-shell {
@@ -222,14 +232,14 @@
   }
 }
 
-/* Tablet */
+/* Tablet / below desktop rail */
 @media (max-width: 1023px) {
   .ob-question {
     max-width: none;
   }
 
-  .ob-main {
-    padding-bottom: 0.5rem;
+  .ob-body {
+    padding-bottom: 4.5rem;
   }
 }
 
@@ -248,8 +258,12 @@
     font-size: 0.875rem;
   }
 
+  .ob-body {
+    padding-bottom: 5.5rem;
+  }
+
   .ob-footer {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
   }
 }

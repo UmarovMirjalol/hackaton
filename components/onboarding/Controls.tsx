@@ -224,7 +224,7 @@ export function ObSelectList<T extends string>({
   );
 }
 
-/** Country multi-select as refined toggles */
+/** Country multi-select — editorial destination list */
 export function ObCountryGrid<T extends string>({
   value,
   onChange,
@@ -235,7 +235,7 @@ export function ObCountryGrid<T extends string>({
   options: { value: T; label: string }[];
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="grid gap-0 sm:grid-cols-2 sm:gap-x-10">
       {options.map((opt) => {
         const on = value.includes(opt.value);
         return (
@@ -250,13 +250,24 @@ export function ObCountryGrid<T extends string>({
               onChange(next);
             }}
             className={cn(
-              "h-11 border px-4 text-[13.5px] font-medium transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--signal)]",
-              on
-                ? "border-[var(--ink,#0b0d12)] bg-[var(--ink,#0b0d12)] text-white"
-                : "border-[var(--border)] bg-transparent text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]",
+              "group flex w-full items-center justify-between gap-3 border-b border-[var(--border)] py-3.5 text-left transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--signal)]",
+              on ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
             )}
           >
-            {opt.label}
+            <span className={cn("text-[15px] tracking-tight", on && "font-medium")}>{opt.label}</span>
+            <span
+              className={cn(
+                "flex h-5 w-5 shrink-0 items-center justify-center border transition-colors duration-150",
+                on
+                  ? "border-[var(--ink,#0b0d12)] bg-[var(--ink,#0b0d12)] text-white"
+                  : "border-[var(--border-strong)] bg-transparent text-transparent group-hover:border-[var(--text-tertiary)]",
+              )}
+              aria-hidden
+            >
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                <path d="M1 3.5L3.8 6.3L9 1" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
+            </span>
           </button>
         );
       })}
