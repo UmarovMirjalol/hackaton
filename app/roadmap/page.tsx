@@ -58,17 +58,24 @@ export default function RoadmapPage() {
               style={{ width: `${progress}%` }}
             />
           </div>
-          <div className="mt-5 flex gap-5 overflow-x-auto">
+          <div className="mt-5 flex gap-4 overflow-x-auto pb-1">
             {roadmapPicks.slice(0, 3).map((c) => (
-              <div key={c.university.id} className="flex min-w-[200px] shrink-0 gap-3">
+              <div
+                key={c.university.id}
+                className="flex min-w-[11.5rem] shrink-0 gap-3 sm:min-w-[13rem]"
+              >
                 <CampusThumb
                   universityId={c.university.id}
                   alt={c.university.shortName}
                   className="h-12 w-16 shrink-0"
                 />
-                <div className="self-center">
-                  <p className="text-[13px] font-medium">{c.university.shortName}</p>
-                  <p className="meta">Fit {c.fitIndex}</p>
+                <div className="min-w-0 self-center">
+                  <p className="text-[13px] font-medium leading-snug break-words">
+                    {c.university.shortName}
+                  </p>
+                  <p className="meta mt-0.5 leading-snug break-words">
+                    {c.university.city} · Fit {c.fitIndex}
+                  </p>
                 </div>
               </div>
             ))}
