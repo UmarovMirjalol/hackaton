@@ -18,6 +18,7 @@ function parseScore(value: string) {
 }
 
 function academicScore(profile: Profile, uni: University) {
+  if (!profile.field) return 40;
   let score = uni.programs.includes(profile.field) ? 86 : 28;
   if (profile.field === "undecided" && uni.programs.includes("undecided")) score = 78;
   if (profile.field === "economics" && uni.id === "lse") score = 96;
@@ -34,6 +35,10 @@ function academicScore(profile: Profile, uni: University) {
     if (gpa >= 38) score += 6;
     else if (gpa < 32) score -= 10;
   }
+  // Transparent activity signal: building-related text + building interest
+  if (profile.interests.includes("building") && activitySignals(profile).building) {
+    score += 4;
+  }
   return clamp(score);
 }
 
@@ -41,7 +46,7 @@ function aidScore(profile: Profile, uni: University) {
   const need = profile.aidNeed;
   const budget = parseScore(profile.annualBudget) ?? 0;
 
-  if (need === "none" || budget >= 50000) {
+  if (!need || need === "none" || budget >= 50000) {
     if (uni.aid.kind === "low-tuition") return 78;
     return 72;
   }
@@ -94,13 +99,26 @@ function locationScore(profile: Profile, uni: University) {
   return 18;
 }
 
+function activitySignals(profile: Profile) {
+  const text = `${profile.activities} ${profile.achievements}`.toLowerCase();
+  return {
+    research: /research|lab|olympiad|publication|science fair|urop|thesis|paper/.test(text),
+    building: /built|build|robot|coding|software|hackathon|app|maker|engineering club/.test(text),
+    any: Boolean(profile.activities.trim() || profile.achievements.trim()),
+  };
+}
+
 function researchScore(profile: Profile, uni: University) {
   const wantsResearch = profile.interests.includes("research");
-  if (!wantsResearch) return uni.research === "high" ? 64 : 70;
-  if (uni.research === "high") {
-    return profile.researchExperience ? 92 : 84;
-  }
-  return 52;
+  const signals = activitySignals(profile);
+  let score: number;
+  if (!wantsResearch) score = uni.research === "high" ? 64 : 70;
+  else if (uni.research === "high") score = profile.researchExperience ? 92 : 84;
+  else score = 52;
+
+  // Small transparent bump when the user described research-like work
+  if (wantsResearch && signals.research) score += 6;
+  return clamp(score);
 }
 
 function testingScore(profile: Profile, uni: University) {
@@ -164,22 +182,27 @@ function factorDetail(
     };
   }
   if (key === "research") {
+    const signals = activitySignals(profile);
     return {
       key,
       label: "Research",
       value: uni.research === "high" ? "Undergraduate research is normal here" : "More course-driven",
-      detail: uni.notes,
+      detail:
+        signals.research && profile.interests.includes("research")
+          ? `${uni.notes} Your activities/achievements text also mentions research-like work.`
+          : uni.notes,
       tone: score >= 75 ? "good" : "mixed",
     };
   }
   if (key === "academic") {
-    const overlap = uni.programs.includes(profile.field);
+    const fieldName = profile.field ? fieldLabels[profile.field] : "your field";
+    const overlap = Boolean(profile.field && uni.programs.includes(profile.field));
     return {
       key,
       label: "Academic fit",
       value: overlap
-        ? `Offers ${fieldLabels[profile.field]}`
-        : `${fieldLabels[profile.field]} is not a core programme`,
+        ? `Offers ${fieldName}`
+        : `${fieldName} is not a core programme`,
       detail: overlap
         ? `Listed against ${uni.shortName}'s undergraduate strengths.`
         : "This campus stays in the list only if other constraints still make it useful to investigate.",
@@ -212,30 +235,39 @@ function factorDetail(
 }
 
 function whyText(profile: Profile, uni: University, scores: Record<FactorKey, number>) {
-  const field = fieldLabels[profile.field].toLowerCase();
-  const aidNeed: Record<AidNeed, string> = {
+  const field = profile.field ? fieldLabels[profile.field].toLowerCase() : "your intended field";
+  const aidNeedLabels: Record<AidNeed, string> = {
     none: "you can fund the degree without institutional aid",
     some: "you will likely need some institutional help",
     substantial: "you need substantial aid or a low-tuition system",
     full: "you need a realistic full-aid or low-tuition path",
   };
+  const aidLabel = profile.aidNeed ? aidNeedLabels[profile.aidNeed] : "your aid preference";
 
   const aidClause =
     scores.aid >= 80
-      ? `${uni.shortName}'s funding model is one of the few in this catalog that can coexist with ${aidNeed[profile.aidNeed]}.`
+      ? `${uni.shortName}'s funding model is one of the few in this catalog that can coexist with ${aidLabel}.`
       : scores.aid >= 50
         ? `Aid is uncertain here — ${uni.aid.summary}`
         : `Treat this as a stretch on money: ${uni.aid.summary}`;
 
-  const academicClause = uni.programs.includes(profile.field)
-    ? `It stays on the list because ${field} is a real undergraduate path here`
-    : `Academic overlap with ${field} is thin`;
+  const academicClause =
+    profile.field && uni.programs.includes(profile.field)
+      ? `It stays on the list because ${field} is a real undergraduate path here`
+      : `Academic overlap with ${field} is thin`;
 
-  const researchClause = profile.interests.includes("research")
+  const signals = activitySignals(profile);
+  let researchClause = profile.interests.includes("research")
     ? uni.research === "high"
       ? "and research is structurally available to undergraduates."
       : "though research access is less central than at some peers."
     : "and it matches a more course- or career-led plan.";
+
+  if (signals.research && profile.interests.includes("research")) {
+    researchClause += " Your activities/achievements text supports that research direction.";
+  } else if (signals.building && profile.interests.includes("building")) {
+    researchClause += " Your activities text also shows building/making work.";
+  }
 
   return `${academicClause} ${researchClause} ${aidClause}`;
 }

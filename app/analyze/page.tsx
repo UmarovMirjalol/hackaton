@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
 import { synthesize } from "@/lib/diagnosis";
@@ -30,7 +30,7 @@ const STAGES = [
     id: "match",
     label: "Matching universities to your constraints",
     detail: (p: ReturnType<typeof useRoute>["profile"]) =>
-      `${fieldLabels[p.field]} · ${p.aidNeed} aid · ${p.countries.length} countries`,
+      `${p.field ? fieldLabels[p.field] : "Field unset"} · ${p.aidNeed || "aid unset"} · ${p.countries.length} countries`,
   },
   {
     id: "requirements",
@@ -50,6 +50,9 @@ export default function AnalyzePage() {
   const router = useRouter();
   const [stage, setStage] = useState(0);
   const [done, setDone] = useState(false);
+  const timersRef = useRef<number[]>([]);
+  const cancelledRef = useRef(false);
+  const navigatedRef = useRef(false);
 
   const diagnosis = useMemo(() => synthesize(profile), [profile]);
   const recs = useMemo(() => recommended(profile, 6), [profile]);
@@ -63,26 +66,56 @@ export default function AnalyzePage() {
   );
 
   useEffect(() => {
-    if (!hydrated) return;
+    cancelledRef.current = false;
+    navigatedRef.current = false;
+
+    const clearAll = () => {
+      for (const id of timersRef.current) window.clearTimeout(id);
+      timersRef.current = [];
+    };
+
+    const schedule = (fn: () => void, ms: number) => {
+      const id = window.setTimeout(() => {
+        timersRef.current = timersRef.current.filter((t) => t !== id);
+        if (cancelledRef.current) return;
+        fn();
+      }, ms);
+      timersRef.current.push(id);
+    };
+
+    if (!hydrated) return clearAll;
+
     if (!profileReady(profile)) {
       router.replace("/onboarding");
-      return;
+      return clearAll;
     }
 
     let i = 0;
     const tick = () => {
+      if (cancelledRef.current) return;
       i += 1;
       if (i < STAGES.length) {
         setStage(i);
-        window.setTimeout(tick, 520);
+        schedule(tick, 520);
       } else {
         setDone(true);
-        window.setTimeout(() => router.push("/results"), 480);
+        schedule(() => {
+          if (cancelledRef.current || navigatedRef.current) return;
+          navigatedRef.current = true;
+          router.push("/results");
+        }, 480);
       }
     };
-    const t = window.setTimeout(tick, 520);
-    return () => window.clearTimeout(t);
-  }, [hydrated, profile, router]);
+
+    schedule(tick, 520);
+
+    return () => {
+      cancelledRef.current = true;
+      clearAll();
+    };
+    // Intentionally omit `profile` object identity churn — only re-run when ready/hydrated flips.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated, profile.firstName, profile.field, profile.aidNeed, profile.countries.join(","), router]);
 
   return (
     <div className="min-h-dvh bg-background">
@@ -135,9 +168,7 @@ export default function AnalyzePage() {
                   >
                     {s.label}
                   </p>
-                  {shown ? (
-                    <p className="meta mt-1">{s.detail(profile)}</p>
-                  ) : null}
+                  {shown ? <p className="meta mt-1">{s.detail(profile)}</p> : null}
                 </div>
               </li>
             );

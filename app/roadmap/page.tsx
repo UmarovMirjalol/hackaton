@@ -43,6 +43,13 @@ export default function RoadmapPage() {
               document.getElementById("next")?.scrollIntoView({ behavior: "smooth", block: "start" })
             }
           />
+        ) : roadmap.length > 0 ? (
+          <NextUp
+            title="All roadmap tasks are complete"
+            detail={`${doneCount}/${roadmap.length} complete · ${progress}%`}
+            href="/results"
+            cta="Back to results"
+          />
         ) : undefined
       }
     >
@@ -211,8 +218,19 @@ export default function RoadmapPage() {
                       : "Reopen"}
                 </Button>
               </>
+            ) : roadmap.length > 0 ? (
+              <>
+                <h2 className="text-h1 mt-2">Route complete</h2>
+                <p className="body mt-3 text-secondary">
+                  Every task on this roadmap is marked done. There are no remaining actions in the
+                  current plan.
+                </p>
+                <p className="meta mt-4">
+                  {doneCount}/{roadmap.length} tasks complete
+                </p>
+              </>
             ) : (
-              <p className="body mt-3 text-secondary">All tasks complete.</p>
+              <p className="body mt-3 text-secondary">No tasks yet.</p>
             )}
           </div>
         </aside>

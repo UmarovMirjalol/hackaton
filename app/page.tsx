@@ -81,8 +81,8 @@ export default function LandingPage() {
         <div className="enter lg:col-span-7">
           <div className="overflow-hidden border border-border bg-surface shadow-[var(--shadow-panel)]">
             <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
-              <span className="text-[12px] font-medium">Results preview</span>
-              <span className="meta">Why-first recommendations</span>
+              <span className="text-[12px] font-medium">Static product example</span>
+              <span className="meta">Not your results</span>
             </div>
             {mit ? (
               <div className="relative aspect-[2.1/1] bg-surface-muted">
@@ -103,8 +103,8 @@ export default function LandingPage() {
                     Massachusetts Institute of Technology
                   </p>
                   <p className="mt-2 max-w-lg text-[13px] leading-5 text-white/90">
-                    Why it fits: quantitative CS path + need-based aid that can meet full
-                    demonstrated need for a full-aid applicant.
+                    Example of how a recommendation explains fit (sample copy for a full-aid CS
+                    applicant — not generated from your profile).
                   </p>
                 </div>
               </div>

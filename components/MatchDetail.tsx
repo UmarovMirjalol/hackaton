@@ -75,7 +75,7 @@ export function MatchDetail({
           </div>
 
           <div className="mt-6 space-y-2.5 border-t border-border pt-5 text-[13px]">
-            <Row k="Program" v={fieldLabels[profile.field]} />
+            <Row k="Program" v={profile.field ? fieldLabels[profile.field] : "—"} />
             <Row k="Intl tuition (demo)" v={`$${u.tuitionIntlUsd.toLocaleString()}/yr`} />
             <Row k="Aid" v={u.aid.summary} />
             <Row k="Application" v={u.application} />

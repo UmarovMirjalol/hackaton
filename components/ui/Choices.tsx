@@ -45,12 +45,12 @@ export function ChoiceGrid<T extends string>({
   options,
   multiple,
 }: {
-  value: T | T[];
+  value: T | T[] | "";
   onChange: (v: T | T[]) => void;
   options: { value: T; label: string; hint?: string }[];
   multiple?: boolean;
 }) {
-  const selected = Array.isArray(value) ? value : [value];
+  const selected = Array.isArray(value) ? value : value ? [value] : [];
   return (
     <div className="grid gap-2 sm:grid-cols-2">
       {options.map((opt) => {

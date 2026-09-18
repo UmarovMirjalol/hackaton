@@ -8,6 +8,7 @@ import { Field, Input, TextArea } from "@/components/ui/Field";
 import { cn } from "@/lib/cn";
 import {
   ONBOARDING_STEPS,
+  clampOnboardingStep,
   validateStep,
   type OnboardingStepId,
 } from "@/lib/onboarding";
@@ -25,12 +26,14 @@ import { countryLabels, fieldLabels } from "@/lib/universities";
 import Link from "next/link";
 
 export default function OnboardingPage() {
-  const { profile, setProfile, loadDemo, hydrated } = useRoute();
-  const [stepIndex, setStepIndex] = useState(0);
+  const { profile, setProfile, loadDemo, hydrated, onboardingStep, setOnboardingStep } = useRoute();
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const stepIndex = clampOnboardingStep(onboardingStep);
   const step = ONBOARDING_STEPS[stepIndex];
   const progress = ((stepIndex + 1) / ONBOARDING_STEPS.length) * 100;
+
+  const setStep = (i: number) => setOnboardingStep(clampOnboardingStep(i));
 
   const goNext = () => {
     const err = validateStep(step.id, profile);
@@ -43,7 +46,7 @@ export default function OnboardingPage() {
       router.push("/analyze");
       return;
     }
-    setStepIndex((i) => i + 1);
+    setStep(stepIndex + 1);
   };
 
   const goBack = () => {
@@ -52,7 +55,7 @@ export default function OnboardingPage() {
       router.push("/");
       return;
     }
-    setStepIndex((i) => i - 1);
+    setStep(stepIndex - 1);
   };
 
   const summary = useMemo(
@@ -60,8 +63,10 @@ export default function OnboardingPage() {
       [
         profile.firstName && `${profile.firstName} ${profile.lastName}`.trim(),
         profile.homeCountry,
-        fieldLabels[profile.field],
-        profile.countries.map((c) => countryLabels[c]).join(", "),
+        profile.field ? fieldLabels[profile.field] : null,
+        profile.countries.length
+          ? profile.countries.map((c) => countryLabels[c]).join(", ")
+          : null,
       ]
         .filter(Boolean)
         .join(" · "),
@@ -123,7 +128,7 @@ export default function OnboardingPage() {
                     type="button"
                     onClick={() => {
                       setError(null);
-                      setStepIndex(i);
+                      setStep(i);
                     }}
                     className={cn(
                       "flex w-full items-start gap-3 border-l-2 py-2.5 pl-4 text-left transition-colors",
@@ -441,11 +446,11 @@ function renderStep(
             <dl className="mt-4 grid gap-3 text-[13px] sm:grid-cols-2">
               <div>
                 <dt className="text-tertiary">Field</dt>
-                <dd className="font-medium">{fieldLabels[profile.field]}</dd>
+                <dd className="font-medium">{profile.field ? fieldLabels[profile.field] : "—"}</dd>
               </div>
               <div>
                 <dt className="text-tertiary">Aid</dt>
-                <dd className="font-medium capitalize">{profile.aidNeed}</dd>
+                <dd className="font-medium capitalize">{profile.aidNeed || "—"}</dd>
               </div>
               <div>
                 <dt className="text-tertiary">Countries</dt>

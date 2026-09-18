@@ -33,16 +33,16 @@ export default function ResultsPage() {
 
   const goCompare = (extraId?: string) => {
     const ids = [...compareIds];
-    if (extraId && !ids.includes(extraId) && ids.length < 3) ids.push(extraId);
-    if (ids.length < 2) {
-      for (const row of visible) {
-        if (ids.length >= 2) break;
-        if (!ids.includes(row.university.id)) ids.push(row.university.id);
-      }
+    if (extraId && !ids.includes(extraId) && ids.length < 3) {
+      ids.push(extraId);
+      flushSync(() => setCompareIds(ids));
     }
+    if (ids.length < 2) return;
     flushSync(() => setCompareIds(ids));
     router.push("/compare");
   };
+
+  const canCompare = compareIds.length >= 2;
 
   return (
     <AppShell
@@ -50,21 +50,33 @@ export default function ResultsPage() {
       title={`${profile.firstName || "Your"} personalized options`}
       lede={diagnosis.summary}
       action={
-        <Button variant="signal" onClick={() => goCompare()}>
-          Compare selected
-        </Button>
+        <div className="flex flex-col items-stretch gap-1 sm:items-end">
+          <Button variant="signal" onClick={() => goCompare()} disabled={!canCompare}>
+            Compare selected
+          </Button>
+          {!canCompare ? (
+            <p className="caption text-right">
+              {compareIds.length === 0
+                ? "Select 2 universities to compare"
+                : "Select one more university to compare"}
+            </p>
+          ) : null}
+        </div>
       }
       footer={
         <NextUp
           title={
-            compareIds.length >= 2
+            canCompare
               ? "Compare your shortlist"
-              : "Select two campuses, then compare"
+              : compareIds.length === 1
+                ? "Select one more campus to compare"
+                : "Select two campuses, then compare"
           }
           detail={`${compareIds.length} selected · ${visible.length} recommendations`}
           href="/compare"
           cta="Open compare"
           onClick={() => goCompare()}
+          disabled={!canCompare}
         />
       }
     >
@@ -96,8 +108,8 @@ export default function ResultsPage() {
               {profile.firstName} {profile.lastName}
             </p>
             <dl className="mt-4 space-y-2.5 text-[13px]">
-              <Row k="Field" v={fieldLabels[profile.field]} />
-              <Row k="Aid" v={profile.aidNeed} />
+              <Row k="Field" v={profile.field ? fieldLabels[profile.field] : "—"} />
+              <Row k="Aid" v={profile.aidNeed || "—"} />
               <Row k="Countries" v={profile.countries.map((c) => countryLabels[c]).join(", ")} />
               <Row k="Budget" v={`$${Number(profile.annualBudget || 0).toLocaleString()}/yr`} />
               {profile.satStatus === "done" ? (

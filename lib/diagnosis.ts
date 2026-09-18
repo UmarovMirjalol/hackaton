@@ -23,19 +23,20 @@ function gpaLine(profile: Profile) {
 }
 
 export function synthesize(profile: Profile): Diagnosis {
-  const field = fieldLabels[profile.field];
+  const field = profile.field ? fieldLabels[profile.field] : "Undeclared field";
   const research = profile.interests.includes("research");
   const building = profile.interests.includes("building");
 
-  const title = research && building
-    ? "Research-oriented builder"
-    : research
-      ? "Research-first applicant"
-      : building
-        ? "Builder looking for a technical path"
-        : profile.field === "economics"
-          ? "Quantitatively inclined social scientist"
-          : "Focused undergraduate applicant";
+  const title =
+    research && building
+      ? "Research-oriented builder"
+      : research
+        ? "Research-first applicant"
+        : building
+          ? "Builder looking for a technical path"
+          : profile.field === "economics"
+            ? "Quantitatively inclined social scientist"
+            : "Focused undergraduate applicant";
 
   const strengths: Diagnosis["strengths"] = [];
   const math = Number(profile.satMath);
@@ -59,7 +60,22 @@ export function synthesize(profile: Profile): Diagnosis {
   if (profile.researchExperience) {
     strengths.push({
       label: "Prior research experience",
-      evidence: "You marked undergraduate-style research as already done — that belongs in the diagnosis, not just the form.",
+      evidence:
+        "You marked undergraduate-style research as already done — that belongs in the diagnosis, not just the form.",
+    });
+  }
+
+  if (profile.activities.trim()) {
+    strengths.push({
+      label: "Activities on file",
+      evidence: profile.activities.trim(),
+    });
+  }
+
+  if (profile.achievements.trim()) {
+    strengths.push({
+      label: "Achievements on file",
+      evidence: profile.achievements.trim(),
     });
   }
 
@@ -92,7 +108,7 @@ export function synthesize(profile: Profile): Diagnosis {
     });
   }
 
-  if (profile.countries.length <= 2) {
+  if (profile.countries.length > 0 && profile.countries.length <= 2) {
     constraints.push({
       label: `Country list is tight (${profile.countries.length})`,
       evidence: "A short country list makes aid policy at each campus more decisive.",
@@ -114,16 +130,35 @@ export function synthesize(profile: Profile): Diagnosis {
 
   const gaps: string[] = [];
   if (!profile.gpa) gaps.push("No GPA yet — academic strength is inferred from tests and curriculum only.");
-  if (profile.satStatus === "planned") gaps.push("SAT is planned. U.S. recommendations assume a score will exist by application time.");
-  if (profile.englishExam === "none" && !["United States", "United Kingdom", "Canada", "Ireland", "Australia"].includes(profile.homeCountry)) {
+  if (profile.satStatus === "planned") {
+    gaps.push("SAT is planned. U.S. recommendations assume a score will exist by application time.");
+  }
+  if (
+    profile.englishExam === "none" &&
+    !["United States", "United Kingdom", "Canada", "Ireland", "Australia"].includes(profile.homeCountry)
+  ) {
     gaps.push("No English exam on file. UK, Dutch, and many Canadian programmes will still ask for one.");
   }
   if (!profile.researchExperience && research) {
-    gaps.push("You want research, but have not logged prior research. That is fine — the roadmap will treat it as something to show, not as a fact.");
+    gaps.push(
+      "You want research, but have not logged prior research. That is fine — the roadmap will treat it as something to show, not as a fact.",
+    );
+  }
+  if (!profile.activities.trim() && !profile.achievements.trim()) {
+    gaps.push("No activities or achievements text yet — matching relies more on academics and interests.");
   }
   if (!profile.firstName) gaps.push("Name is empty. The route still runs; documents will use a placeholder.");
 
-  const summary = `${profile.firstName || "This student"} is a ${profile.gradYear} applicant from ${profile.homeCountry || "an unspecified country"}, aiming at ${field.toLowerCase()} with ${profile.aidNeed === "full" ? "a full-aid constraint" : profile.aidNeed === "none" ? "no aid constraint" : "a partial aid constraint"}. Route is ranking campuses against those facts — not against a guessed admissions chance.`;
+  const aidPhrase =
+    profile.aidNeed === "full"
+      ? "a full-aid constraint"
+      : profile.aidNeed === "none"
+        ? "no aid constraint"
+        : profile.aidNeed
+          ? "a partial aid constraint"
+          : "aid preference still unset";
+
+  const summary = `${profile.firstName || "This student"} is a ${profile.gradYear} applicant from ${profile.homeCountry || "an unspecified country"}, aiming at ${field.toLowerCase()} with ${aidPhrase}. Route is ranking campuses against those facts — not against a guessed admissions chance.`;
 
   return { title, summary, strengths, constraints, goals, gaps };
 }

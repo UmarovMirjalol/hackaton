@@ -142,5 +142,5 @@ export function buildRoadmap(
 }
 
 export function nextTask(tasks: RoadmapTask[], status: Record<string, string>) {
-  return tasks.find((t) => status[t.id] !== "done") ?? tasks[0];
+  return tasks.find((t) => status[t.id] !== "done") ?? null;
 }

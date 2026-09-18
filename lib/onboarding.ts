@@ -96,7 +96,7 @@ export function validateStep(stepId: OnboardingStepId, p: Profile): string | nul
       if (!p.aidNeed) return "Select an aid preference.";
       return null;
     case "goals":
-      if (!p.firstName.trim() || !p.field || !p.countries.length) {
+      if (!p.firstName.trim() || !p.field || !p.countries.length || !p.aidNeed || !p.interests.length) {
         return "Finish earlier steps before analyzing.";
       }
       return null;
@@ -106,5 +106,18 @@ export function validateStep(stepId: OnboardingStepId, p: Profile): string | nul
 }
 
 export function profileReady(p: Profile) {
-  return Boolean(p.firstName.trim() && p.homeCountry.trim() && p.field && p.countries.length);
+  return Boolean(
+    p.firstName.trim() &&
+      p.homeCountry.trim() &&
+      p.field &&
+      p.countries.length &&
+      p.aidNeed &&
+      p.interests.length,
+  );
+}
+
+export function clampOnboardingStep(step: number) {
+  const max = ONBOARDING_STEPS.length - 1;
+  if (!Number.isFinite(step)) return 0;
+  return Math.min(max, Math.max(0, Math.floor(step)));
 }

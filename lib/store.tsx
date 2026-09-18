@@ -28,6 +28,7 @@ type Ctx = Persisted & {
   toggleCompare: (id: string) => void;
   setCompareIds: (ids: string[]) => void;
   setTaskStatus: (id: string, status: TaskStatus) => void;
+  setOnboardingStep: (step: number) => void;
   reset: () => void;
 };
 
@@ -60,13 +61,14 @@ export function RouteProvider({ children }: { children: ReactNode }) {
         writeStore({ ...cur, profile: { ...cur.profile, ...patch } });
       },
       replaceProfile: (profile: Profile) => {
-        writeStore({ profile, compareIds: [], taskStatus: {} });
+        writeStore({ profile, compareIds: [], taskStatus: {}, onboardingStep: 0 });
       },
       loadDemo: () => {
         writeStore({
           profile: { ...demoProfile },
           compareIds: [],
           taskStatus: {},
+          onboardingStep: 0,
         });
       },
       toggleCompare: (id: string) => {
@@ -84,6 +86,10 @@ export function RouteProvider({ children }: { children: ReactNode }) {
       setTaskStatus: (id: string, status: TaskStatus) => {
         const cur = getPersistedSnapshot();
         writeStore({ ...cur, taskStatus: { ...cur.taskStatus, [id]: status } });
+      },
+      setOnboardingStep: (step: number) => {
+        const cur = getPersistedSnapshot();
+        writeStore({ ...cur, onboardingStep: step });
       },
       reset: () => {
         writeStore(defaultPersisted);

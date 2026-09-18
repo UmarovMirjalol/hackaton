@@ -28,9 +28,11 @@ export type Profile = {
   englishExam: EnglishExam;
   englishScore: string;
   countries: CountryId[];
-  aidNeed: AidNeed;
+  /** Empty string = unanswered */
+  aidNeed: AidNeed | "";
   annualBudget: string;
-  field: Field;
+  /** Empty string = unanswered */
+  field: Field | "";
   interests: Interest[];
   researchExperience: boolean;
   recLettersStarted: boolean;
@@ -126,11 +128,11 @@ export const defaultProfile: Profile = {
   satStatus: "planned",
   englishExam: "none",
   englishScore: "",
-  countries: ["us", "ca"],
-  aidNeed: "full",
+  countries: [],
+  aidNeed: "",
   annualBudget: "0",
-  field: "cs",
-  interests: ["research", "building"],
+  field: "",
+  interests: [],
   researchExperience: false,
   recLettersStarted: false,
   activities: "",

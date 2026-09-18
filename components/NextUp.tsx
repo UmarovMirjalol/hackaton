@@ -9,6 +9,7 @@ export function NextUp({
   href,
   cta,
   onClick,
+  disabled,
 }: {
   label?: string;
   title: string;
@@ -16,6 +17,7 @@ export function NextUp({
   href: string;
   cta: string;
   onClick?: () => void;
+  disabled?: boolean;
 }) {
   return (
     <div className="sticky bottom-16 z-10 border-t border-border bg-surface/95 backdrop-blur-md md:bottom-0">
@@ -29,7 +31,7 @@ export function NextUp({
           {detail ? <p className="caption mt-0.5">{detail}</p> : null}
         </div>
         {onClick ? (
-          <Button onClick={onClick} className="shrink-0">
+          <Button onClick={onClick} className="shrink-0" disabled={disabled}>
             {cta}
           </Button>
         ) : (

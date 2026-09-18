@@ -6,12 +6,14 @@ export type Persisted = {
   profile: Profile;
   compareIds: string[];
   taskStatus: Record<string, TaskStatus>;
+  onboardingStep: number;
 };
 
 export const defaultPersisted: Persisted = {
   profile: defaultProfile,
   compareIds: [],
   taskStatus: {},
+  onboardingStep: 0,
 };
 
 const listeners = new Set<() => void>();
@@ -31,6 +33,7 @@ export function readStore(): Persisted | null {
       profile: { ...defaultProfile, ...parsed.profile },
       compareIds: parsed.compareIds ?? [],
       taskStatus: parsed.taskStatus ?? {},
+      onboardingStep: Number.isFinite(parsed.onboardingStep) ? Number(parsed.onboardingStep) : 0,
     };
   } catch {
     return null;

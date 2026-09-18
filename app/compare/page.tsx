@@ -29,7 +29,7 @@ export default function ComparePage() {
     <AppShell
       eyebrow="Compare"
       title="Tradeoffs, side by side"
-      lede={`${compare.length} campuses against your ${profile.aidNeed === "full" ? "full-aid" : "aid"} need and ${fieldLabels[profile.field] ?? profile.field} direction. No overall winner — only differences that matter.`}
+      lede={`${compare.length} campuses against your ${profile.aidNeed === "full" ? "full-aid" : profile.aidNeed || "aid"} need and ${profile.field ? fieldLabels[profile.field] : "field"} direction. No overall winner — only differences that matter.`}
       action={
         compare.length >= 2 ? (
           <Button href="/roadmap" variant="signal">
