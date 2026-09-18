@@ -142,7 +142,7 @@ export function fallbackDiagnosisExplanation(
 
   const constraintClause =
     constraints.length > 0
-      ? `while ${joinList(constraints.slice(0, 2))} shape what Route will filter for`
+      ? `with ${joinList(constraints.slice(0, 2))} as hard filters on the search`
       : "without hard constraints forcing an unusually narrow filter yet";
 
   const priorityClause =
