@@ -17,7 +17,7 @@ import {
   type GradYear,
   type Interest,
 } from "@/lib/types";
-import { countryLabels } from "@/lib/universities";
+import { countryLabels, fieldLabels } from "@/lib/universities";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
